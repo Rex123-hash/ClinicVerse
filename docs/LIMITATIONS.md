@@ -33,16 +33,17 @@ A policy that wins on TwinBench has not been shown to be useful in a hospital.
 - **Population.** PhysioNet/CinC 2012 is adult ICU patients with stays ≥48h, from a limited set
   of units. Results do not generalize to non-ICU, paediatric, or outpatient populations.
 - **Vintage.** The data reflects historical ICU practice, not current standards of care.
-- **Scale.** 12,000 patients, ~1,707 in-hospital deaths total. Confidence intervals on
+- **Scale.** 12,000 patients, 1,707 in-hospital deaths total. Confidence intervals on
   subgroup and per-budget-point metrics will be wide, and we report them rather than hiding them.
 - **Multiple comparisons.** Comparing ~8 policies across ~10 budget points invites false
   positives. Mitigated by pre-registered metrics, paired tests on identical patients/seeds, and
   bootstrap CIs — but not eliminated.
-- **Degenerate records.** 3 records in set-a have zero time-series observations; several more
+- **Degenerate records.** 3 records in set-a have zero valid time-series observations (they contain only `Weight,-1`, the missing sentinel); several more
   have fewer than 20. These are retained and flagged, not silently dropped.
 - **Naturally-missing cells are unrecoverable.** If a variable was never measured for a patient,
-  no policy can acquire it. Our acquirable set is strictly the observed support, which is itself
-  a biased sample of what could have been measured.
+  no disclosure can produce it. Under the support-blind protocol a policy may still *request*
+  it and is charged in full for nothing — which is the point — but the value cannot appear.
+  The historical support is itself a biased sample of what could have been measured.
 
 ## 4. Cost model limitations
 
@@ -53,9 +54,10 @@ real prices or as economic findings.**
 
 ## 5. Panel definitions are a simplification
 
-Our panel catalogue (BMP, CBC, LFT, ABG, …) approximates real ordering practice. Real ordering
-varies by institution, and some analytes appear in multiple panels. The catalogue is documented
-and configurable, but it is a model of practice, not practice itself.
+PhysioNet 2012 records analytes with timestamps; it does **not** record what was ordered.
+Our groups (`BMP_like`, `CBC_like`, `hepatic_like`, `ABG_like`) are co-measurement clusters
+that resemble familiar panels, not recovered laboratory orders. They are named `*-like`
+throughout and must be described that way. Real ordering varies by institution.
 
 ## 6. Uncertainty limitations
 
@@ -64,7 +66,12 @@ and configurable, but it is a model of practice, not practice itself.
   this benchmark varies. We report pattern-stratified coverage, including where it fails.
 - **ECE is a biased, inconsistent, binning-sensitive estimator** (Nixon 2019; Kumar 2019;
   Roelofs 2022). It is reported as secondary only, with equal-mass binning, bias correction and
-  bootstrap CIs. No conclusion rests on ECE alone; Brier and NLL are primary.
+  bootstrap CIs. No conclusion rests on ECE alone.
+- **Brier and log-loss are proper scoring rules, not pure calibration metrics.** They combine
+  calibration and refinement, so a better Brier does not by itself demonstrate better
+  calibration. Calibration slope and intercept, plus reliability curves, are the direct readouts.
+- **Conformal scope.** Split conformal is applied to the T3 scalar regression only. CP-MDA is a
+  regression method for missing covariates and is **not** applied to T1 classification.
 - Deep ensembles approximate epistemic uncertainty; they are not Bayesian posteriors.
 
 ## 7. Counterfactual limitations

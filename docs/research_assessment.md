@@ -1,8 +1,35 @@
 # Cliniverse — Research & Architecture Assessment
 
-**Status:** v1.0 — pre-implementation
+**Status:** v1.0 — **PARTIALLY SUPERSEDED, 2026-08-09, after independent review #0**
 **Date:** 2026-08-09
 **Author:** Research/ML engineering pass over the proposed project thesis
+
+> ## ⚠ Corrections — read before citing anything below
+>
+> This document is retained as a record of the initial assessment. Several of its
+> load-bearing claims have since been **disproved** and must not be reused.
+>
+> | Section | Claim | Status |
+> |---|---|---|
+> | §3.2(a) | Panel-structured acquisition is our contribution; "every AFA method surveyed acquires individual features at individual cost" | **FALSE.** Yu et al., ICLR 2023 (arXiv:2302.10261) already performs sequential panel-level acquisition with shared group costs on MIMIC-IV. Retracted. |
+> | §3.2(b) | A temporal clinical AFA benchmark is an open gap | **Weakened.** AFABench (2025) already benchmarks AFA including on PhysioNet 2012. |
+> | §5.1, §13 | 36 time-series variables | **WRONG — it is 37.** `Weight` is longitudinal and was misclassified as a static, which also caused a confirmed post-cutoff leak. See D-007. |
+> | §5.1 | "≥76.7% missing"; occupancy 23.28% | **Superseded.** That is a loose raw row-count bound including sentinel rows. Corrected raw bound 24.46%; the real production figure is **binned occupancy 20.25%, missingness 79.75%**. |
+> | §6.2 | Task T2 (LOS > 3 days) | **DROPPED** — arbitrary threshold, confounded by the discharge/death process. |
+> | §8 | CP-MDA for classification | **WRONG.** CP-MDA is a regression method for missing covariates; scope corrected. |
+> | §8 | Brier/NLL described as calibration metrics | **Imprecise.** They are proper scoring rules combining calibration and refinement. |
+> | §9 | "clinician-inspired heuristic" | **Renamed** to "fixed domain-motivated ordering" — no clinician designed or validated it. |
+> | §10, §15 | "set-c is locked / never touched" | **Reworded** to "quarantined from model fitting and model selection following an aggregate cohort audit". |
+> | §15 | Comparisons via non-overlapping standalone CIs | **Replaced** by paired patient-level inference on ΔAUBC. |
+>
+> **Current authoritative documents:**
+> [`REVIEW_RESPONSE_0.md`](REVIEW_RESPONSE_0.md) (findings and verification) ·
+> [`NOVELTY_REASSESSMENT.md`](NOVELTY_REASSESSMENT.md) (what we may claim) ·
+> [`BENCHMARK_SPEC.md`](BENCHMARK_SPEC.md) (estimand and information boundary) ·
+> [`DECISIONS.md`](DECISIONS.md) D-007/D-008/D-009.
+>
+> §1–2 (literature survey), §4.1 (the AFAPE risk), §5 (dataset access), §11–12 (GCP and
+> components not to build) remain valid.
 
 > **Reading note.** This document is deliberately adversarial toward our own proposal.
 > Its purpose is to establish what is defensible *before* code is written. Section 3 concludes

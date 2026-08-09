@@ -25,8 +25,14 @@ from cliniverse.exceptions import DataError
 SET_A_RECORDS = 4000
 SET_A_DEATHS = 554
 SET_A_DEGENERATE = {140501, 140936, 141264}
-N_TIMESERIES_VARIABLES = 36
-RAW_OCCUPANCY_UPPER_BOUND = 0.2328
+#: 37, not 36. `Weight` is longitudinal in this dataset and was previously
+#: misclassified as a static descriptor; see tests/test_leakage.py.
+N_TIMESERIES_VARIABLES = 37
+#: Raw row-count bound recomputed with Weight included as a time series (24.46%).
+#: This is a loose upper bound, NOT the reported missingness statistic: it counts
+#: raw rows including `-1` sentinels and multiple readings that collapse into one
+#: hour-cell. The production figure is `Cohort.describe()['grid_occupancy']`.
+RAW_OCCUPANCY_UPPER_BOUND = 0.2446
 
 
 # --------------------------------------------------------------- parsing ----

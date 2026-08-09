@@ -1,0 +1,217 @@
+{
+  "cutoff_hours": 24,
+  "sets": [
+    "a",
+    "b"
+  ],
+  "n_patients": 8000,
+  "prevalence": 0.14025,
+  "n_folds": 5,
+  "seed": 20260809,
+  "results": {
+    "availability_only::logreg": {
+      "view": "availability_only",
+      "model": "logreg",
+      "n_features": 113,
+      "auroc": 0.7223745891599919,
+      "auroc_ci": [
+        0.7071290128034882,
+        0.7375651262685368
+      ],
+      "auprc": 0.26952942721241374,
+      "auprc_ci": [
+        0.24931810107295824,
+        0.29211776871738737
+      ],
+      "brier": 0.11266451463814688,
+      "fit_seconds": 0.5
+    },
+    "availability_only::gbdt": {
+      "view": "availability_only",
+      "model": "gbdt",
+      "n_features": 113,
+      "auroc": 0.7187013905194635,
+      "auroc_ci": [
+        0.7029834620379241,
+        0.733463705864683
+      ],
+      "auprc": 0.2587769924705849,
+      "auprc_ci": [
+        0.24015498101210736,
+        0.2821868277529766
+      ],
+      "brier": 0.11306766803879806,
+      "fit_seconds": 3.2
+    },
+    "values_only::logreg": {
+      "view": "values_only",
+      "model": "logreg",
+      "n_features": 185,
+      "auroc": 0.8007688364409711,
+      "auroc_ci": [
+        0.7875612075604761,
+        0.8143211226528957
+      ],
+      "auprc": 0.40802905383047633,
+      "auprc_ci": [
+        0.37968358764451376,
+        0.437648637834146
+      ],
+      "brier": 0.10225141652706328,
+      "fit_seconds": 0.7
+    },
+    "values_only::gbdt": {
+      "view": "values_only",
+      "model": "gbdt",
+      "n_features": 185,
+      "auroc": 0.8183726925965608,
+      "auroc_ci": [
+        0.8066002350205683,
+        0.8308928644934125
+      ],
+      "auprc": 0.42845896732663374,
+      "auprc_ci": [
+        0.39973756719271175,
+        0.45954376184979767
+      ],
+      "brier": 0.09918015080522306,
+      "fit_seconds": 3.5
+    },
+    "statics_only::logreg": {
+      "view": "statics_only",
+      "model": "logreg",
+      "n_features": 5,
+      "auroc": 0.632669445424949,
+      "auroc_ci": [
+        0.613731749600367,
+        0.6511511762069044
+      ],
+      "auprc": 0.22093275195829826,
+      "auprc_ci": [
+        0.2025417324472435,
+        0.2424923592524324
+      ],
+      "brier": 0.11710722951165914,
+      "fit_seconds": 0.0
+    },
+    "statics_only::gbdt": {
+      "view": "statics_only",
+      "model": "gbdt",
+      "n_features": 5,
+      "auroc": 0.6691726546549255,
+      "auroc_ci": [
+        0.65278575713927,
+        0.6865039281864015
+      ],
+      "auprc": 0.2236679565497349,
+      "auprc_ci": [
+        0.20603091175189392,
+        0.24306371539582702
+      ],
+      "brier": 0.115877554071872,
+      "fit_seconds": 0.3
+    },
+    "availability+statics::logreg": {
+      "view": "availability+statics",
+      "model": "logreg",
+      "n_features": 118,
+      "auroc": 0.7514489869013242,
+      "auroc_ci": [
+        0.736380098063955,
+        0.7651778250220836
+      ],
+      "auprc": 0.3033046886520889,
+      "auprc_ci": [
+        0.2804777132873513,
+        0.3277996150935315
+      ],
+      "brier": 0.10966211395169935,
+      "fit_seconds": 0.5
+    },
+    "availability+statics::gbdt": {
+      "view": "availability+statics",
+      "model": "gbdt",
+      "n_features": 118,
+      "auroc": 0.7510036132669251,
+      "auroc_ci": [
+        0.7357657444912349,
+        0.764819835047237
+      ],
+      "auprc": 0.3050555521015914,
+      "auprc_ci": [
+        0.2816570563271777,
+        0.3317640158054808
+      ],
+      "brier": 0.10925927555811278,
+      "fit_seconds": 1.3
+    },
+    "values+statics::logreg": {
+      "view": "values+statics",
+      "model": "logreg",
+      "n_features": 190,
+      "auroc": 0.8093740589100902,
+      "auroc_ci": [
+        0.7964234961096431,
+        0.822175198020811
+      ],
+      "auprc": 0.4138072337713922,
+      "auprc_ci": [
+        0.38656765458691517,
+        0.4433286768415194
+      ],
+      "brier": 0.10130296544986081,
+      "fit_seconds": 0.6
+    },
+    "values+statics::gbdt": {
+      "view": "values+statics",
+      "model": "gbdt",
+      "n_features": 190,
+      "auroc": 0.8335385913597775,
+      "auroc_ci": [
+        0.8220168914685917,
+        0.8439102292037984
+      ],
+      "auprc": 0.4514589322880367,
+      "auprc_ci": [
+        0.42166162862269535,
+        0.48105150458628376
+      ],
+      "brier": 0.09658031951686792,
+      "fit_seconds": 3.6
+    },
+    "all::logreg": {
+      "view": "all",
+      "model": "logreg",
+      "n_features": 303,
+      "auroc": 0.8180530783779847,
+      "auroc_ci": [
+        0.8062160874405798,
+        0.8301005888447591
+      ],
+      "auprc": 0.42932490371949605,
+      "auprc_ci": [
+        0.40200377834944756,
+        0.45874862576609576
+      ],
+      "brier": 0.10009657287257669,
+      "fit_seconds": 1.0
+    },
+    "all::gbdt": {
+      "view": "all",
+      "model": "gbdt",
+      "n_features": 303,
+      "auroc": 0.8363063351645875,
+      "auroc_ci": [
+        0.8254298919803879,
+        0.8471990410883928
+      ],
+      "auprc": 0.4565412437403001,
+      "auprc_ci": [
+        0.4258543444404798,
+        0.48573581194155196
+      ],
+      "brier": 0.0960849041219629,
+      "fit_seconds": 7.7
+    }
+  }
+}

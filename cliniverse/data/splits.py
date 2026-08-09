@@ -28,8 +28,9 @@ IntArray = npt.NDArray[np.int64]
 DEVELOPMENT_SETS: Final = ("a", "b")
 LOCKED_SET: Final = "c"
 
-#: Required by :func:`final_holdout`. Deliberately awkward to type by accident.
-UNLOCK_TOKEN: Final = "I_HAVE_FINISHED_ALL_MODEL_SELECTION"
+#: Required by :func:`final_holdout`. Not a secret — a deliberate speed bump, so
+#: that touching the quarantined holdout is always an explicit, greppable act.
+UNLOCK_TOKEN: Final = "I_HAVE_FINISHED_ALL_MODEL_SELECTION"  # noqa: S105
 
 
 @dataclasses.dataclass(frozen=True, slots=True)

@@ -15,8 +15,11 @@ from cliniverse.exceptions import ConfigError
 def test_config_loads_expected_shape(variable_config: VariableConfig) -> None:
     assert variable_config.dataset == "physionet-cinc-2012"
     assert variable_config.horizon_hours == 48
-    assert len(variable_config.variables) == 36
+    # 37 time-series variables: Weight is longitudinal, not a static descriptor.
+    assert len(variable_config.variables) == 37
     assert len(variable_config.statics) == 5
+    assert "Weight" in variable_config.variables
+    assert "AdmissionWeight" in variable_config.statics
 
 
 def test_variable_order_is_sorted_and_stable(variable_config: VariableConfig) -> None:

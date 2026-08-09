@@ -58,7 +58,13 @@ class Repair(BaseModel):
 
 
 class VariableSpec(BaseModel):
-    """Schema for one measured variable."""
+    """Schema for one measured variable.
+
+    For statics, ``source_parameter`` names the raw parameter it is read from and
+    ``at_hour`` pins the only hour at which that reading may be taken. This is a
+    leakage control: without it, a parameter recorded repeatedly through the stay
+    (``Weight``) silently delivers post-cutoff values into a "static" feature.
+    """
 
     model_config = ConfigDict(frozen=True)
 
@@ -66,6 +72,8 @@ class VariableSpec(BaseModel):
     unit: str
     plausible: tuple[float, float]
     kind: VariableKind
+    source_parameter: str | None = None
+    at_hour: int | None = Field(default=None, ge=0)
 
     @model_validator(mode="after")
     def _check_bounds(self) -> VariableSpec:
@@ -109,23 +117,54 @@ class VariableConfig(BaseModel):
         wanted = set(kinds)
         return tuple(n for n in self.variable_names if self.variables[n].kind in wanted)
 
-    def clean(self, name: str, value: float) -> float | None:
-        """Repair then validate a single raw reading.
+    @property
+    def static_sources(self) -> dict[str, tuple[str, int]]:
+        """Map raw parameter name -> (static field name, the only admissible hour).
 
-        Returns the cleaned value, or ``None`` if it is implausible and must be
-        treated as missing. Unknown variable names return ``None`` rather than
-        raising: the raw files contain occasional undeclared parameters.
+        A raw parameter absent from this map can never populate a static field.
         """
-        spec = self.variables.get(name) or self.statics.get(name)
-        if spec is None:
-            return None
+        out: dict[str, tuple[str, int]] = {}
+        for name, spec in self.statics.items():
+            source = spec.source_parameter or name
+            hour = 0 if spec.at_hour is None else spec.at_hour
+            out[source] = (name, hour)
+        return out
+
+    def _clean_with(self, spec: VariableSpec, raw_name: str, value: float) -> float | None:
         if value == -1.0 and spec.kind in ("demographic", "context"):
             return None  # dataset's static missing sentinel
-        for repair in self.repairs.get(name, ()):
+        for repair in self.repairs.get(raw_name, ()):
             if repair.matches(value):
                 value = repair.apply(value)
                 break
         return value if spec.is_plausible(value) else None
+
+    def clean(self, name: str, value: float) -> float | None:
+        """Repair then validate a single raw *time-series* reading.
+
+        Returns the cleaned value, or ``None`` if it is implausible and must be
+        treated as missing. Unknown names return ``None`` rather than raising:
+        the raw files contain occasional undeclared parameters.
+        """
+        spec = self.variables.get(name) or self.statics.get(name)
+        if spec is None:
+            return None
+        return self._clean_with(spec, name, value)
+
+    def clean_static(self, raw_name: str, value: float) -> tuple[str, float] | None:
+        """Repair and validate a raw reading destined for a static field.
+
+        Returns ``(static_field_name, cleaned_value)``, or ``None`` if the
+        parameter is not a static source or the value is implausible. The caller
+        is responsible for enforcing the hour constraint from
+        :attr:`static_sources`.
+        """
+        target = self.static_sources.get(raw_name)
+        if target is None:
+            return None
+        field, _ = target
+        cleaned = self._clean_with(self.statics[field], raw_name, value)
+        return None if cleaned is None else (field, cleaned)
 
 
 def _load_yaml(path: pathlib.Path) -> dict[str, Any]:

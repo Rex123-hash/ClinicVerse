@@ -6,8 +6,13 @@ supersede rather than silently edit.
 ---
 
 ## D-001 — Reframe the project's claimed contribution
-**Status:** ACCEPTED (project owner, 2026-08-09)
+**Status:** **SUPERSEDED BY D-008** (2026-08-09, after independent review #0)
 **Date:** 2026-08-09
+
+> **Why superseded.** D-001 claimed panel-level, shared-cost acquisition as our contribution.
+> Yu et al., ICLR 2023 (arXiv:2302.10261) already does exactly this — sequential panel selection
+> (CBC, CMP) with shared group costs on MIMIC-IV, clinical endpoints, and Pareto cost-performance
+> curves. The claim is void. See `docs/REVIEW_RESPONSE_0.md` §1 and D-008 below.
 
 **Context.** The brief names "active information acquisition applied to a longitudinal patient
 world model" as the defining innovation.
@@ -57,8 +62,14 @@ discrete acquisition events. Established literature baselines exist for the mort
 ---
 
 ## D-003 — Masking-on-observed-support evaluation protocol
-**Status:** ACCEPTED
+**Status:** **AMENDED BY D-009** (2026-08-09)
 **Date:** 2026-08-09
+
+> **Amendment.** The rule "naturally-missing cells are permanently unavailable and never
+> acquirable" is superseded. Under D-009 a policy may *request* any panel; an unavailable request
+> costs full price and discloses nothing. Forbidding the request would itself tell the policy which
+> panels hold hidden values — the exact support leak that invalidates the benchmark. The rest of
+> D-003 (synthetic, seeded, disclosed mechanism; ground truth by construction) stands.
 
 **Context.** AFAPE (von Kleist et al., JMLR 26) shows estimating deployed AFA performance from
 retrospective data requires No-Direct-Effect and No-Unobserved-Confounding. **NUC is false in
@@ -126,3 +137,97 @@ Python being 3.14.4.
 **Why.** Verified on PyPI: torch has no Windows cp314 wheel yet. xgboost 3.4.0 and lightgbm
 4.7.0 ship `py3-none-win_amd64` and would be fine either way, so torch is the binding
 constraint. 3.12 has universal wheel coverage for the whole stack.
+
+---
+
+## D-007 — Weight is a time-series variable; statics are pinned to hour 0
+**Status:** ACCEPTED
+**Date:** 2026-08-09
+
+**Context.** independent review #0 flagged that `Weight` was treated as a static descriptor despite
+being recorded longitudinally. Verified in set-a: of 129,165 `Weight` rows, only 4.1% are at
+hour 0; 95.9% come later and 52.1% are at hour >= 24, affecting 2,726 of 4,000 patients. The
+parser tested `param in statics` before looking at the timestamp, so a model with a 24h cutoff
+received weights measured as late as hour 47.
+
+**Broader audit.** `Age`, `Gender`, `Height`, `ICUType` and `RecordID` each appear exactly 4,000
+times in set-a, all at hour 0. Weight was the only offender.
+
+**Decision.**
+1. `Weight` becomes a time-series variable, giving **37**, not 36.
+2. A new static `AdmissionWeight` is declared with `source_parameter: Weight, at_hour: 0`.
+3. The parser resolves **time before routing**: a static may be populated only at its pinned hour.
+4. Statics sourced from a parameter that is also a time series are **derived from the binned grid
+   cell**, because parsing them separately made the two views disagree for 1.76% of patients
+   (statics took the last hour-0 row; binning takes the within-hour mean).
+5. `tests/test_leakage.py` asserts the general property "no model input may depend on post-cutoff
+   data", so any future variable of this shape is caught automatically.
+
+**Consequences.** Corrected statistics: 37 variables; binned occupancy 20.25% (missingness
+79.75%); raw row-count upper bound 24.46%. The raw bound counts sentinel rows and within-hour
+collisions and is never reported as the missingness statistic.
+
+**Alternatives rejected.** *Keep Weight static but take its first value.* Rejected: it would still
+require trusting parse order, and it discards a genuinely longitudinal signal.
+
+---
+
+## D-008 — Revised contribution: measuring availability-driven bias in acquisition evaluation
+**Status:** ACCEPTED (supersedes D-001)
+**Date:** 2026-08-09
+
+**Context.** D-001's panel-level novelty claim is void (Yu et al., ICLR 2023). A second novelty
+search confirmed that active sensing, EIG acquisition, longitudinal AFA, AFA benchmarking on
+PhysioNet 2012, informative missingness, and calibration under missing modalities are all
+established. See `docs/NOVELTY_REASSESSMENT.md`.
+
+**Decision.** The project's question becomes:
+
+> When an acquisition policy is evaluated by replaying a historical ICU record, how much of its
+> measured benefit comes from information it acquired, and how much from knowing which tests the
+> clinician chose to order?
+
+Method: evaluate identical policies under **support-aware** and **support-blind** disclosure on
+identical patients, masks and seeds; report paired ΔAUBC; test whether policy rankings survive
+four cost regimes.
+
+**Empirical basis (already executed, E-002).** At a 24h cutoff on 8,000 patients, a model using
+only which tests were ordered — no measured value at all — reaches AUROC **0.7224 [0.707, 0.738]**
+versus 0.8184 values-only and 0.8363 full. Availability recovers 65-70% of the full model's
+discrimination above chance.
+
+**What we may claim.** That we *quantify* the gap on open data with an assumption-light protocol,
+and test ranking stability. **What we may not claim:** that we discovered informative missingness
+(Agniel 2018; JAMA Netw Open 2019), that we identified availability-shift evaluation bias
+(von Kleist et al., JMLR 26), or anything involving the words *first*, *novel panel acquisition*,
+or *clinically costed panels*.
+
+**Honest characterisation.** This is a measurement contribution, not a new method.
+
+**Alternatives rejected.** Uncertainty-gated abstention (L2M 2025 overlaps; method-heavy); full
+AFAPE DM/IPW/DRL estimators (require the NUC assumption that fails here); pattern-conditional
+calibration as the thesis (MOSAIC 2026 overlaps) — retained as secondary analysis.
+
+---
+
+## D-009 — Benchmark is disclosure replay, not prospective ordering
+**Status:** ACCEPTED
+**Date:** 2026-08-09
+
+**Context.** the reviewer correctly observed that "at t=24h, buy a panel" was undefined: it can neither
+re-order a past observation nor reveal future data without leakage.
+
+**Decision.** The benchmark is **sequential selective disclosure (replay) of historically recorded
+panel-like events**. At epoch k with boundary t_k, a purchase discloses only hidden values with
+timestamp <= t_k. Targets lie strictly beyond the final boundary. Formal specification in
+`docs/BENCHMARK_SPEC.md`.
+
+**Binding wording rule.** We do not describe this as prospective or temporal test ordering.
+
+**Unavailable requests cost full price and disclose nothing.** This is what makes synthetically
+hidden and naturally missing indistinguishable to the policy; free failed probes would let a
+policy reconstruct the historical ordering pattern, which is precisely the signal E-002 shows is
+worth AUROC 0.72.
+
+**Alternatives rejected.** *Genuine prospective epochs.* Not achievable on retrospective data
+without the counterfactual "what would this untaken test have shown", which is unidentifiable here.

@@ -26,7 +26,12 @@ BASE_URL = "https://physionet.org/files/challenge-2012/1.0.0"
 OUTCOME_FILES = ("Outcomes-a.txt", "Outcomes-b.txt", "Outcomes-c.txt")
 
 # Recorded once at 00:00; not part of the time-series signal.
-STATIC_PARAMS = frozenset({"RecordID", "Age", "Gender", "Height", "ICUType", "Weight"})
+#
+# `Weight` is deliberately NOT in this set. It is recorded repeatedly through the
+# stay (95.9% of set-a Weight rows are after hour 0), so it is a time-series
+# variable, giving 37 rather than 36. Excluding it was an error in the first
+# version of this script and in the parser it was written to check.
+STATIC_PARAMS = frozenset({"RecordID", "Age", "Gender", "Height", "ICUType"})
 
 
 def _download(url: str, dest: pathlib.Path) -> pathlib.Path:

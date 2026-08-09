@@ -95,7 +95,153 @@ panel-level acquisition framing in `research_assessment.md` §3.2(a).
 
 ---
 
-## Planned next run
+## E-001 — Empirical derivation of the laboratory panel catalogue
 
-**E-001** — baseline tier 0/1 on task T1 (in-hospital mortality at the 24h decision point).
+- **Date:** 2026-08-09
+- **Status:** COMPLETE
+- **Command:** `python experiments/baselines/derive_panels.py --sets a b --threshold 0.35`
+- **Git SHA:** recorded in commit for this milestone
+- **Purpose:** The panel-level acquisition framing rests on a factual claim — that
+  laboratory analytes are ordered *in groups, as single events*. This run tests that claim
+  instead of assuming it.
+
+### Method
+
+For every `(patient, hour)` cell in which at least one of the 23 laboratory analytes was
+measured (**86,559 ordering events** across sets a+b, n=8,000 patients), record which analytes
+were measured together. Compute pairwise Jaccard co-measurement,
+`P(i and j | i or j)`, then agglomeratively cluster (average linkage) on Jaccard distance.
+
+**No clinical panel definitions were supplied to the clustering.** Recovery of recognised
+panels is therefore evidence, not construction.
+
+### Result — clusters at Jaccard distance threshold 0.35
+
+| Derived cluster | Members | Mean within-cluster Jaccard | Corresponds to |
+|---|---|---|---|
+| 1 | pH, PaCO2, PaO2 | **0.969** | Arterial blood gas (ABG) |
+| 6 | ALP, ALT, AST, Bilirubin | **0.934** | Hepatic function panel (LFT) |
+| 4 | BUN, Creatinine, Glucose, HCO3, K, Mg, Na | **0.861** | Basic metabolic panel (BMP) |
+| 5 | HCT, Platelets, WBC | **0.782** | Complete blood count (CBC) |
+| singletons | SaO2, Lactate, Albumin, TroponinT, TroponinI, Cholesterol | — | Individual sends |
+
+The unsupervised clustering recovers the four standard clinical panels exactly.
+
+### Threshold sensitivity
+
+| Threshold | Behaviour |
+|---|---|
+| 0.50 | BMP and CBC merge into one 10-analyte cluster (Jaccard 0.753) — consistent with a combined morning ICU draw |
+| **0.35** | **BMP, CBC, LFT, ABG recovered exactly — adopted as the operating point** |
+| 0.25 | Stable, except HCT peels off CBC leaving {Platelets, WBC} at 0.909 |
+| 0.15 | BMP fragments: K and Mg separate, leaving {BUN, Creatinine, Glucose, HCO3, Na} at 0.919 |
+
+The three primary panels (ABG, LFT, BMP-core) are stable across the whole 0.15–0.50 range.
+
+### Strongest pairwise co-measurement
+
+| Jaccard | Pair | | Jaccard | Pair |
+|---|---|---|---|---|
+| 0.995 | PaCO2–PaO2 | | 0.956 | PaO2–pH |
+| 0.991 | BUN–Creatinine | | 0.953 | ALP–AST |
+| 0.979 | ALT–AST | | 0.953 | Creatinine–HCO3 |
+| 0.957 | PaCO2–pH | | 0.945 | ALP–ALT |
+| 0.957 | BUN–HCO3 | | 0.929 | HCO3–Na |
+
+### Findings that changed the design
+
+1. **The panel claim is supported.** Within-panel co-measurement of 0.78–0.97 means treating
+   these analytes as independently acquirable features — as all surveyed AFA benchmarks do —
+   misrepresents how the data is generated. This is the empirical basis for
+   `research_assessment.md` §3.2(a).
+2. **SaO2 is not part of ABG in this dataset.** It separated from the ABG cluster at every
+   threshold (marginal draw frequency 0.176 vs 0.536 for pH). Assuming it belonged to ABG on
+   clinical intuition would have been wrong; it is modelled as a singleton send.
+3. **Albumin is not part of the hepatic panel here**, despite the clinical association. Also
+   modelled as a singleton.
+
+### Output
+
+`experiments/baselines/results/panel_derivation.json` (full Jaccard and conditional matrices),
+consumed by `configs/panels.yaml`.
+
+---
+
+## E-002 — Availability vs values: how much of ICU mortality prediction is clinician behaviour?
+
+- **Date:** 2026-08-09
+- **Status:** COMPLETE
+- **Command:** `python experiments/baselines/availability_ablation.py --cutoff 24 --folds 5`
+- **Purpose:** The mandatory mask-only baseline (independent review #0, finding 11). Measures how much
+  discrimination is available from *which tests were ordered* alone, with no measured value.
+- **Setup:** Task T1 (in-hospital mortality), 24h decision point, 5-fold stratified CV on sets
+  a+b, **n = 8,000**, prevalence **14.03%**. Imputation and scaling fit on training rows only.
+  Bootstrap CIs, 1,000 resamples. Run **after** the Weight leakage fix (D-007), so no feature
+  depends on post-cutoff data.
+
+### Feature views
+
+Three **disjoint** blocks, so each can be trained on alone:
+
+- **availability** — per-variable observation counts, ever-measured flags, hours since last
+  observation, plus totals. **Contains no measured value.**
+- **values** — per-variable last / mean / min / max / slope. **Contains no mask indicator.**
+- **statics** — Age, Gender, Height, ICUType, AdmissionWeight.
+
+### Results
+
+| Feature view | Model | #feat | AUROC | 95% CI | AUPRC | Brier |
+|---|---|---|---|---|---|---|
+| **availability only** | logreg | 113 | **0.7224** | [0.707, 0.738] | 0.2695 | 0.1127 |
+| **availability only** | gbdt | 113 | 0.7187 | [0.703, 0.733] | 0.2588 | 0.1131 |
+| values only | logreg | 185 | 0.8008 | [0.788, 0.814] | 0.4080 | 0.1023 |
+| values only | gbdt | 185 | 0.8184 | [0.807, 0.831] | 0.4285 | 0.0992 |
+| statics only | logreg | 5 | 0.6327 | [0.614, 0.651] | 0.2209 | 0.1171 |
+| statics only | gbdt | 5 | 0.6692 | [0.653, 0.687] | 0.2237 | 0.1159 |
+| availability + statics | logreg | 118 | 0.7514 | [0.736, 0.765] | 0.3033 | 0.1097 |
+| availability + statics | gbdt | 118 | 0.7510 | [0.736, 0.765] | 0.3051 | 0.1093 |
+| values + statics | gbdt | 190 | 0.8335 | [0.822, 0.844] | 0.4515 | 0.0966 |
+| **all** | gbdt | 303 | **0.8363** | [0.825, 0.847] | 0.4565 | 0.0961 |
+
+### Finding
+
+**A model that sees no laboratory or vital value whatsoever — only which tests were ordered, how
+often, and how recently — reaches AUROC 0.7224.** Relative to the full model's discrimination
+above chance, availability alone recovers **69.9%** (logreg) and **65.0%** (gbdt).
+
+Adding measured values on top of availability moves the full model from 0.7510 to 0.8363, so
+values do carry substantial independent signal. The point is not that values are useless; it is
+that the *ordering pattern by itself* is worth most of the model's apparent skill.
+
+### Consistency with prior work
+
+Directionally consistent with published results and slightly stronger, as expected for a shorter
+horizon: JAMA Netw Open (2019) reports AUROC ≈ 0.684 using missingness indicators alone for
+30-day mortality. **The phenomenon is established prior art — we are not claiming to have
+discovered it.** What it establishes *for this project* is that the acquirable support in a
+retrospective acquisition benchmark is itself a strong predictor, which is why the support-blind
+protocol (D-009, `BENCHMARK_SPEC.md` §5) is necessary rather than merely tidy.
+
+### Caveats
+
+- Availability features are computed on the 24h-truncated cohort; recency is measured to the
+  cutoff, so no post-cutoff information is used.
+- `HistGradientBoosting` handles NaN natively but is given the same imputation path as logistic
+  regression so that views differ only in their features.
+- These are out-of-fold predictions on development data (sets a+b). **set-c is quarantined.**
+
+### Output
+
+`experiments/baselines/results/availability_ablation.json` plus out-of-fold predictions in
+`availability_ablation.oof.npz`, retained for later paired comparisons.
+
+---
+
+## Planned next runs
+
+**E-003** — T1 clinical baselines: prevalence, SAPS-I, SOFA as single-feature predictors, for
+comparison against the model tiers above.
+**E-004** — support-aware vs support-blind disclosure, paired ΔAUBC across policies and cost
+regimes (the primary pre-registered comparison in `BENCHMARK_SPEC.md` §3).
+
 No numbers will be recorded here until executed.

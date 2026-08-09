@@ -144,9 +144,16 @@ def parse_record(
     Returns ``(statics, observations)`` where ``observations`` is a list of
     ``(hour, variable, cleaned_value)``. Readings that are implausible after
     repair, or that fall outside the horizon, are dropped.
+
+    Routing is decided by *time first*. A parameter may populate a static field
+    only at the hour pinned in the schema (hour 0); at any later hour the same
+    parameter is a time-series observation. Without this rule ``Weight`` — which
+    is recorded throughout the stay — silently delivered post-cutoff values into
+    a "static" feature. See ``configs/variables.yaml`` and docs/DECISIONS.md D-007.
     """
     statics: dict[str, float] = {}
     observations: list[tuple[int, str, float]] = []
+    static_sources = config.static_sources
 
     with path.open("r", encoding="utf-8", newline="") as fh:
         reader = csv.reader(fh)
@@ -167,16 +174,28 @@ def parse_record(
             except ValueError:
                 continue
 
+            hour = _parse_time(raw_time)
+            if hour is None:
+                continue
+
+            # Time-first routing. A static field may only be populated at its
+            # pinned hour; the same parameter observed later is time series.
+            target = static_sources.get(param)
+            if target is not None and hour == target[1]:
+                resolved = config.clean_static(param, value)
+                # First value wins, so repeated rows cannot make parsing order
+                # significant. For parameters that are also time series, this
+                # value is later superseded by the binned grid cell (see
+                # `load_cohort`) so that both views agree by construction.
+                if resolved is not None and resolved[0] not in statics:
+                    statics[resolved[0]] = resolved[1]
+                # Fall through: an hour-0 reading of a longitudinal parameter is
+                # also a genuine observation at hour 0.
+
+            if param not in config.variables or hour >= config.horizon_hours:
+                continue
             cleaned = config.clean(param, value)
             if cleaned is None:
-                continue
-
-            if param in config.statics:
-                statics[param] = cleaned
-                continue
-
-            hour = _parse_time(raw_time)
-            if hour is None or hour >= config.horizon_hours:
                 continue
             observations.append((hour, param, cleaned))
 
@@ -222,6 +241,7 @@ def load_cohort(
     static_names = config.static_names
     var_index = {name: i for i, name in enumerate(var_names)}
     static_index = {name: i for i, name in enumerate(static_names)}
+    static_source_map = config.static_sources
     n_hours = config.horizon_hours
 
     record_ids: list[int] = []
@@ -285,6 +305,22 @@ def load_cohort(
                 if col is not None:
                     static_vec[col] = np.float32(value)
                     static_mask[col] = True
+
+            # Single source of truth: where a static is sourced from a parameter
+            # that is *also* a time-series variable (Weight), take it from the
+            # binned grid cell at its pinned hour. Parsing it separately would
+            # let the two views disagree whenever an hour holds several readings
+            # — which happens for 1.76% of set-a patients.
+            for raw, (field, hour) in static_source_map.items():
+                col_v, col_s = var_index.get(raw), static_index.get(field)
+                if col_v is None or col_s is None or hour >= n_hours:
+                    continue
+                if mask[hour, col_v]:
+                    static_vec[col_s] = values[hour, col_v]
+                    static_mask[col_s] = True
+                else:
+                    static_vec[col_s] = np.float32(np.nan)
+                    static_mask[col_s] = False
 
             record_ids.append(rid)
             source.append(which)

@@ -52,9 +52,7 @@ class Cohort:
         if self.m.shape != self.x.shape:
             raise DataError(f"mask shape {self.m.shape} != values shape {self.x.shape}")
         if len(self.variable_names) != v:
-            raise DataError(
-                f"{len(self.variable_names)} variable names for {v} value columns"
-            )
+            raise DataError(f"{len(self.variable_names)} variable names for {v} value columns")
         if len(self.static_names) != self.statics.shape[1]:
             raise DataError("static name count does not match statics width")
         for name, arr in (
@@ -118,9 +116,7 @@ class Cohort:
         """
         if not 0 < hours <= self.n_hours:
             raise DataError(f"hours must be in 1..{self.n_hours}, got {hours}")
-        return dataclasses.replace(
-            self, x=self.x[:, :hours, :], m=self.m[:, :hours, :]
-        )
+        return dataclasses.replace(self, x=self.x[:, :hours, :], m=self.m[:, :hours, :])
 
     # ------------------------------------------------------------ summary ----
     def observation_counts(self) -> IntArray:
