@@ -1,7 +1,7 @@
 # Cliniverse — Status
 
 **Updated:** 2026-08-09
-**Current milestone:** M2 (baselines) — M0 and M1 complete.
+**Current milestone:** M2 complete — decision gate reached, awaiting sign-off before M3.
 
 ## Where we are
 
@@ -62,8 +62,30 @@ python scripts/verify_physionet2012.py
 | Unavailable requests charged in full | `test_successful_and_empty_requests_cost_the_same` |
 | Works end-to-end on real data | Repaired E-003: explicit oracle, uniform-all, and training-frequency baselines |
 
+## M2 exit criteria — all met
+
+| Criterion | Evidence |
+|---|---|
+| Three binding representations on identical splits | `mask_only` / `values_only` / `values_mask`, E-004 |
+| Prevalence floor | AUROC 0.4994 [0.4840, 0.5152] |
+| LR and GBDT for each representation | 13 runs in `results/m2/results.json` |
+| Tuning on development data only | Nested inner-validation selection; set-c never loaded |
+| Paired inference, not overlapping CIs | `paired_bootstrap_difference`, 2,000 patient resamples |
+| Calibration slope/intercept + reliability | Reported per run; reliability figure from artifacts |
+| Machine-readable artifacts with provenance | git SHA, cohort fingerprint, split hash, config hash, per-fold hyperparameters, raw OOF predictions |
+| Figures generated from artifacts | `results/m2/figures/` |
+| E-002 reproduced under a comparable protocol | mask-only 0.7278/0.7280 vs 0.7223745892 |
+
+## Key M2 result
+
+Mask-only reaches **AUROC 0.7278** with no clinical values. But values dominate
+(VALUES ONLY − MASK ONLY = **+0.095** AUROC, GBDT), and explicit mask features add only
+**+0.0090** on top of values. Meanwhile median-versus-stochastic imputation is worth **+0.0145** —
+larger than the entire mask block. Pre-declared **Outcome B**; the strong measurement-shortcut
+framing is not supported and has been restated.
+
 ## Next actions
 
-M2 — baselines on T1 with the full metric suite, including the **directly comparable tuned
-full-value baseline** required before any ratio against the E-002 availability-only figure may
-be stated.
+**STOP at the M2 decision gate.** M3 (uncertainty/calibration) begins only after sign-off. The
+report recommends carrying imputation strategy as an experimental axis into M3/M4, and identifies
+calibration under budget pressure (H3) as the strongest remaining open question.

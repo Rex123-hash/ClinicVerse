@@ -17,6 +17,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+figures = [
+    "matplotlib>=3.8",
+]
 models = [
     "xgboost>=2.1",
     "lightgbm>=4.3",

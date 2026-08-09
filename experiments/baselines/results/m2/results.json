@@ -1,0 +1,2785 @@
+{
+  "runs": [
+    {
+      "cutoff_hours": 24,
+      "hyperparameters": {},
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.14808572065425302,
+          "ci_low": 0.13186497234459568,
+          "n_boot": 2000,
+          "point": 0.14010026737967915
+        },
+        "auroc": {
+          "ci_high": 0.5152452919683354,
+          "ci_low": 0.48402775830917144,
+          "n_boot": 2000,
+          "point": 0.4993780059804725
+        },
+        "brier": {
+          "ci_high": 0.1259758590259552,
+          "ci_low": 0.11545060440330508,
+          "n_boot": 2000,
+          "point": 0.12057999023437503
+        },
+        "nll": {
+          "ci_high": 0.419014800322143,
+          "ci_low": 0.3924895394026362,
+          "n_boot": 2000,
+          "point": 0.4054172668242668
+        }
+      },
+      "metrics": {
+        "auprc": 0.14010026737967915,
+        "auroc": 0.4993780059804725,
+        "brier": 0.12057999023437503,
+        "calibration_intercept": -0.4229813181012835,
+        "calibration_slope": 0.7669545383686586,
+        "n": 8000,
+        "nll": 0.4054172668242668,
+        "prevalence": 0.14025
+      },
+      "model": "constant",
+      "n_features": 0,
+      "per_fold_selection": [],
+      "provenance": {
+        "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+        "config_hash": "a80e2d2829a09a95489f5ae047839c8333ce9bf90642979c2cf588f316905fd0",
+        "excluded_sets": [
+          "c"
+        ],
+        "git_dirty": true,
+        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "n_patients": 8000,
+        "platform": "Windows-11-10.0.26100-SP0",
+        "python": "3.12.13",
+        "sets": [
+          "a",
+          "b"
+        ],
+        "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775",
+        "task": "T1_in_hospital_mortality"
+      },
+      "reliability": {
+        "count": [
+          3200.0,
+          4800.0
+        ],
+        "mean_predicted": [
+          0.14015625,
+          0.14031250000000003
+        ],
+        "observed_rate": [
+          0.140625,
+          0.14
+        ]
+      },
+      "representation": "prevalence",
+      "run_id": "prevalence",
+      "search_space": {},
+      "seed": 20260809,
+      "selection_metric": "inner_validation_auroc"
+    },
+    {
+      "cutoff_hours": 24,
+      "hyperparameters": {
+        "per_fold": [
+          {
+            "fold": 0,
+            "inner_validation_auroc": 0.7235606060606061,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 1,
+            "inner_validation_auroc": 0.7322323232323232,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 2,
+            "inner_validation_auroc": 0.7026515151515151,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.1
+            }
+          },
+          {
+            "fold": 3,
+            "inner_validation_auroc": 0.7241410804804165,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 4,
+            "inner_validation_auroc": 0.7290122235245764,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          }
+        ]
+      },
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.301787128259281,
+          "ci_low": 0.2569883956598629,
+          "n_boot": 2000,
+          "point": 0.27825013772553187
+        },
+        "auroc": {
+          "ci_high": 0.7423122893732672,
+          "ci_low": 0.7128101913851572,
+          "n_boot": 2000,
+          "point": 0.727788140025367
+        },
+        "brier": {
+          "ci_high": 0.11631649150604752,
+          "ci_low": 0.10674021801351455,
+          "n_boot": 2000,
+          "point": 0.11140950999883946
+        },
+        "nll": {
+          "ci_high": 0.37866400342358336,
+          "ci_low": 0.3529123383749127,
+          "n_boot": 2000,
+          "point": 0.36574508538963674
+        }
+      },
+      "metrics": {
+        "auprc": 0.27825013772553187,
+        "auroc": 0.727788140025367,
+        "brier": 0.11140950999883946,
+        "calibration_intercept": -0.0026185979937789557,
+        "calibration_slope": 0.9997244720248895,
+        "n": 8000,
+        "nll": 0.36574508538963674,
+        "prevalence": 0.14025
+      },
+      "model": "logreg",
+      "n_features": 113,
+      "per_fold_selection": [
+        {
+          "fold": 0,
+          "inner_validation_auroc": 0.7235606060606061,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 1,
+          "inner_validation_auroc": 0.7322323232323232,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 2,
+          "inner_validation_auroc": 0.7026515151515151,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.1
+          }
+        },
+        {
+          "fold": 3,
+          "inner_validation_auroc": 0.7241410804804165,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 4,
+          "inner_validation_auroc": 0.7290122235245764,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        }
+      ],
+      "provenance": {
+        "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+        "config_hash": "a80e2d2829a09a95489f5ae047839c8333ce9bf90642979c2cf588f316905fd0",
+        "excluded_sets": [
+          "c"
+        ],
+        "fit_seconds": 1.5046766999876127,
+        "git_dirty": true,
+        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "imputation": "median",
+        "n_patients": 8000,
+        "platform": "Windows-11-10.0.26100-SP0",
+        "python": "3.12.13",
+        "sets": [
+          "a",
+          "b"
+        ],
+        "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775",
+        "task": "T1_in_hospital_mortality"
+      },
+      "reliability": {
+        "count": [
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0
+        ],
+        "mean_predicted": [
+          0.02489980225699053,
+          0.04485718335365543,
+          0.06144238263833481,
+          0.08056086023699262,
+          0.10248792948690508,
+          0.12942278886766503,
+          0.16013446078510227,
+          0.19628454722860092,
+          0.24879140208647652,
+          0.3558769640962026
+        ],
+        "observed_rate": [
+          0.015,
+          0.025,
+          0.06875,
+          0.07875,
+          0.11125,
+          0.145,
+          0.17375,
+          0.1975,
+          0.245,
+          0.3425
+        ]
+      },
+      "representation": "mask_only",
+      "run_id": "mask_only::logreg",
+      "search_space": {
+        "C": [
+          0.01,
+          0.1,
+          1.0,
+          10.0
+        ]
+      },
+      "seed": 20260809,
+      "selection_metric": "inner_validation_auroc"
+    },
+    {
+      "cutoff_hours": 24,
+      "hyperparameters": {
+        "per_fold": [
+          {
+            "fold": 0,
+            "inner_validation_auroc": 0.735459595959596,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 112,
+              "learning_rate": 0.05,
+              "max_depth": 3,
+              "min_child_weight": 1
+            }
+          },
+          {
+            "fold": 1,
+            "inner_validation_auroc": 0.7397575757575757,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 214,
+              "learning_rate": 0.05,
+              "max_depth": 3,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 2,
+            "inner_validation_auroc": 0.7103989898989899,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 31,
+              "learning_rate": 0.1,
+              "max_depth": 5,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 3,
+            "inner_validation_auroc": 0.7458252781879348,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 68,
+              "learning_rate": 0.1,
+              "max_depth": 3,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 4,
+            "inner_validation_auroc": 0.7510135529406989,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 123,
+              "learning_rate": 0.05,
+              "max_depth": 5,
+              "min_child_weight": 10
+            }
+          }
+        ]
+      },
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.2965325122971729,
+          "ci_low": 0.2533036513393693,
+          "n_boot": 2000,
+          "point": 0.27344049527724185
+        },
+        "auroc": {
+          "ci_high": 0.7417899647492618,
+          "ci_low": 0.713298551690923,
+          "n_boot": 2000,
+          "point": 0.7280498958419181
+        },
+        "brier": {
+          "ci_high": 0.1165003617028976,
+          "ci_low": 0.10675442312567486,
+          "n_boot": 2000,
+          "point": 0.11163899788424221
+        },
+        "nll": {
+          "ci_high": 0.3777321711504349,
+          "ci_low": 0.3522457975834651,
+          "n_boot": 2000,
+          "point": 0.36518678426709067
+        }
+      },
+      "metrics": {
+        "auprc": 0.27344049527724185,
+        "auroc": 0.7280498958419181,
+        "brier": 0.11163899788424221,
+        "calibration_intercept": 0.013905845191743593,
+        "calibration_slope": 1.001705049854211,
+        "n": 8000,
+        "nll": 0.36518678426709067,
+        "prevalence": 0.14025
+      },
+      "model": "xgboost",
+      "n_features": 113,
+      "per_fold_selection": [
+        {
+          "fold": 0,
+          "inner_validation_auroc": 0.735459595959596,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 112,
+            "learning_rate": 0.05,
+            "max_depth": 3,
+            "min_child_weight": 1
+          }
+        },
+        {
+          "fold": 1,
+          "inner_validation_auroc": 0.7397575757575757,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 214,
+            "learning_rate": 0.05,
+            "max_depth": 3,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 2,
+          "inner_validation_auroc": 0.7103989898989899,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 31,
+            "learning_rate": 0.1,
+            "max_depth": 5,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 3,
+          "inner_validation_auroc": 0.7458252781879348,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 68,
+            "learning_rate": 0.1,
+            "max_depth": 3,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 4,
+          "inner_validation_auroc": 0.7510135529406989,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 123,
+            "learning_rate": 0.05,
+            "max_depth": 5,
+            "min_child_weight": 10
+          }
+        }
+      ],
+      "provenance": {
+        "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+        "config_hash": "a80e2d2829a09a95489f5ae047839c8333ce9bf90642979c2cf588f316905fd0",
+        "excluded_sets": [
+          "c"
+        ],
+        "fit_seconds": 6.723191800061613,
+        "git_dirty": true,
+        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "imputation": "median",
+        "n_patients": 8000,
+        "platform": "Windows-11-10.0.26100-SP0",
+        "python": "3.12.13",
+        "sets": [
+          "a",
+          "b"
+        ],
+        "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775",
+        "task": "T1_in_hospital_mortality"
+      },
+      "reliability": {
+        "count": [
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0
+        ],
+        "mean_predicted": [
+          0.019798973904689775,
+          0.0443869842030108,
+          0.06256917200051249,
+          0.08105526641011238,
+          0.10358895406126976,
+          0.12925750616937876,
+          0.15839835589751602,
+          0.19477547554299235,
+          0.24451449137181044,
+          0.35174959260970357
+        ],
+        "observed_rate": [
+          0.01125,
+          0.035,
+          0.05125,
+          0.07625,
+          0.1225,
+          0.15125,
+          0.165,
+          0.21125,
+          0.26375,
+          0.315
+        ]
+      },
+      "representation": "mask_only",
+      "run_id": "mask_only::xgboost",
+      "search_space": {
+        "learning_rate": [
+          0.05,
+          0.1
+        ],
+        "max_depth": [
+          3,
+          5
+        ],
+        "min_child_weight": [
+          1,
+          10
+        ]
+      },
+      "seed": 20260809,
+      "selection_metric": "inner_validation_auroc"
+    },
+    {
+      "cutoff_hours": 24,
+      "hyperparameters": {
+        "per_fold": [
+          {
+            "fold": 0,
+            "inner_validation_auroc": 0.7880757575757575,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 1,
+            "inner_validation_auroc": 0.8045858585858586,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 2,
+            "inner_validation_auroc": 0.8081464646464646,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 3,
+            "inner_validation_auroc": 0.8149650647709801,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 4,
+            "inner_validation_auroc": 0.8425200046681788,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          }
+        ]
+      },
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.4564451832543738,
+          "ci_low": 0.3980986479888451,
+          "n_boot": 2000,
+          "point": 0.427255812763912
+        },
+        "auroc": {
+          "ci_high": 0.821889497063205,
+          "ci_low": 0.796393021198878,
+          "n_boot": 2000,
+          "point": 0.8094580928937701
+        },
+        "brier": {
+          "ci_high": 0.10435579156931114,
+          "ci_low": 0.09513030270300858,
+          "n_boot": 2000,
+          "point": 0.09969691897532452
+        },
+        "nll": {
+          "ci_high": 0.3407342209720498,
+          "ci_low": 0.31488865092170704,
+          "n_boot": 2000,
+          "point": 0.32764926614914497
+        }
+      },
+      "metrics": {
+        "auprc": 0.427255812763912,
+        "auroc": 0.8094580928937701,
+        "brier": 0.09969691897532452,
+        "calibration_intercept": -0.03661265997215347,
+        "calibration_slope": 0.9785467746243162,
+        "n": 8000,
+        "nll": 0.32764926614914497,
+        "prevalence": 0.14025
+      },
+      "model": "logreg",
+      "n_features": 185,
+      "per_fold_selection": [
+        {
+          "fold": 0,
+          "inner_validation_auroc": 0.7880757575757575,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 1,
+          "inner_validation_auroc": 0.8045858585858586,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 2,
+          "inner_validation_auroc": 0.8081464646464646,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 3,
+          "inner_validation_auroc": 0.8149650647709801,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 4,
+          "inner_validation_auroc": 0.8425200046681788,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        }
+      ],
+      "provenance": {
+        "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+        "config_hash": "a80e2d2829a09a95489f5ae047839c8333ce9bf90642979c2cf588f316905fd0",
+        "excluded_sets": [
+          "c"
+        ],
+        "fit_seconds": 1.8235484999604523,
+        "git_dirty": true,
+        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "imputation": "median",
+        "n_patients": 8000,
+        "platform": "Windows-11-10.0.26100-SP0",
+        "python": "3.12.13",
+        "sets": [
+          "a",
+          "b"
+        ],
+        "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775",
+        "task": "T1_in_hospital_mortality"
+      },
+      "reliability": {
+        "count": [
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0
+        ],
+        "mean_predicted": [
+          0.015156246029724879,
+          0.028537862515674722,
+          0.041422235041396596,
+          0.05710713133895592,
+          0.07478221634426868,
+          0.09789739342682313,
+          0.130270523076008,
+          0.18108382366016118,
+          0.2683341380610687,
+          0.5126406704007153
+        ],
+        "observed_rate": [
+          0.01375,
+          0.015,
+          0.03875,
+          0.04,
+          0.06125,
+          0.10125,
+          0.14875,
+          0.22,
+          0.28875,
+          0.475
+        ]
+      },
+      "representation": "values_only",
+      "run_id": "values_only::logreg",
+      "search_space": {
+        "C": [
+          0.01,
+          0.1,
+          1.0,
+          10.0
+        ]
+      },
+      "seed": 20260809,
+      "selection_metric": "inner_validation_auroc"
+    },
+    {
+      "cutoff_hours": 24,
+      "hyperparameters": {
+        "per_fold": [
+          {
+            "fold": 0,
+            "inner_validation_auroc": 0.8136313131313132,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 155,
+              "learning_rate": 0.05,
+              "max_depth": 5,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 1,
+            "inner_validation_auroc": 0.8227676767676768,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 54,
+              "learning_rate": 0.1,
+              "max_depth": 5,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 2,
+            "inner_validation_auroc": 0.8226919191919192,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 202,
+              "learning_rate": 0.05,
+              "max_depth": 3,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 3,
+            "inner_validation_auroc": 0.833932077999178,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 127,
+              "learning_rate": 0.1,
+              "max_depth": 3,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 4,
+            "inner_validation_auroc": 0.8433267877348677,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 160,
+              "learning_rate": 0.1,
+              "max_depth": 5,
+              "min_child_weight": 10
+            }
+          }
+        ]
+      },
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.4782583338341067,
+          "ci_low": 0.41513379083568985,
+          "n_boot": 2000,
+          "point": 0.44550089924448905
+        },
+        "auroc": {
+          "ci_high": 0.8352122220552362,
+          "ci_low": 0.8108743104836268,
+          "n_boot": 2000,
+          "point": 0.8233003106341799
+        },
+        "brier": {
+          "ci_high": 0.10172010461454624,
+          "ci_low": 0.0926922602741459,
+          "n_boot": 2000,
+          "point": 0.09722159859344669
+        },
+        "nll": {
+          "ci_high": 0.3303331750805165,
+          "ci_low": 0.30414939610193137,
+          "n_boot": 2000,
+          "point": 0.3174423023528335
+        }
+      },
+      "metrics": {
+        "auprc": 0.44550089924448905,
+        "auroc": 0.8233003106341799,
+        "brier": 0.09722159859344669,
+        "calibration_intercept": -0.008098831285421023,
+        "calibration_slope": 0.95404131830366,
+        "n": 8000,
+        "nll": 0.3174423023528335,
+        "prevalence": 0.14025
+      },
+      "model": "xgboost",
+      "n_features": 185,
+      "per_fold_selection": [
+        {
+          "fold": 0,
+          "inner_validation_auroc": 0.8136313131313132,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 155,
+            "learning_rate": 0.05,
+            "max_depth": 5,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 1,
+          "inner_validation_auroc": 0.8227676767676768,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 54,
+            "learning_rate": 0.1,
+            "max_depth": 5,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 2,
+          "inner_validation_auroc": 0.8226919191919192,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 202,
+            "learning_rate": 0.05,
+            "max_depth": 3,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 3,
+          "inner_validation_auroc": 0.833932077999178,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 127,
+            "learning_rate": 0.1,
+            "max_depth": 3,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 4,
+          "inner_validation_auroc": 0.8433267877348677,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 160,
+            "learning_rate": 0.1,
+            "max_depth": 5,
+            "min_child_weight": 10
+          }
+        }
+      ],
+      "provenance": {
+        "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+        "config_hash": "a80e2d2829a09a95489f5ae047839c8333ce9bf90642979c2cf588f316905fd0",
+        "excluded_sets": [
+          "c"
+        ],
+        "fit_seconds": 22.512959400075488,
+        "git_dirty": true,
+        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "imputation": "median",
+        "n_patients": 8000,
+        "platform": "Windows-11-10.0.26100-SP0",
+        "python": "3.12.13",
+        "sets": [
+          "a",
+          "b"
+        ],
+        "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775",
+        "task": "T1_in_hospital_mortality"
+      },
+      "reliability": {
+        "count": [
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0
+        ],
+        "mean_predicted": [
+          0.008057953182142228,
+          0.01673985367291607,
+          0.027114198710769415,
+          0.04091851844452322,
+          0.05909909793175757,
+          0.08489176629111171,
+          0.12357464011758566,
+          0.1835470547899604,
+          0.2857278336025775,
+          0.5196719756349921
+        ],
+        "observed_rate": [
+          0.0075,
+          0.00875,
+          0.0225,
+          0.05125,
+          0.06125,
+          0.10125,
+          0.15625,
+          0.1925,
+          0.30625,
+          0.495
+        ]
+      },
+      "representation": "values_only",
+      "run_id": "values_only::xgboost",
+      "search_space": {
+        "learning_rate": [
+          0.05,
+          0.1
+        ],
+        "max_depth": [
+          3,
+          5
+        ],
+        "min_child_weight": [
+          1,
+          10
+        ]
+      },
+      "seed": 20260809,
+      "selection_metric": "inner_validation_auroc"
+    },
+    {
+      "cutoff_hours": 24,
+      "hyperparameters": {
+        "per_fold": [
+          {
+            "fold": 0,
+            "inner_validation_auroc": 0.8070353535353537,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 1,
+            "inner_validation_auroc": 0.81939898989899,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 2,
+            "inner_validation_auroc": 0.8134090909090909,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 3,
+            "inner_validation_auroc": 0.8150462504883828,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 4,
+            "inner_validation_auroc": 0.8408658456760993,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          }
+        ]
+      },
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.4805724274549277,
+          "ci_low": 0.42047117771459547,
+          "n_boot": 2000,
+          "point": 0.45106787821618904
+        },
+        "auroc": {
+          "ci_high": 0.8359357457969212,
+          "ci_low": 0.8120673412533632,
+          "n_boot": 2000,
+          "point": 0.8240222124430939
+        },
+        "brier": {
+          "ci_high": 0.10148066701729946,
+          "ci_low": 0.09237147816628954,
+          "n_boot": 2000,
+          "point": 0.09692278383979426
+        },
+        "nll": {
+          "ci_high": 0.33139106332488966,
+          "ci_low": 0.305025643446319,
+          "n_boot": 2000,
+          "point": 0.3182473264676031
+        }
+      },
+      "metrics": {
+        "auprc": 0.45106787821618904,
+        "auroc": 0.8240222124430939,
+        "brier": 0.09692278383979426,
+        "calibration_intercept": -0.056669932982435244,
+        "calibration_slope": 0.964686697532711,
+        "n": 8000,
+        "nll": 0.3182473264676031,
+        "prevalence": 0.14025
+      },
+      "model": "logreg",
+      "n_features": 298,
+      "per_fold_selection": [
+        {
+          "fold": 0,
+          "inner_validation_auroc": 0.8070353535353537,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 1,
+          "inner_validation_auroc": 0.81939898989899,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 2,
+          "inner_validation_auroc": 0.8134090909090909,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 3,
+          "inner_validation_auroc": 0.8150462504883828,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 4,
+          "inner_validation_auroc": 0.8408658456760993,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        }
+      ],
+      "provenance": {
+        "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+        "config_hash": "a80e2d2829a09a95489f5ae047839c8333ce9bf90642979c2cf588f316905fd0",
+        "excluded_sets": [
+          "c"
+        ],
+        "fit_seconds": 3.182334400014952,
+        "git_dirty": true,
+        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "imputation": "median",
+        "n_patients": 8000,
+        "platform": "Windows-11-10.0.26100-SP0",
+        "python": "3.12.13",
+        "sets": [
+          "a",
+          "b"
+        ],
+        "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775",
+        "task": "T1_in_hospital_mortality"
+      },
+      "reliability": {
+        "count": [
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0
+        ],
+        "mean_predicted": [
+          0.009780476963071588,
+          0.020202775011912165,
+          0.03214231045155143,
+          0.04769711163461238,
+          0.0680438217244126,
+          0.09481276750805925,
+          0.13331328046987675,
+          0.18766127145788986,
+          0.28020715816548486,
+          0.5347037419258318
+        ],
+        "observed_rate": [
+          0.0125,
+          0.01375,
+          0.01875,
+          0.04125,
+          0.06125,
+          0.105,
+          0.145,
+          0.205,
+          0.285,
+          0.515
+        ]
+      },
+      "representation": "values_mask",
+      "run_id": "values_mask::logreg",
+      "search_space": {
+        "C": [
+          0.01,
+          0.1,
+          1.0,
+          10.0
+        ]
+      },
+      "seed": 20260809,
+      "selection_metric": "inner_validation_auroc"
+    },
+    {
+      "cutoff_hours": 24,
+      "hyperparameters": {
+        "per_fold": [
+          {
+            "fold": 0,
+            "inner_validation_auroc": 0.8142272727272727,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 245,
+              "learning_rate": 0.05,
+              "max_depth": 3,
+              "min_child_weight": 1
+            }
+          },
+          {
+            "fold": 1,
+            "inner_validation_auroc": 0.832570707070707,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 130,
+              "learning_rate": 0.05,
+              "max_depth": 5,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 2,
+            "inner_validation_auroc": 0.8312676767676768,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 131,
+              "learning_rate": 0.05,
+              "max_depth": 5,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 3,
+            "inner_validation_auroc": 0.8357689048554133,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 270,
+              "learning_rate": 0.05,
+              "max_depth": 3,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 4,
+            "inner_validation_auroc": 0.8450367619076614,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 150,
+              "learning_rate": 0.05,
+              "max_depth": 5,
+              "min_child_weight": 1
+            }
+          }
+        ]
+      },
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.49328511932824,
+          "ci_low": 0.4331010075172296,
+          "n_boot": 2000,
+          "point": 0.4627366876427224
+        },
+        "auroc": {
+          "ci_high": 0.844153151489846,
+          "ci_low": 0.8206026126709642,
+          "n_boot": 2000,
+          "point": 0.8322695939778538
+        },
+        "brier": {
+          "ci_high": 0.09999782592193188,
+          "ci_low": 0.09118391020300172,
+          "n_boot": 2000,
+          "point": 0.09561057125776751
+        },
+        "nll": {
+          "ci_high": 0.32400528209360113,
+          "ci_low": 0.29889361391186675,
+          "n_boot": 2000,
+          "point": 0.3116007628442892
+        }
+      },
+      "metrics": {
+        "auprc": 0.4627366876427224,
+        "auroc": 0.8322695939778538,
+        "brier": 0.09561057125776751,
+        "calibration_intercept": 0.10432804870496955,
+        "calibration_slope": 1.0176316923425892,
+        "n": 8000,
+        "nll": 0.3116007628442892,
+        "prevalence": 0.14025
+      },
+      "model": "xgboost",
+      "n_features": 298,
+      "per_fold_selection": [
+        {
+          "fold": 0,
+          "inner_validation_auroc": 0.8142272727272727,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 245,
+            "learning_rate": 0.05,
+            "max_depth": 3,
+            "min_child_weight": 1
+          }
+        },
+        {
+          "fold": 1,
+          "inner_validation_auroc": 0.832570707070707,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 130,
+            "learning_rate": 0.05,
+            "max_depth": 5,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 2,
+          "inner_validation_auroc": 0.8312676767676768,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 131,
+            "learning_rate": 0.05,
+            "max_depth": 5,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 3,
+          "inner_validation_auroc": 0.8357689048554133,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 270,
+            "learning_rate": 0.05,
+            "max_depth": 3,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 4,
+          "inner_validation_auroc": 0.8450367619076614,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 150,
+            "learning_rate": 0.05,
+            "max_depth": 5,
+            "min_child_weight": 1
+          }
+        }
+      ],
+      "provenance": {
+        "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+        "config_hash": "a80e2d2829a09a95489f5ae047839c8333ce9bf90642979c2cf588f316905fd0",
+        "excluded_sets": [
+          "c"
+        ],
+        "fit_seconds": 30.140247900038958,
+        "git_dirty": true,
+        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "imputation": "median",
+        "n_patients": 8000,
+        "platform": "Windows-11-10.0.26100-SP0",
+        "python": "3.12.13",
+        "sets": [
+          "a",
+          "b"
+        ],
+        "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775",
+        "task": "T1_in_hospital_mortality"
+      },
+      "reliability": {
+        "count": [
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0
+        ],
+        "mean_predicted": [
+          0.008890022588893771,
+          0.017020926385885104,
+          0.02732304234523326,
+          0.04148281850386411,
+          0.059135893951170145,
+          0.08556101254187524,
+          0.12086478536948561,
+          0.17870053187012672,
+          0.2811598781496286,
+          0.508862072005868
+        ],
+        "observed_rate": [
+          0.00625,
+          0.01,
+          0.025,
+          0.045,
+          0.03375,
+          0.13,
+          0.1375,
+          0.1925,
+          0.31625,
+          0.50625
+        ]
+      },
+      "representation": "values_mask",
+      "run_id": "values_mask::xgboost",
+      "search_space": {
+        "learning_rate": [
+          0.05,
+          0.1
+        ],
+        "max_depth": [
+          3,
+          5
+        ],
+        "min_child_weight": [
+          1,
+          10
+        ]
+      },
+      "seed": 20260809,
+      "selection_metric": "inner_validation_auroc"
+    },
+    {
+      "cutoff_hours": 24,
+      "hyperparameters": {
+        "per_fold": [
+          {
+            "fold": 0,
+            "inner_validation_auroc": 0.573479797979798,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 1,
+            "inner_validation_auroc": 0.6139065656565657,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 1.0
+            }
+          },
+          {
+            "fold": 2,
+            "inner_validation_auroc": 0.6402954545454546,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 10.0
+            }
+          },
+          {
+            "fold": 3,
+            "inner_validation_auroc": 0.665930921102705,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 4,
+            "inner_validation_auroc": 0.6969311798821792,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          }
+        ]
+      },
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.23935790316679054,
+          "ci_low": 0.200728030549247,
+          "n_boot": 2000,
+          "point": 0.21825320108287366
+        },
+        "auroc": {
+          "ci_high": 0.6492682542505206,
+          "ci_low": 0.6126785005945229,
+          "n_boot": 2000,
+          "point": 0.6309737990202557
+        },
+        "brier": {
+          "ci_high": 0.12270999372966805,
+          "ci_low": 0.11214894610516477,
+          "n_boot": 2000,
+          "point": 0.11728370233576914
+        },
+        "nll": {
+          "ci_high": 0.407318403091503,
+          "ci_low": 0.37972462612451546,
+          "n_boot": 2000,
+          "point": 0.39315304106982013
+        }
+      },
+      "metrics": {
+        "auprc": 0.21825320108287366,
+        "auroc": 0.6309737990202557,
+        "brier": 0.11728370233576914,
+        "calibration_intercept": 0.026988265551736418,
+        "calibration_slope": 1.0146497289676966,
+        "n": 8000,
+        "nll": 0.39315304106982013,
+        "prevalence": 0.14025
+      },
+      "model": "logreg",
+      "n_features": 5,
+      "per_fold_selection": [
+        {
+          "fold": 0,
+          "inner_validation_auroc": 0.573479797979798,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 1,
+          "inner_validation_auroc": 0.6139065656565657,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 1.0
+          }
+        },
+        {
+          "fold": 2,
+          "inner_validation_auroc": 0.6402954545454546,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 10.0
+          }
+        },
+        {
+          "fold": 3,
+          "inner_validation_auroc": 0.665930921102705,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 4,
+          "inner_validation_auroc": 0.6969311798821792,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        }
+      ],
+      "provenance": {
+        "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+        "config_hash": "a80e2d2829a09a95489f5ae047839c8333ce9bf90642979c2cf588f316905fd0",
+        "excluded_sets": [
+          "c"
+        ],
+        "fit_seconds": 0.13461459998507053,
+        "git_dirty": true,
+        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "imputation": "median",
+        "n_patients": 8000,
+        "platform": "Windows-11-10.0.26100-SP0",
+        "python": "3.12.13",
+        "sets": [
+          "a",
+          "b"
+        ],
+        "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775",
+        "task": "T1_in_hospital_mortality"
+      },
+      "reliability": {
+        "count": [
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0
+        ],
+        "mean_predicted": [
+          0.061947068273761605,
+          0.08480701137001974,
+          0.09958615633548618,
+          0.11285669560499922,
+          0.12571533711097238,
+          0.13882526133681217,
+          0.15470849118883737,
+          0.17515296991655305,
+          0.20194283071038768,
+          0.24527681023658068
+        ],
+        "observed_rate": [
+          0.08,
+          0.08875,
+          0.08,
+          0.11,
+          0.13125,
+          0.10375,
+          0.155,
+          0.17125,
+          0.21875,
+          0.26375
+        ]
+      },
+      "representation": "statics_only",
+      "run_id": "statics_only::logreg",
+      "search_space": {
+        "C": [
+          0.01,
+          0.1,
+          1.0,
+          10.0
+        ]
+      },
+      "seed": 20260809,
+      "selection_metric": "inner_validation_auroc"
+    },
+    {
+      "cutoff_hours": 24,
+      "hyperparameters": {
+        "per_fold": [
+          {
+            "fold": 0,
+            "inner_validation_auroc": 0.6336641414141414,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 30,
+              "learning_rate": 0.05,
+              "max_depth": 3,
+              "min_child_weight": 1
+            }
+          },
+          {
+            "fold": 1,
+            "inner_validation_auroc": 0.6770808080808081,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 31,
+              "learning_rate": 0.1,
+              "max_depth": 3,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 2,
+            "inner_validation_auroc": 0.6811338383838383,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 50,
+              "learning_rate": 0.05,
+              "max_depth": 3,
+              "min_child_weight": 1
+            }
+          },
+          {
+            "fold": 3,
+            "inner_validation_auroc": 0.6981058357308491,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 46,
+              "learning_rate": 0.1,
+              "max_depth": 3,
+              "min_child_weight": 1
+            }
+          },
+          {
+            "fold": 4,
+            "inner_validation_auroc": 0.7266857453102564,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 47,
+              "learning_rate": 0.1,
+              "max_depth": 3,
+              "min_child_weight": 10
+            }
+          }
+        ]
+      },
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.25376839967721115,
+          "ci_low": 0.21657315572577718,
+          "n_boot": 2000,
+          "point": 0.2342956041210963
+        },
+        "auroc": {
+          "ci_high": 0.6950804805655924,
+          "ci_low": 0.6624837798326373,
+          "n_boot": 2000,
+          "point": 0.6789200136424022
+        },
+        "brier": {
+          "ci_high": 0.12008305667198897,
+          "ci_low": 0.11012496401183605,
+          "n_boot": 2000,
+          "point": 0.11504135642995436
+        },
+        "nll": {
+          "ci_high": 0.3954938865317081,
+          "ci_low": 0.36900391094787016,
+          "n_boot": 2000,
+          "point": 0.38176945581711735
+        }
+      },
+      "metrics": {
+        "auprc": 0.2342956041210963,
+        "auroc": 0.6789200136424022,
+        "brier": 0.11504135642995436,
+        "calibration_intercept": 0.14350965072502486,
+        "calibration_slope": 1.0886225690882931,
+        "n": 8000,
+        "nll": 0.38176945581711735,
+        "prevalence": 0.14025
+      },
+      "model": "xgboost",
+      "n_features": 5,
+      "per_fold_selection": [
+        {
+          "fold": 0,
+          "inner_validation_auroc": 0.6336641414141414,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 30,
+            "learning_rate": 0.05,
+            "max_depth": 3,
+            "min_child_weight": 1
+          }
+        },
+        {
+          "fold": 1,
+          "inner_validation_auroc": 0.6770808080808081,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 31,
+            "learning_rate": 0.1,
+            "max_depth": 3,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 2,
+          "inner_validation_auroc": 0.6811338383838383,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 50,
+            "learning_rate": 0.05,
+            "max_depth": 3,
+            "min_child_weight": 1
+          }
+        },
+        {
+          "fold": 3,
+          "inner_validation_auroc": 0.6981058357308491,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 46,
+            "learning_rate": 0.1,
+            "max_depth": 3,
+            "min_child_weight": 1
+          }
+        },
+        {
+          "fold": 4,
+          "inner_validation_auroc": 0.7266857453102564,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 47,
+            "learning_rate": 0.1,
+            "max_depth": 3,
+            "min_child_weight": 10
+          }
+        }
+      ],
+      "provenance": {
+        "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+        "config_hash": "a80e2d2829a09a95489f5ae047839c8333ce9bf90642979c2cf588f316905fd0",
+        "excluded_sets": [
+          "c"
+        ],
+        "fit_seconds": 2.451894999947399,
+        "git_dirty": true,
+        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "imputation": "median",
+        "n_patients": 8000,
+        "platform": "Windows-11-10.0.26100-SP0",
+        "python": "3.12.13",
+        "sets": [
+          "a",
+          "b"
+        ],
+        "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775",
+        "task": "T1_in_hospital_mortality"
+      },
+      "reliability": {
+        "count": [
+          801.0,
+          799.0,
+          801.0,
+          799.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          802.0,
+          798.0
+        ],
+        "mean_predicted": [
+          0.04709138854705588,
+          0.06718627677225648,
+          0.08298206252142433,
+          0.10139127433747612,
+          0.12091866479255259,
+          0.13989017521962524,
+          0.16109775690361858,
+          0.18430037532001733,
+          0.21838407040088254,
+          0.2855286252192387
+        ],
+        "observed_rate": [
+          0.03745318352059925,
+          0.060075093867334166,
+          0.07240948813982521,
+          0.08760951188986232,
+          0.1225,
+          0.15875,
+          0.14875,
+          0.19125,
+          0.25311720698254364,
+          0.2706766917293233
+        ]
+      },
+      "representation": "statics_only",
+      "run_id": "statics_only::xgboost",
+      "search_space": {
+        "learning_rate": [
+          0.05,
+          0.1
+        ],
+        "max_depth": [
+          3,
+          5
+        ],
+        "min_child_weight": [
+          1,
+          10
+        ]
+      },
+      "seed": 20260809,
+      "selection_metric": "inner_validation_auroc"
+    },
+    {
+      "cutoff_hours": 24,
+      "hyperparameters": {
+        "per_fold": [
+          {
+            "fold": 0,
+            "inner_validation_auroc": 0.807080808080808,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 1,
+            "inner_validation_auroc": 0.8188535353535353,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 2,
+            "inner_validation_auroc": 0.824020202020202,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 3,
+            "inner_validation_auroc": 0.8203004886365366,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 4,
+            "inner_validation_auroc": 0.8526022559481222,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          }
+        ]
+      },
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.4890646778886223,
+          "ci_low": 0.42791131893722484,
+          "n_boot": 2000,
+          "point": 0.4585599427534811
+        },
+        "auroc": {
+          "ci_high": 0.842355021403715,
+          "ci_low": 0.8188222656283121,
+          "n_boot": 2000,
+          "point": 0.830870755344354
+        },
+        "brier": {
+          "ci_high": 0.10034546006023487,
+          "ci_low": 0.09136345200737049,
+          "n_boot": 2000,
+          "point": 0.09585730998637261
+        },
+        "nll": {
+          "ci_high": 0.32741373206215296,
+          "ci_low": 0.3013917956757684,
+          "n_boot": 2000,
+          "point": 0.3140788296182311
+        }
+      },
+      "metrics": {
+        "auprc": 0.4585599427534811,
+        "auroc": 0.830870755344354,
+        "brier": 0.09585730998637261,
+        "calibration_intercept": -0.05033248522061112,
+        "calibration_slope": 0.9681164185871212,
+        "n": 8000,
+        "nll": 0.3140788296182311,
+        "prevalence": 0.14025
+      },
+      "model": "logreg",
+      "n_features": 303,
+      "per_fold_selection": [
+        {
+          "fold": 0,
+          "inner_validation_auroc": 0.807080808080808,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 1,
+          "inner_validation_auroc": 0.8188535353535353,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 2,
+          "inner_validation_auroc": 0.824020202020202,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 3,
+          "inner_validation_auroc": 0.8203004886365366,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 4,
+          "inner_validation_auroc": 0.8526022559481222,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        }
+      ],
+      "provenance": {
+        "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+        "config_hash": "a80e2d2829a09a95489f5ae047839c8333ce9bf90642979c2cf588f316905fd0",
+        "excluded_sets": [
+          "c"
+        ],
+        "fit_seconds": 2.8871199999703094,
+        "git_dirty": true,
+        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "imputation": "median",
+        "n_patients": 8000,
+        "platform": "Windows-11-10.0.26100-SP0",
+        "python": "3.12.13",
+        "sets": [
+          "a",
+          "b"
+        ],
+        "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775",
+        "task": "T1_in_hospital_mortality"
+      },
+      "reliability": {
+        "count": [
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0
+        ],
+        "mean_predicted": [
+          0.008440322682604078,
+          0.018077024097325704,
+          0.029501919185409654,
+          0.044580630006205484,
+          0.06416728941249936,
+          0.09301130398838149,
+          0.1324263311894746,
+          0.19040686416440253,
+          0.2866752670464001,
+          0.5409678062045938
+        ],
+        "observed_rate": [
+          0.01375,
+          0.01375,
+          0.01125,
+          0.0325,
+          0.07375,
+          0.09875,
+          0.135,
+          0.215,
+          0.27625,
+          0.5325
+        ]
+      },
+      "representation": "values_mask_statics",
+      "run_id": "values_mask_statics::logreg",
+      "search_space": {
+        "C": [
+          0.01,
+          0.1,
+          1.0,
+          10.0
+        ]
+      },
+      "seed": 20260809,
+      "selection_metric": "inner_validation_auroc"
+    },
+    {
+      "cutoff_hours": 24,
+      "hyperparameters": {
+        "per_fold": [
+          {
+            "fold": 0,
+            "inner_validation_auroc": 0.8202929292929293,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 112,
+              "learning_rate": 0.05,
+              "max_depth": 5,
+              "min_child_weight": 1
+            }
+          },
+          {
+            "fold": 1,
+            "inner_validation_auroc": 0.8331666666666667,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 129,
+              "learning_rate": 0.05,
+              "max_depth": 5,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 2,
+            "inner_validation_auroc": 0.8432525252525253,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 96,
+              "learning_rate": 0.05,
+              "max_depth": 5,
+              "min_child_weight": 1
+            }
+          },
+          {
+            "fold": 3,
+            "inner_validation_auroc": 0.8433648435399002,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 211,
+              "learning_rate": 0.05,
+              "max_depth": 3,
+              "min_child_weight": 1
+            }
+          },
+          {
+            "fold": 4,
+            "inner_validation_auroc": 0.8648257805245612,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 223,
+              "learning_rate": 0.05,
+              "max_depth": 5,
+              "min_child_weight": 1
+            }
+          }
+        ]
+      },
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.49799423748251753,
+          "ci_low": 0.43499214105048084,
+          "n_boot": 2000,
+          "point": 0.46536252934007244
+        },
+        "auroc": {
+          "ci_high": 0.8505819795915053,
+          "ci_low": 0.8286342257086853,
+          "n_boot": 2000,
+          "point": 0.8396682128401335
+        },
+        "brier": {
+          "ci_high": 0.09941885701378271,
+          "ci_low": 0.0905478450134209,
+          "n_boot": 2000,
+          "point": 0.09497853060488987
+        },
+        "nll": {
+          "ci_high": 0.3208283766875149,
+          "ci_low": 0.29554694520243163,
+          "n_boot": 2000,
+          "point": 0.30812872310662787
+        }
+      },
+      "metrics": {
+        "auprc": 0.46536252934007244,
+        "auroc": 0.8396682128401335,
+        "brier": 0.09497853060488987,
+        "calibration_intercept": 0.1614689099670178,
+        "calibration_slope": 1.0262497296161042,
+        "n": 8000,
+        "nll": 0.30812872310662787,
+        "prevalence": 0.14025
+      },
+      "model": "xgboost",
+      "n_features": 303,
+      "per_fold_selection": [
+        {
+          "fold": 0,
+          "inner_validation_auroc": 0.8202929292929293,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 112,
+            "learning_rate": 0.05,
+            "max_depth": 5,
+            "min_child_weight": 1
+          }
+        },
+        {
+          "fold": 1,
+          "inner_validation_auroc": 0.8331666666666667,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 129,
+            "learning_rate": 0.05,
+            "max_depth": 5,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 2,
+          "inner_validation_auroc": 0.8432525252525253,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 96,
+            "learning_rate": 0.05,
+            "max_depth": 5,
+            "min_child_weight": 1
+          }
+        },
+        {
+          "fold": 3,
+          "inner_validation_auroc": 0.8433648435399002,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 211,
+            "learning_rate": 0.05,
+            "max_depth": 3,
+            "min_child_weight": 1
+          }
+        },
+        {
+          "fold": 4,
+          "inner_validation_auroc": 0.8648257805245612,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 223,
+            "learning_rate": 0.05,
+            "max_depth": 5,
+            "min_child_weight": 1
+          }
+        }
+      ],
+      "provenance": {
+        "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+        "config_hash": "a80e2d2829a09a95489f5ae047839c8333ce9bf90642979c2cf588f316905fd0",
+        "excluded_sets": [
+          "c"
+        ],
+        "fit_seconds": 31.743458800017834,
+        "git_dirty": true,
+        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "imputation": "median",
+        "n_patients": 8000,
+        "platform": "Windows-11-10.0.26100-SP0",
+        "python": "3.12.13",
+        "sets": [
+          "a",
+          "b"
+        ],
+        "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775",
+        "task": "T1_in_hospital_mortality"
+      },
+      "reliability": {
+        "count": [
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0
+        ],
+        "mean_predicted": [
+          0.007797689095023088,
+          0.015309225819073617,
+          0.024275194278452546,
+          0.037015648246742784,
+          0.05437568720430136,
+          0.0805791753064841,
+          0.115954967783764,
+          0.17368479922413826,
+          0.27685548095032575,
+          0.5034035687148571
+        ],
+        "observed_rate": [
+          0.00625,
+          0.01125,
+          0.0175,
+          0.02625,
+          0.04375,
+          0.1175,
+          0.14625,
+          0.205,
+          0.32375,
+          0.505
+        ]
+      },
+      "representation": "values_mask_statics",
+      "run_id": "values_mask_statics::xgboost",
+      "search_space": {
+        "learning_rate": [
+          0.05,
+          0.1
+        ],
+        "max_depth": [
+          3,
+          5
+        ],
+        "min_child_weight": [
+          1,
+          10
+        ]
+      },
+      "seed": 20260809,
+      "selection_metric": "inner_validation_auroc"
+    },
+    {
+      "cutoff_hours": 24,
+      "hyperparameters": {
+        "per_fold": [
+          {
+            "fold": 0,
+            "inner_validation_auroc": 0.7692373737373736,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 1,
+            "inner_validation_auroc": 0.7703232323232324,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 2,
+            "inner_validation_auroc": 0.788,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 3,
+            "inner_validation_auroc": 0.8054587246738616,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          },
+          {
+            "fold": 4,
+            "inner_validation_auroc": 0.8200011163036142,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "C": 0.01
+            }
+          }
+        ]
+      },
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.4468583339491467,
+          "ci_low": 0.38828374663535137,
+          "n_boot": 2000,
+          "point": 0.41743753154207025
+        },
+        "auroc": {
+          "ci_high": 0.8115163687249279,
+          "ci_low": 0.785275961428366,
+          "n_boot": 2000,
+          "point": 0.798371826988217
+        },
+        "brier": {
+          "ci_high": 0.10554147999065172,
+          "ci_low": 0.09637634479312167,
+          "n_boot": 2000,
+          "point": 0.10084956393548128
+        },
+        "nll": {
+          "ci_high": 0.34534450943988293,
+          "ci_low": 0.31933311115476054,
+          "n_boot": 2000,
+          "point": 0.33205285781032795
+        }
+      },
+      "metrics": {
+        "auprc": 0.41743753154207025,
+        "auroc": 0.798371826988217,
+        "brier": 0.10084956393548128,
+        "calibration_intercept": -0.07215154039870181,
+        "calibration_slope": 0.9547592483304017,
+        "n": 8000,
+        "nll": 0.33205285781032795,
+        "prevalence": 0.14025
+      },
+      "model": "logreg",
+      "n_features": 185,
+      "per_fold_selection": [
+        {
+          "fold": 0,
+          "inner_validation_auroc": 0.7692373737373736,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 1,
+          "inner_validation_auroc": 0.7703232323232324,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 2,
+          "inner_validation_auroc": 0.788,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 3,
+          "inner_validation_auroc": 0.8054587246738616,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "fold": 4,
+          "inner_validation_auroc": 0.8200011163036142,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        }
+      ],
+      "provenance": {
+        "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+        "config_hash": "a80e2d2829a09a95489f5ae047839c8333ce9bf90642979c2cf588f316905fd0",
+        "excluded_sets": [
+          "c"
+        ],
+        "fit_seconds": 1.237200399977155,
+        "git_dirty": true,
+        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "imputation": "stochastic",
+        "n_patients": 8000,
+        "platform": "Windows-11-10.0.26100-SP0",
+        "python": "3.12.13",
+        "sets": [
+          "a",
+          "b"
+        ],
+        "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775",
+        "task": "T1_in_hospital_mortality"
+      },
+      "reliability": {
+        "count": [
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0
+        ],
+        "mean_predicted": [
+          0.014545284900604303,
+          0.027748090638464458,
+          0.04077444996291891,
+          0.056581534439344466,
+          0.0758521640016466,
+          0.10027178147526496,
+          0.13308726527794856,
+          0.18304484745313546,
+          0.27021920835631064,
+          0.5053464115942355
+        ],
+        "observed_rate": [
+          0.015,
+          0.02375,
+          0.02375,
+          0.06125,
+          0.07875,
+          0.0975,
+          0.14125,
+          0.2025,
+          0.3,
+          0.45875
+        ]
+      },
+      "representation": "values_only_stochastic",
+      "run_id": "values_only_stochastic::logreg",
+      "search_space": {
+        "C": [
+          0.01,
+          0.1,
+          1.0,
+          10.0
+        ]
+      },
+      "seed": 20260809,
+      "selection_metric": "inner_validation_auroc"
+    },
+    {
+      "cutoff_hours": 24,
+      "hyperparameters": {
+        "per_fold": [
+          {
+            "fold": 0,
+            "inner_validation_auroc": 0.8099646464646465,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 41,
+              "learning_rate": 0.1,
+              "max_depth": 5,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 1,
+            "inner_validation_auroc": 0.8066666666666666,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 85,
+              "learning_rate": 0.05,
+              "max_depth": 5,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 2,
+            "inner_validation_auroc": 0.816540404040404,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 61,
+              "learning_rate": 0.1,
+              "max_depth": 3,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 3,
+            "inner_validation_auroc": 0.8208662516046864,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 65,
+              "learning_rate": 0.1,
+              "max_depth": 3,
+              "min_child_weight": 10
+            }
+          },
+          {
+            "fold": 4,
+            "inner_validation_auroc": 0.8289011005738816,
+            "n_train": 6400,
+            "n_validation": 1600,
+            "selected": {
+              "best_iteration": 98,
+              "learning_rate": 0.1,
+              "max_depth": 5,
+              "min_child_weight": 10
+            }
+          }
+        ]
+      },
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.4532060839746988,
+          "ci_low": 0.39128214882247003,
+          "n_boot": 2000,
+          "point": 0.420578694062338
+        },
+        "auroc": {
+          "ci_high": 0.8220500708813216,
+          "ci_low": 0.7961967748059241,
+          "n_boot": 2000,
+          "point": 0.8088074612329269
+        },
+        "brier": {
+          "ci_high": 0.10414823352467473,
+          "ci_low": 0.09514193140590206,
+          "n_boot": 2000,
+          "point": 0.09971205253260332
+        },
+        "nll": {
+          "ci_high": 0.33886527567373353,
+          "ci_low": 0.3139870102267949,
+          "n_boot": 2000,
+          "point": 0.32664366368143954
+        }
+      },
+      "metrics": {
+        "auprc": 0.420578694062338,
+        "auroc": 0.8088074612329269,
+        "brier": 0.09971205253260332,
+        "calibration_intercept": 0.10876923790030095,
+        "calibration_slope": 1.0394484106233195,
+        "n": 8000,
+        "nll": 0.32664366368143954,
+        "prevalence": 0.14025
+      },
+      "model": "xgboost",
+      "n_features": 185,
+      "per_fold_selection": [
+        {
+          "fold": 0,
+          "inner_validation_auroc": 0.8099646464646465,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 41,
+            "learning_rate": 0.1,
+            "max_depth": 5,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 1,
+          "inner_validation_auroc": 0.8066666666666666,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 85,
+            "learning_rate": 0.05,
+            "max_depth": 5,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 2,
+          "inner_validation_auroc": 0.816540404040404,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 61,
+            "learning_rate": 0.1,
+            "max_depth": 3,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 3,
+          "inner_validation_auroc": 0.8208662516046864,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 65,
+            "learning_rate": 0.1,
+            "max_depth": 3,
+            "min_child_weight": 10
+          }
+        },
+        {
+          "fold": 4,
+          "inner_validation_auroc": 0.8289011005738816,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "best_iteration": 98,
+            "learning_rate": 0.1,
+            "max_depth": 5,
+            "min_child_weight": 10
+          }
+        }
+      ],
+      "provenance": {
+        "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+        "config_hash": "a80e2d2829a09a95489f5ae047839c8333ce9bf90642979c2cf588f316905fd0",
+        "excluded_sets": [
+          "c"
+        ],
+        "fit_seconds": 22.4637972000055,
+        "git_dirty": true,
+        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "imputation": "stochastic",
+        "n_patients": 8000,
+        "platform": "Windows-11-10.0.26100-SP0",
+        "python": "3.12.13",
+        "sets": [
+          "a",
+          "b"
+        ],
+        "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775",
+        "task": "T1_in_hospital_mortality"
+      },
+      "reliability": {
+        "count": [
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0,
+          800.0
+        ],
+        "mean_predicted": [
+          0.014741898073116317,
+          0.026662460879888387,
+          0.039065099619328976,
+          0.053333796043880284,
+          0.07181944248732179,
+          0.09496146328747272,
+          0.1291549497935921,
+          0.1813564157858491,
+          0.26759799372404813,
+          0.4747515184059739
+        ],
+        "observed_rate": [
+          0.0075,
+          0.0125,
+          0.04,
+          0.04125,
+          0.06625,
+          0.1125,
+          0.15625,
+          0.20375,
+          0.285,
+          0.4775
+        ]
+      },
+      "representation": "values_only_stochastic",
+      "run_id": "values_only_stochastic::xgboost",
+      "search_space": {
+        "learning_rate": [
+          0.05,
+          0.1
+        ],
+        "max_depth": [
+          3,
+          5
+        ],
+        "min_child_weight": [
+          1,
+          10
+        ]
+      },
+      "seed": 20260809,
+      "selection_metric": "inner_validation_auroc"
+    }
+  ],
+  "schema": "cliniverse.evaluation.artifacts/1"
+}

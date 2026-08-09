@@ -296,6 +296,61 @@ Printed to stdout; no artifacts written. Rerun to reproduce — the run is fully
 
 ---
 
+## E-004 — M2 representation ablation (mask vs values vs both)
+
+- **Date:** 2026-08-09
+- **Status:** COMPLETE
+- **Commands:**
+  `python experiments/baselines/m2_representation_ablation.py --folds 5 --n-boot 2000`
+  `python experiments/baselines/m2_figures.py`
+- **Full report:** [`M2_MILESTONE_REPORT.md`](M2_MILESTONE_REPORT.md)
+- **Artifacts:** `experiments/baselines/results/m2/{results.json,predictions.npz,figures/}`
+- **Setup:** T1 in-hospital mortality, 24h boundary, 5-fold stratified CV, sets a+b, n=8,000,
+  prevalence 14.03%. Nested hyperparameter selection on inner validation splits. set-c never
+  loaded.
+
+### Headline numbers
+
+| run | AUROC [95% CI] | AUPRC | Brier | NLL |
+|---|---|---|---|---|
+| prevalence | 0.4994 [0.4840, 0.5152] | 0.1401 | 0.1206 | 0.4054 |
+| LR mask-only | 0.7278 [0.7128, 0.7423] | 0.2783 | 0.1114 | 0.3657 |
+| GBDT mask-only | 0.7280 [0.7133, 0.7418] | 0.2734 | 0.1116 | 0.3652 |
+| LR values-only | 0.8095 [0.7964, 0.8219] | 0.4273 | 0.0997 | 0.3276 |
+| GBDT values-only | 0.8233 [0.8109, 0.8352] | 0.4455 | 0.0972 | 0.3174 |
+| LR values+mask | 0.8240 [0.8121, 0.8359] | 0.4511 | 0.0969 | 0.3182 |
+| GBDT values+mask | **0.8323** [0.8206, 0.8442] | 0.4627 | 0.0956 | 0.3116 |
+
+### Paired differences (identical patients and folds)
+
+| Comparison | LR | GBDT |
+|---|---|---|
+| VALUES+MASK − VALUES ONLY (AUROC) | +0.0146 [+0.0089, +0.0204] | +0.0090 [+0.0043, +0.0137] |
+| VALUES ONLY − MASK ONLY (AUROC) | +0.0817 [+0.0655, +0.0975] | +0.0953 [+0.0810, +0.1101] |
+| values-only median − stochastic (AUROC) | +0.0111 [+0.0059, +0.0162] | +0.0145 [+0.0081, +0.0207] |
+
+All intervals exclude zero.
+
+### Findings
+
+1. **E-002 reproduces under the M2 protocol.** Mask-only reaches 0.7278/0.7280 versus E-002's
+   0.7223745892 with fixed `C=1.0`; the gain is attributable to in-fold hyperparameter selection.
+2. **Values dominate measurement patterns.** VALUES ONLY − MASK ONLY = +0.095 AUROC (GBDT).
+3. **Explicit mask features add little on top of values:** +0.0090 AUROC (GBDT).
+4. **The imputation artefact exceeds the explicit mask gain.** For GBDT, median-versus-stochastic
+   imputation is worth +0.0145 AUROC — more than the entire 113-feature mask block. Standard
+   "values-only" baselines therefore already absorb measurement-pattern information implicitly.
+5. **SAPS-I and SOFA omitted**: PhysioNet documents no time window for them and warns its own
+   calculator disagrees with the outcomes file, so cutoff-safety is unverifiable.
+
+### Interpretation
+
+Pre-declared **Outcome B**: availability carries real signal, but does not materially change a
+sufficiently strong physiological predictor. Reported as measured; the strong form of the
+measurement-shortcut framing is **not** supported and has been restated.
+
+---
+
 ## Planned next runs
 
 **E-004** — T1 clinical baselines: prevalence, SAPS-I, SOFA as single-feature predictors, for
