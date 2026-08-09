@@ -19,18 +19,16 @@ about missingness, and we do not claim otherwise.
 
 - A summary of a never-measured variable does not exist, so something must be
   substituted. Whatever is substituted is, in principle, detectable.
-- Median imputation is the worst offender: an imputed cell holds *exactly* the
-  training median, and a tree can split on that value to recover the missingness
-  indicator almost perfectly.
+- Median imputation leaves a detectable point mass at the training median. How
+  much a fitted model exploits it is an empirical question, not an assumption.
 - Native NaN handling in gradient boosting is strictly worse still — the learned
   default direction *is* a missingness indicator.
 
 We therefore (a) never use native NaN routing in ``values_only``, and (b) provide
-``values_only_stochastic``, which imputes by sampling from the training marginal
-of each feature. The sampled values are indistinguishable from observed ones, so
-the "exactly median" tell disappears. The gap between the two variants bounds how
-much of ``values_only``'s performance is residual missingness information rather
-than physiology.
+two diagnostics: a small train-derived jitter around the median and an empirical
+marginal draw for each summary column. Marginal draws remove the exact point mass
+but can break correlations among last/mean/min/max/slope summaries, so their
+performance gap is not an estimate of missingness signal by itself.
 """
 
 from __future__ import annotations
@@ -83,21 +81,26 @@ CORE_REPRESENTATIONS: tuple[Representation, ...] = (
 
 class ImputationStrategy(enum.StrEnum):
     MEDIAN = "median"
-    STOCHASTIC = "stochastic"
+    MEDIAN_JITTER = "median_jitter"
+    EMPIRICAL_MARGINAL = "empirical_marginal"
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
 class FittedImputer:
     """Imputer fitted on training rows only.
 
-    ``MEDIAN`` substitutes the training median. ``STOCHASTIC`` samples from the
-    observed training values of each feature, which removes the "exactly the
-    median" signature that otherwise lets a model recover missingness.
+    ``MEDIAN`` substitutes the training median. ``MEDIAN_JITTER`` adds small,
+    independent Gaussian noise scaled by 1% of the training IQR. It tests whether
+    exact equality to the median is necessary, not whether missingness has been
+    removed. ``EMPIRICAL_MARGINAL`` draws independently from observed training
+    values in each summary column; it is a diagnostic with a known
+    correlation-breaking disadvantage.
     """
 
     strategy: ImputationStrategy
     medians: FloatArray
     pools: tuple[FloatArray, ...]
+    jitter_scales: FloatArray
     seed: int
 
     @classmethod
@@ -121,7 +124,7 @@ class FittedImputer:
         medians = np.where(np.isfinite(medians), medians, 0.0).astype(np.float64)
 
         pools: tuple[FloatArray, ...] = ()
-        if strategy is ImputationStrategy.STOCHASTIC:
+        if strategy is ImputationStrategy.EMPIRICAL_MARGINAL:
             pools = tuple(
                 (
                     col[np.isfinite(col)]
@@ -130,7 +133,27 @@ class FittedImputer:
                 )
                 for j, col in enumerate(x.T.astype(np.float64))
             )
-        return cls(strategy=strategy, medians=medians, pools=pools, seed=seed)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RuntimeWarning)
+            q25, q75 = np.nanpercentile(x, [25.0, 75.0], axis=0)
+            std = np.nanstd(x, axis=0)
+        jitter_scales = 0.01 * (q75 - q25)
+        jitter_scales = np.where(
+            np.isfinite(jitter_scales) & (jitter_scales > 0),
+            jitter_scales,
+            0.01 * std,
+        )
+        fallback = np.maximum(np.abs(medians) * 1e-6, 1e-6)
+        jitter_scales = np.where(
+            np.isfinite(jitter_scales) & (jitter_scales > 0), jitter_scales, fallback
+        ).astype(np.float64)
+        return cls(
+            strategy=strategy,
+            medians=medians,
+            pools=pools,
+            jitter_scales=jitter_scales,
+            seed=seed,
+        )
 
     def transform(self, x: FloatArray, *, draw_seed: int) -> FloatArray:
         out = np.array(x, dtype=np.float64, copy=True)
@@ -142,6 +165,11 @@ class FittedImputer:
             return out
 
         rng = np.random.default_rng(self.seed + draw_seed)
+        if self.strategy is ImputationStrategy.MEDIAN_JITTER:
+            draws = self.medians[None, :] + rng.normal(size=out.shape) * self.jitter_scales
+            out[missing] = draws[missing]
+            return out
+
         for j in range(out.shape[1]):
             sel = missing[:, j]
             n = int(sel.sum())
@@ -169,6 +197,32 @@ class RepresentationView:
         """
         prefixes = ("n_obs::", "ever::", "recency::", "n_distinct_vars::")
         return any(n.startswith(prefixes) for n in self.names)
+
+    def feature_inventory(self) -> list[dict[str, object]]:
+        """Machine-readable scientific provenance for every feature column."""
+        inventory: list[dict[str, object]] = []
+        for name in self.names:
+            statistic, source = name.split("::", maxsplit=1)
+            explicit = statistic in {"n_obs", "ever", "recency", "n_distinct_vars"}
+            numeric = statistic in {"last", "mean", "min", "max", "slope", "static"}
+            inventory.append(
+                {
+                    "name": name,
+                    "source_variable": source,
+                    "statistic": statistic,
+                    "uses_numeric_value": numeric,
+                    "measurement_presence": (
+                        "explicit" if explicit else "implicit" if numeric else "no"
+                    ),
+                    "uses_count": statistic in {"n_obs", "n_distinct_vars"},
+                    "uses_recency": statistic == "recency",
+                    "uses_time_since_last": statistic == "recency",
+                    "uses_missing_sentinel": statistic == "recency",
+                    "requires_imputation": numeric,
+                    "cutoff_safe": True,
+                }
+            )
+        return inventory
 
 
 def build_representation(cohort: Cohort, representation: Representation) -> RepresentationView:

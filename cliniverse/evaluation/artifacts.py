@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
+import importlib.metadata
 import json
 import pathlib
 import platform
@@ -114,6 +115,7 @@ class RunArtifact:
     seed: int
     n_features: int
     feature_names: list[str]
+    feature_inventory: list[dict[str, object]]
     hyperparameters: dict[str, Any]
     search_space: dict[str, Any]
     selection_metric: str
@@ -121,6 +123,7 @@ class RunArtifact:
     metrics: dict[str, Any]
     intervals: dict[str, Any]
     reliability: dict[str, list[float]]
+    fold_diagnostics: list[dict[str, Any]]
     predictions: np.ndarray
     labels: np.ndarray
     record_ids: np.ndarray
@@ -135,6 +138,8 @@ class RunArtifact:
             "cutoff_hours": self.cutoff_hours,
             "seed": self.seed,
             "n_features": self.n_features,
+            "feature_names": self.feature_names,
+            "feature_inventory": self.feature_inventory,
             "hyperparameters": self.hyperparameters,
             "search_space": self.search_space,
             "selection_metric": self.selection_metric,
@@ -142,6 +147,7 @@ class RunArtifact:
             "metrics": self.metrics,
             "intervals": self.intervals,
             "reliability": self.reliability,
+            "fold_diagnostics": self.fold_diagnostics,
             "provenance": self.provenance,
         }
 
@@ -159,6 +165,10 @@ def build_provenance(
         "git_dirty": git_is_dirty(),
         "python": sys.version.split()[0],
         "platform": platform.platform(),
+        "package_versions": {
+            package: importlib.metadata.version(package)
+            for package in ("numpy", "scikit-learn", "xgboost")
+        },
         "config_hash": stable_hash(config_payload),
         "cohort_fingerprint": cohort_fingerprint(cohort),
         "split_hash": split_hash(splits),
@@ -185,16 +195,6 @@ def write_run(
     manifest_path = directory / manifest_name
     predictions_path = directory / predictions_name
 
-    manifest = {
-        "schema": "cliniverse.evaluation.artifacts/1",
-        "runs": [a.summary() for a in artifacts],
-    }
-    manifest_path.write_text(
-        json.dumps(manifest, indent=2, sort_keys=True, default=str),
-        encoding="utf-8",
-        newline="\n",
-    )
-
     arrays: dict[str, np.ndarray] = {}
     for a in artifacts:
         arrays[f"pred__{a.run_id}"] = a.predictions
@@ -206,4 +206,17 @@ def write_run(
     # call does not type-check. Passing the dict positionally would store it as a
     # single `arr_0` entry and break every reader.
     np.savez_compressed(predictions_path, **arrays)  # type: ignore[arg-type]
+    manifest = {
+        "schema": "cliniverse.evaluation.artifacts/2",
+        "predictions_file": {
+            "name": predictions_path.name,
+            "sha256": hashlib.sha256(predictions_path.read_bytes()).hexdigest(),
+        },
+        "runs": [a.summary() for a in artifacts],
+    }
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True, default=str),
+        encoding="utf-8",
+        newline="\n",
+    )
     return manifest_path, predictions_path

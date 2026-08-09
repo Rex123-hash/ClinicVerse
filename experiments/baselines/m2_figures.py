@@ -15,6 +15,7 @@ import argparse
 import json
 import pathlib
 import sys
+from typing import Any
 
 import matplotlib
 
@@ -29,20 +30,24 @@ COLOURS = {
     "mask_only": "#B45309",
     "values_only": "#1D4ED8",
     "values_mask": "#047857",
-    "values_only_stochastic": "#7C3AED",
+    "values_only_median_jitter": "#7C3AED",
+    "values_only_empirical_marginal": "#9333EA",
     "prevalence": "#6B7280",
     "statics_only": "#9CA3AF",
     "values_mask_statics": "#065F46",
 }
 
 
-def _load(results_dir: pathlib.Path) -> tuple[list[dict], dict[str, np.ndarray]]:
+RunSummary = dict[str, Any]
+
+
+def _load(results_dir: pathlib.Path) -> tuple[list[RunSummary], dict[str, np.ndarray]]:
     manifest = json.loads((results_dir / "results.json").read_text(encoding="utf-8"))
     arrays = dict(np.load(results_dir / "predictions.npz"))
     return manifest["runs"], arrays
 
 
-def figure_baseline_comparison(runs: list[dict], out: pathlib.Path) -> pathlib.Path:
+def figure_baseline_comparison(runs: list[RunSummary], out: pathlib.Path) -> pathlib.Path:
     """AUROC with bootstrap intervals for every run."""
     ordered = sorted(runs, key=lambda r: r["metrics"]["auroc"])
     labels = [r["run_id"] for r in ordered]
@@ -76,17 +81,20 @@ def figure_baseline_comparison(runs: list[dict], out: pathlib.Path) -> pathlib.P
     return path
 
 
-def figure_representation_contrast(runs: list[dict], out: pathlib.Path) -> pathlib.Path:
+def figure_representation_contrast(runs: list[RunSummary], out: pathlib.Path) -> pathlib.Path:
     """The three binding representations, grouped by model."""
     models = ["logreg", "xgboost"]
     fig, axes = plt.subplots(1, 2, figsize=(11, 4.2), sharey=True)
     by_id = {r["run_id"]: r for r in runs}
 
-    for ax, metric, label in zip(axes, ("auroc", "auprc"), ("AUROC", "AUPRC"), strict=True):
+    for ax, metric, label in zip(
+        axes, ("auroc", "auprc"), ("AUROC", "Average precision (AP)"), strict=True
+    ):
         width = 0.26
         xpos = np.arange(len(models))
         for k, rep in enumerate(CORE):
-            values, errs = [], [[], []]
+            values: list[float] = []
+            errs: list[list[float]] = [[], []]
             for model in models:
                 run = by_id.get(f"{rep}::{model}")
                 if run is None:
@@ -136,7 +144,7 @@ def figure_representation_contrast(runs: list[dict], out: pathlib.Path) -> pathl
 
 
 def figure_reliability(
-    runs: list[dict], arrays: dict[str, np.ndarray], out: pathlib.Path
+    runs: list[RunSummary], arrays: dict[str, np.ndarray], out: pathlib.Path
 ) -> pathlib.Path:
     """Reliability curves recomputed from retained predictions."""
     y = arrays["labels"].astype(float)
@@ -166,7 +174,10 @@ def figure_reliability(
 
     axes[0].set_ylabel("observed mortality rate")
     axes[1].legend(fontsize=8, loc="upper left")
-    fig.suptitle("M2 — reliability (equal-mass bins, out-of-fold); diagonal is perfect", y=1.0)
+    fig.suptitle(
+        "M2 — descriptive OOF reliability (equal-mass bins); diagonal is reference",
+        y=1.0,
+    )
     fig.tight_layout()
     path = out / "m2_reliability.png"
     fig.savefig(path, dpi=160)

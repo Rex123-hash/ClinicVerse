@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from experiments.baselines.m2_representation_ablation import _select_and_predict
 
 from cliniverse.data.cohort import Cohort
 from cliniverse.evaluation.artifacts import cohort_fingerprint, split_hash, stable_hash
@@ -222,22 +223,28 @@ class TestImputer:
         out = imputer.transform(np.array([[np.nan], [1e6]]), draw_seed=0)
         assert out[0, 0] == pytest.approx(1.0)
 
-    def test_stochastic_imputation_draws_from_the_training_pool(self) -> None:
+    def test_empirical_imputation_draws_from_the_training_pool(self) -> None:
         train = np.array([[1.0], [2.0], [3.0]])
-        imputer = FittedImputer.fit(train, strategy=ImputationStrategy.STOCHASTIC, seed=7)
+        imputer = FittedImputer.fit(
+            train, strategy=ImputationStrategy.EMPIRICAL_MARGINAL, seed=7
+        )
         out = imputer.transform(np.full((200, 1), np.nan), draw_seed=0)
         assert set(np.unique(out[:, 0]).tolist()) <= {1.0, 2.0, 3.0}
 
-    def test_stochastic_imputation_is_not_constant(self) -> None:
+    def test_empirical_imputation_is_not_constant(self) -> None:
         """This is the property that removes the 'exactly the median' signature."""
         train = np.array([[1.0], [2.0], [3.0], [4.0]])
-        imputer = FittedImputer.fit(train, strategy=ImputationStrategy.STOCHASTIC, seed=7)
+        imputer = FittedImputer.fit(
+            train, strategy=ImputationStrategy.EMPIRICAL_MARGINAL, seed=7
+        )
         out = imputer.transform(np.full((200, 1), np.nan), draw_seed=0)
         assert len(np.unique(out[:, 0])) > 1
 
-    def test_stochastic_imputation_is_deterministic_given_seeds(self) -> None:
+    def test_empirical_imputation_is_deterministic_given_seeds(self) -> None:
         train = np.array([[1.0], [2.0], [3.0]])
-        imputer = FittedImputer.fit(train, strategy=ImputationStrategy.STOCHASTIC, seed=7)
+        imputer = FittedImputer.fit(
+            train, strategy=ImputationStrategy.EMPIRICAL_MARGINAL, seed=7
+        )
         a = imputer.transform(np.full((50, 1), np.nan), draw_seed=4)
         b = imputer.transform(np.full((50, 1), np.nan), draw_seed=4)
         np.testing.assert_array_equal(a, b)
@@ -255,9 +262,50 @@ class TestImputer:
         imputer = FittedImputer.fit(train, strategy=ImputationStrategy.MEDIAN)
         assert np.isfinite(imputer.transform(train, draw_seed=0)).all()
 
+    def test_median_jitter_breaks_exact_point_mass_but_stays_local(self) -> None:
+        train = np.arange(1.0, 101.0).reshape(-1, 1)
+        imputer = FittedImputer.fit(train, strategy=ImputationStrategy.MEDIAN_JITTER, seed=7)
+        out = imputer.transform(np.full((1000, 1), np.nan), draw_seed=3)
+        assert not np.any(out == imputer.medians[0])
+        assert abs(float(out.mean()) - imputer.medians[0]) < 0.1
+
     def test_rejects_non_2d(self) -> None:
         with pytest.raises(ConfigError, match="2-D"):
             FittedImputer.fit(np.zeros((2, 2, 2)))
+
+    def test_inner_selection_fits_preprocessing_without_inner_validation(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        rng = np.random.default_rng(9)
+        x_train = rng.normal(size=(100, 3))
+        x_train[rng.random(x_train.shape) < 0.2] = np.nan
+        y_train = np.array([0, 1] * 50)
+        x_outer_test = rng.normal(size=(20, 3))
+        fitted_sizes: list[int] = []
+        original = FittedImputer.fit
+
+        def recording_fit(
+            cls: type[FittedImputer],
+            x: np.ndarray,
+            *,
+            strategy: ImputationStrategy = ImputationStrategy.MEDIAN,
+            seed: int = 0,
+        ) -> FittedImputer:
+            fitted_sizes.append(len(x))
+            return original(x, strategy=strategy, seed=seed)
+
+        monkeypatch.setattr(FittedImputer, "fit", classmethod(recording_fit))
+        _, _, _, nesting = _select_and_predict(
+            "logreg",
+            x_train,
+            y_train,
+            x_outer_test,
+            seed=3,
+            imputation=ImputationStrategy.MEDIAN,
+        )
+        assert fitted_sizes == [80, 100]
+        assert nesting["inner_preprocessing_fit_n"] == 80
+        assert nesting["final_preprocessing_fit_n"] == 100
 
 
 class TestRepresentations:
@@ -305,6 +353,15 @@ class TestRepresentations:
         both = build_representation(small, Representation.VALUES_MASK)
         assert both.n_features == mask.n_features + values.n_features
         assert set(both.names) == set(mask.names) | set(values.names)
+
+    def test_feature_inventory_describes_explicit_and_implicit_presence(
+        self, small: Cohort
+    ) -> None:
+        mask = build_representation(small, Representation.MASK_ONLY).feature_inventory()
+        values = build_representation(small, Representation.VALUES_ONLY).feature_inventory()
+        assert all(item["measurement_presence"] == "explicit" for item in mask)
+        assert all(item["measurement_presence"] == "implicit" for item in values)
+        assert all(item["cutoff_safe"] is True for item in mask + values)
 
     def test_unknown_representation_rejected(self, small: Cohort) -> None:
         with pytest.raises(ConfigError, match="unknown representation"):

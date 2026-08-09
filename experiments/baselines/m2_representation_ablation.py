@@ -41,7 +41,8 @@ from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 
 from cliniverse.data import load_cohort
-from cliniverse.data.splits import development_cohort, stratified_folds
+from cliniverse.data.cohort import Cohort
+from cliniverse.data.splits import Split, development_cohort, stratified_folds
 from cliniverse.evaluation.artifacts import RunArtifact, build_provenance, write_run
 from cliniverse.evaluation.metrics import (
     METRIC_FUNCTIONS,
@@ -76,6 +77,8 @@ XGB_FIXED: dict[str, Any] = {
     "subsample": 0.8,
     "colsample_bytree": 0.8,
     "reg_lambda": 1.0,
+    "objective": "binary:logistic",
+    "scale_pos_weight": 1.0,
     "eval_metric": "logloss",
     "early_stopping_rounds": 50,
     "tree_method": "hist",
@@ -131,7 +134,8 @@ def _select_and_predict(
     y_train: np.ndarray,
     x_valid: np.ndarray,
     seed: int,
-) -> tuple[np.ndarray, dict[str, Any], float]:
+    imputation: ImputationStrategy,
+) -> tuple[np.ndarray, dict[str, Any], float, dict[str, int]]:
     """Select hyperparameters inside the training fold, then predict.
 
     The inner split is carved from ``x_train`` only. Validation rows never
@@ -143,35 +147,61 @@ def _select_and_predict(
         random_state=seed,
         stratify=y_train,
     )
-    x_inner_tr, y_inner_tr = x_train[idx_tr], y_train[idx_tr]
-    x_inner_va, y_inner_va = x_train[idx_in], y_train[idx_in]
+    y_inner_tr, y_inner_va = y_train[idx_tr], y_train[idx_in]
+    inner_imputer = FittedImputer.fit(x_train[idx_tr], strategy=imputation, seed=seed)
+    x_inner_tr = inner_imputer.transform(x_train[idx_tr], draw_seed=10)
+    x_inner_va = inner_imputer.transform(x_train[idx_in], draw_seed=11)
 
     best_params: dict[str, Any] = {}
+    best_iteration: int | None = None
     best_score = -np.inf
     space = LR_GRID if model_kind == "logreg" else XGB_GRID
 
     for params in _grid(space):
+        candidate_iteration: int | None = None
         if model_kind == "logreg":
             p_in = _evaluate_logreg(x_inner_tr, y_inner_tr, x_inner_va, params, seed)
         else:
             model = _fit_xgb(x_inner_tr, y_inner_tr, x_inner_va, y_inner_va, params, seed)
             p_in = np.asarray(model.predict_proba(x_inner_va)[:, 1])
+            candidate_iteration = int(model.best_iteration or 0)
         score = float(METRIC_FUNCTIONS["auroc"](y_inner_va.astype(float), p_in))
         if score > best_score:
             best_score, best_params = score, params
+            best_iteration = candidate_iteration
+
+    outer_imputer = FittedImputer.fit(x_train, strategy=imputation, seed=seed + 100)
+    x_outer_tr = outer_imputer.transform(x_train, draw_seed=20)
+    x_outer_va = outer_imputer.transform(x_valid, draw_seed=21)
 
     if model_kind == "logreg":
-        preds = _evaluate_logreg(x_train, y_train, x_valid, best_params, seed)
+        preds = _evaluate_logreg(x_outer_tr, y_train, x_outer_va, best_params, seed)
         chosen = dict(best_params)
     else:
-        # Refit on the full outer-training fold. Early stopping still needs a
-        # validation signal, so the inner split is reused for that purpose only.
-        model = _fit_xgb(
-            x_train[idx_tr], y_train[idx_tr], x_inner_va, y_inner_va, best_params, seed
+        n_estimators = (
+            best_iteration if best_iteration is not None else XGB_FIXED["n_estimators"] - 1
+        ) + 1
+        fixed = {
+            key: value
+            for key, value in XGB_FIXED.items()
+            if key not in {"early_stopping_rounds", "n_estimators"}
+        }
+        model = XGBClassifier(
+            random_state=seed,
+            n_estimators=n_estimators,
+            **fixed,
+            **best_params,
         )
-        preds = np.asarray(model.predict_proba(x_valid)[:, 1])
-        chosen = {**best_params, "best_iteration": int(model.best_iteration or 0)}
-    return preds, chosen, best_score
+        model.fit(x_outer_tr, y_train, verbose=False)
+        preds = np.asarray(model.predict_proba(x_outer_va)[:, 1])
+        chosen = {**best_params, "n_estimators": n_estimators}
+    nesting = {
+        "n_inner_train": len(idx_tr),
+        "n_inner_validation": len(idx_in),
+        "inner_preprocessing_fit_n": len(idx_tr),
+        "final_preprocessing_fit_n": len(y_train),
+    }
+    return preds, chosen, best_score, nesting
 
 
 def run_one(
@@ -179,7 +209,7 @@ def run_one(
     model_kind: str,
     x_full: np.ndarray,
     y: np.ndarray,
-    splits: list,
+    splits: list[Split],
     *,
     seed: int,
     imputation: ImputationStrategy,
@@ -190,12 +220,13 @@ def run_one(
 
     for split in splits:
         tr, va = split.train, split.validation
-        imputer = FittedImputer.fit(x_full[tr], strategy=imputation, seed=seed + split.fold)
-        x_tr = imputer.transform(x_full[tr], draw_seed=split.fold)
-        x_va = imputer.transform(x_full[va], draw_seed=1000 + split.fold)
-
-        preds, params, inner_score = _select_and_predict(
-            model_kind, x_tr, y[tr], x_va, seed + split.fold
+        preds, params, inner_score, nesting = _select_and_predict(
+            model_kind,
+            x_full[tr],
+            y[tr],
+            x_full[va],
+            seed + split.fold,
+            imputation,
         )
         oof[va] = preds
         per_fold.append(
@@ -205,6 +236,7 @@ def run_one(
                 "n_validation": len(va),
                 "selected": params,
                 SELECTION_METRIC: inner_score,
+                **nesting,
             }
         )
 
@@ -259,16 +291,19 @@ def main(argv: list[str] | None = None) -> int:
     ):
         for model_kind in ("logreg", "xgboost"):
             plan.append((rep, model_kind, ImputationStrategy.MEDIAN))
-    # Residual-missingness sensitivity for values_only.
-    plan.append((Representation.VALUES_ONLY, "logreg", ImputationStrategy.STOCHASTIC))
-    plan.append((Representation.VALUES_ONLY, "xgboost", ImputationStrategy.STOCHASTIC))
+    # Minimal imputation sensitivity controls for values_only.
+    for strategy in (
+        ImputationStrategy.MEDIAN_JITTER,
+        ImputationStrategy.EMPIRICAL_MARGINAL,
+    ):
+        plan.append((Representation.VALUES_ONLY, "logreg", strategy))
+        plan.append((Representation.VALUES_ONLY, "xgboost", strategy))
 
     artifacts: list[RunArtifact] = []
 
-    # Prevalence floor: the training-fold positive rate, predicted for everyone.
-    prevalence_oof = np.full(len(y), np.nan)
-    for split in splits:
-        prevalence_oof[split.validation] = float(y[split.train].mean())
+    # A prevalence reference is constant by definition. Fold-specific constants
+    # create meaningless cross-fold ranking and AUROC slightly different from 0.5.
+    prevalence_oof = np.full(len(y), float(y.mean()))
     artifacts.append(
         _artifact(
             "prevalence",
@@ -284,6 +319,7 @@ def main(argv: list[str] | None = None) -> int:
             hyperparameters={},
             search_space={},
             per_fold=[],
+            splits=splits,
         )
     )
     log.info("done", model="prevalence", auroc=0.5)
@@ -294,7 +330,7 @@ def main(argv: list[str] | None = None) -> int:
             raise RuntimeError(
                 "values_only representation contains explicit presence features"
             )
-        suffix = "" if imputation is ImputationStrategy.MEDIAN else "_stochastic"
+        suffix = "" if imputation is ImputationStrategy.MEDIAN else f"_{imputation}"
         run_id = f"{rep}{suffix}::{model_kind}"
 
         t0 = time.perf_counter()
@@ -315,9 +351,15 @@ def main(argv: list[str] | None = None) -> int:
                 provenance,
                 n_features=view.n_features,
                 names=list(view.names),
+                feature_inventory=view.feature_inventory(),
                 hyperparameters={"per_fold": per_fold},
-                search_space=LR_GRID if model_kind == "logreg" else XGB_GRID,
+                search_space=(
+                    LR_GRID
+                    if model_kind == "logreg"
+                    else {"tuned": XGB_GRID, "fixed": XGB_FIXED}
+                ),
                 per_fold=per_fold,
+                splits=splits,
                 extra_provenance={"imputation": str(imputation), "fit_seconds": elapsed},
             )
         )
@@ -341,18 +383,30 @@ def _artifact(
     model: str,
     oof: np.ndarray,
     y: np.ndarray,
-    cohort: Any,
+    cohort: Cohort,
     args: argparse.Namespace,
     provenance: dict[str, Any],
     *,
     n_features: int,
     names: list[str],
+    feature_inventory: list[dict[str, object]] | None = None,
     hyperparameters: dict[str, Any],
     search_space: dict[str, Any],
     per_fold: list[dict[str, Any]],
+    splits: list[Split],
     extra_provenance: dict[str, Any] | None = None,
 ) -> RunArtifact:
     metrics = classification_metrics(y, oof)
+    fold_diagnostics = []
+    for split in splits:
+        fold_metrics = classification_metrics(y[split.validation], oof[split.validation])
+        fold_diagnostics.append(
+            {
+                "fold": split.fold,
+                "metrics": fold_metrics.as_dict(),
+                "reliability": reliability_curve(y[split.validation], oof[split.validation]),
+            }
+        )
     intervals = {
         name: bootstrap_metric(y, oof, fn, n_boot=args.n_boot, seed=args.seed).as_dict()
         for name, fn in METRIC_FUNCTIONS.items()
@@ -365,6 +419,7 @@ def _artifact(
         seed=args.seed,
         n_features=n_features,
         feature_names=names,
+        feature_inventory=feature_inventory or [],
         hyperparameters=hyperparameters,
         search_space=search_space,
         selection_metric=SELECTION_METRIC,
@@ -372,6 +427,7 @@ def _artifact(
         metrics=metrics.as_dict(),
         intervals=intervals,
         reliability=reliability_curve(y, oof),
+        fold_diagnostics=fold_diagnostics,
         predictions=oof,
         labels=y,
         record_ids=cohort.record_ids,
@@ -388,7 +444,7 @@ def _report(artifacts: list[RunArtifact], y: np.ndarray, args: argparse.Namespac
     )
     print("=" * 104)
     header = (
-        f"{'run':<40}{'#feat':>7}{'AUROC':>9}{'95% CI':>20}{'AUPRC':>9}{'Brier':>9}{'NLL':>9}"
+        f"{'run':<40}{'#feat':>7}{'AUROC':>9}{'95% CI':>20}{'AP':>9}{'Brier':>9}{'NLL':>9}"
     )
     print(header)
     print("-" * 104)
@@ -401,7 +457,7 @@ def _report(artifacts: list[RunArtifact], y: np.ndarray, args: argparse.Namespac
         )
 
     print("\n" + "=" * 104)
-    print("CALIBRATION (slope 1.0 and intercept 0.0 are perfect)")
+    print("DESCRIPTIVE OOF CALIBRATION (same OOF labels used to fit diagnostics)")
     print("=" * 104)
     print(f"{'run':<40}{'slope':>10}{'intercept':>12}")
     print("-" * 104)
@@ -446,37 +502,36 @@ def _report(artifacts: list[RunArtifact], y: np.ndarray, args: argparse.Namespac
                 )
 
     print("\n" + "=" * 104)
-    print("RESIDUAL-MISSINGNESS CONTROL — values_only(median) vs values_only(stochastic)")
+    print("IMPUTATION SENSITIVITY — values_only controls")
     print("=" * 104)
     print(
-        "Median imputation writes the training median into every unmeasured cell, so a model\n"
-        "can detect 'exactly the median' and recover the missingness indicator. Stochastic\n"
-        "imputation samples from the training marginal, removing that signature. The gap is\n"
-        "an estimate of how much values-only performance is recoverable missingness\n"
-        "information rather than physiology."
+        "Median-jitter tests sensitivity to the exact median point mass. Empirical-marginal\n"
+        "draws remove that point mass but independently sample summary columns and can break\n"
+        "their joint structure. Performance gaps are diagnostics, not identified quantities."
     )
-    for model_kind in ("logreg", "xgboost"):
-        a_id = f"values_only_stochastic::{model_kind}"
-        b_id = f"values_only::{model_kind}"
-        if a_id not in by_id or b_id not in by_id:
-            continue
-        for metric_name in ("auroc", "auprc"):
-            diff = paired_bootstrap_difference(
-                y,
-                by_id[a_id].predictions,
-                by_id[b_id].predictions,
-                METRIC_FUNCTIONS[metric_name],
-                metric_name=metric_name,
-                name_a=a_id,
-                name_b=b_id,
-                n_boot=args.n_boot,
-                seed=args.seed,
-            )
-            flag = "*" if diff.excludes_zero else " "
-            print(
-                f"  {flag} [{model_kind}] median - stochastic  {metric_name:<6} "
-                f"{diff.difference:+.4f} [{diff.low:+.4f}, {diff.high:+.4f}]"
-            )
+    for control in ("median_jitter", "empirical_marginal"):
+        for model_kind in ("logreg", "xgboost"):
+            a_id = f"values_only_{control}::{model_kind}"
+            b_id = f"values_only::{model_kind}"
+            if a_id not in by_id or b_id not in by_id:
+                continue
+            for metric_name in ("auroc", "auprc"):
+                diff = paired_bootstrap_difference(
+                    y,
+                    by_id[a_id].predictions,
+                    by_id[b_id].predictions,
+                    METRIC_FUNCTIONS[metric_name],
+                    metric_name=metric_name,
+                    name_a=a_id,
+                    name_b=b_id,
+                    n_boot=args.n_boot,
+                    seed=args.seed,
+                )
+                flag = "*" if diff.excludes_zero else " "
+                print(
+                    f"  {flag} [{model_kind}] median - {control:<18} {metric_name:<6} "
+                    f"{diff.difference:+.4f} [{diff.low:+.4f}, {diff.high:+.4f}]"
+                )
 
     print("\n  * = 95% paired interval excludes zero.")
 
