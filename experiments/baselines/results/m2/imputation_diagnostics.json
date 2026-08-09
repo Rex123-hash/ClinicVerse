@@ -3,8 +3,8 @@
     "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
     "config_hash": "92b7903f000dd8ba87e7c4037e5315202c6dd7711908b9e9d6883a97fb14a695",
     "diagnostic": "value_summary_missingness_reconstructibility",
-    "git_dirty": true,
-    "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+    "git_dirty": false,
+    "git_sha": "25cdf18cc932b2509a2f7065c8473cd4a2b1fa3b",
     "n_patients": 8000,
     "package_versions": {
       "numpy": "2.5.2",

@@ -95,6 +95,12 @@ class TestMetricCorrectness:
         sharpened = np.clip(0.5 + (p_true - 0.5) * 2.5, 0.001, 0.999)
         assert calibration_slope(y, sharpened) < 0.9
 
+    def test_constant_predictor_has_undefined_calibration_regression(self) -> None:
+        y = np.array([0.0, 1.0, 0.0, 1.0])
+        p = np.full(4, 0.5)
+        assert np.isnan(calibration_slope(y, p))
+        assert np.isnan(calibration_intercept(y, p))
+
     def test_metrics_bundle_reports_prevalence_and_n(
         self, scored: tuple[np.ndarray, np.ndarray]
     ) -> None:

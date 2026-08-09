@@ -133,7 +133,7 @@ def _recalibration_fit(y: FloatArray, p: FloatArray) -> tuple[float, float]:
     """
     y, p = _validate(y, p)
     x = _logit(p).reshape(-1, 1)
-    if len(np.unique(y)) < 2 or float(np.std(x)) == 0.0:
+    if len(np.unique(y)) < 2 or np.unique(x).size < 2:
         return float("nan"), float("nan")
     # Effectively unpenalised: we want the maximum-likelihood recalibration.
     model = LogisticRegression(C=1e12, solver="lbfgs", max_iter=1000)
