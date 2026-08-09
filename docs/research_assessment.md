@@ -347,7 +347,7 @@ See [`LIMITATIONS.md`](LIMITATIONS.md) in full. The load-bearing ones:
 |---|---|---|
 | **M0** | Repo, tooling, CI, P12 loader, splits, leakage guards | **Done** — ruff/mypy clean, 95 tests |
 | **M1** | TwinBench: case schema, epochs, masking mechanisms, `PolicyView`, disclosure engine, support-blind/aware protocols, seeded manifests | Regeneration reproduces identical content hashes; non-inferability tests pass |
-| **M2** | Baselines + full metric suite; **directly comparable full-value baseline** | Real AUROC/AUPRC/Brier with paired CIs; GBDT ≥ SOFA |
+| **M2** | Baselines + full metric suite; **directly comparable full-value baseline** | Real AUROC/average-precision/Brier with paired CIs; GBDT ≥ SOFA |
 | **M3** | Ensembles, calibration, conformal, abstention | Coverage reported stratified by pattern, including failures |
 | **M4** | **Acquisition — the core**: all policies × 2 protocols × 4 cost regimes | Paired ΔAUBC with CIs; H1/H2/H3 answered including nulls |
 | **M5** | Ablations, robustness sweep, OOD, cost sensitivity | Each component justified or removed |

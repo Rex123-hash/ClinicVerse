@@ -198,7 +198,8 @@ had a reason to be measured — and it is reported as a limitation, not silently
 
 ## 8. Metrics
 
-**T1.** AUROC, AUPRC, Brier, log-loss, **reliability curve, calibration slope, calibration
+**T1.** AUROC, **average precision (AP; scikit-learn estimator)**, Brier, log-loss,
+**reliability curve, calibration slope, calibration
 intercept**, risk–coverage curve and AURC for selective prediction.
 Brier and log-loss are described as **proper scoring rules** (calibration *and* refinement), never
 as calibration metrics on their own.

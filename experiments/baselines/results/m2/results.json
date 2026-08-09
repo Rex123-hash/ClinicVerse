@@ -15,8 +15,8 @@
             "auprc": 0.14,
             "auroc": 0.5,
             "brier": 0.12040006249999999,
-            "calibration_intercept": -0.42346266611380695,
-            "calibration_slope": 0.7678289025628302,
+            "calibration_intercept": NaN,
+            "calibration_slope": NaN,
             "n": 1600,
             "nll": 0.40496374435710114,
             "prevalence": 0.14
@@ -33,8 +33,8 @@
             "auprc": 0.14,
             "auroc": 0.5,
             "brier": 0.12040006249999999,
-            "calibration_intercept": -0.42346266611380695,
-            "calibration_slope": 0.7678289025628301,
+            "calibration_intercept": NaN,
+            "calibration_slope": NaN,
             "n": 1600,
             "nll": 0.40496374435710114,
             "prevalence": 0.14
@@ -51,8 +51,8 @@
             "auprc": 0.14,
             "auroc": 0.5,
             "brier": 0.12040006250000002,
-            "calibration_intercept": -0.42346266611380695,
-            "calibration_slope": 0.7678289025628301,
+            "calibration_intercept": NaN,
+            "calibration_slope": NaN,
             "n": 1600,
             "nll": 0.40496374435710114,
             "prevalence": 0.14
@@ -69,8 +69,8 @@
             "auprc": 0.140625,
             "auroc": 0.5,
             "brier": 0.12084975,
-            "calibration_intercept": -0.4222595082909517,
-            "calibration_slope": 0.7656473186248389,
+            "calibration_intercept": NaN,
+            "calibration_slope": NaN,
             "n": 1600,
             "nll": 0.4060970037976696,
             "prevalence": 0.140625
@@ -87,8 +87,8 @@
             "auprc": 0.140625,
             "auroc": 0.5,
             "brier": 0.12084975,
-            "calibration_intercept": -0.4222595082909519,
-            "calibration_slope": 0.7656473186248389,
+            "calibration_intercept": NaN,
+            "calibration_slope": NaN,
             "n": 1600,
             "nll": 0.4060970037976696,
             "prevalence": 0.140625
@@ -131,8 +131,8 @@
         "auprc": 0.14025,
         "auroc": 0.5,
         "brier": 0.1205799375,
-        "calibration_intercept": -0.4229808459366016,
-        "calibration_slope": 0.7669552589396699,
+        "calibration_intercept": NaN,
+        "calibration_slope": NaN,
         "n": 8000,
         "nll": 0.4054170481333285,
         "prevalence": 0.14025
@@ -147,7 +147,7 @@
           "c"
         ],
         "git_dirty": false,
-        "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+        "git_sha": "ae7fbb818491ed9bfbe62b84f2dc37213cde9715",
         "n_patients": 8000,
         "package_versions": {
           "numpy": "2.5.2",
@@ -2199,9 +2199,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 1.4712400999851525,
+        "fit_seconds": 1.5517477999674156,
         "git_dirty": false,
-        "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+        "git_sha": "ae7fbb818491ed9bfbe62b84f2dc37213cde9715",
         "imputation": "median",
         "n_patients": 8000,
         "package_versions": {
@@ -4324,9 +4324,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 6.699452699976973,
+        "fit_seconds": 6.938892200007103,
         "git_dirty": false,
-        "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+        "git_sha": "ae7fbb818491ed9bfbe62b84f2dc37213cde9715",
         "imputation": "median",
         "n_patients": 8000,
         "package_versions": {
@@ -7447,9 +7447,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 2.0371698000235483,
+        "fit_seconds": 1.9300546000013128,
         "git_dirty": false,
-        "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+        "git_sha": "ae7fbb818491ed9bfbe62b84f2dc37213cde9715",
         "imputation": "median",
         "n_patients": 8000,
         "package_versions": {
@@ -10580,9 +10580,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 19.801279700011946,
+        "fit_seconds": 20.77329209994059,
         "git_dirty": false,
-        "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+        "git_sha": "ae7fbb818491ed9bfbe62b84f2dc37213cde9715",
         "imputation": "median",
         "n_patients": 8000,
         "package_versions": {
@@ -15285,9 +15285,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 3.1212045999709517,
+        "fit_seconds": 3.053905599983409,
         "git_dirty": false,
-        "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+        "git_sha": "ae7fbb818491ed9bfbe62b84f2dc37213cde9715",
         "imputation": "median",
         "n_patients": 8000,
         "package_versions": {
@@ -20000,9 +20000,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 26.37237900006585,
+        "fit_seconds": 26.878315299982205,
         "git_dirty": false,
-        "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+        "git_sha": "ae7fbb818491ed9bfbe62b84f2dc37213cde9715",
         "imputation": "median",
         "n_patients": 8000,
         "package_versions": {
@@ -20603,9 +20603,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 0.1392553000478074,
+        "fit_seconds": 0.14658069994766265,
         "git_dirty": false,
-        "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+        "git_sha": "ae7fbb818491ed9bfbe62b84f2dc37213cde9715",
         "imputation": "median",
         "n_patients": 8000,
         "package_versions": {
@@ -21216,9 +21216,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 2.300515200011432,
+        "fit_seconds": 2.2671129999216646,
         "git_dirty": false,
-        "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+        "git_sha": "ae7fbb818491ed9bfbe62b84f2dc37213cde9715",
         "imputation": "median",
         "n_patients": 8000,
         "package_versions": {
@@ -25991,9 +25991,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 3.147218200028874,
+        "fit_seconds": 3.3874576000962406,
         "git_dirty": false,
-        "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+        "git_sha": "ae7fbb818491ed9bfbe62b84f2dc37213cde9715",
         "imputation": "median",
         "n_patients": 8000,
         "package_versions": {
@@ -30776,9 +30776,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 28.929190499940887,
+        "fit_seconds": 28.995038999943063,
         "git_dirty": false,
-        "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+        "git_sha": "ae7fbb818491ed9bfbe62b84f2dc37213cde9715",
         "imputation": "median",
         "n_patients": 8000,
         "package_versions": {
@@ -33899,9 +33899,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 2.4201178000075743,
+        "fit_seconds": 2.2161863999208435,
         "git_dirty": false,
-        "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+        "git_sha": "ae7fbb818491ed9bfbe62b84f2dc37213cde9715",
         "imputation": "median_jitter",
         "n_patients": 8000,
         "package_versions": {
@@ -37032,9 +37032,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 24.048644199967384,
+        "fit_seconds": 24.270841100020334,
         "git_dirty": false,
-        "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+        "git_sha": "ae7fbb818491ed9bfbe62b84f2dc37213cde9715",
         "imputation": "median_jitter",
         "n_patients": 8000,
         "package_versions": {
@@ -40155,9 +40155,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 1.504396399948746,
+        "fit_seconds": 1.4094162000110373,
         "git_dirty": false,
-        "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+        "git_sha": "ae7fbb818491ed9bfbe62b84f2dc37213cde9715",
         "imputation": "empirical_marginal",
         "n_patients": 8000,
         "package_versions": {
@@ -43288,9 +43288,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 20.87119019997772,
+        "fit_seconds": 19.922042999998666,
         "git_dirty": false,
-        "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+        "git_sha": "ae7fbb818491ed9bfbe62b84f2dc37213cde9715",
         "imputation": "empirical_marginal",
         "n_patients": 8000,
         "package_versions": {

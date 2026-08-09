@@ -189,7 +189,7 @@ Three **disjoint** blocks, so each can be trained on alone:
 
 ### Results
 
-| Feature view | Model | #feat | AUROC | 95% CI | AUPRC | Brier |
+| Feature view | Model | #feat | AUROC | 95% CI | average precision (AP) | Brier |
 |---|---|---|---|---|---|---|
 | **availability only** | logreg | 113 | **0.7224** | [0.707, 0.738] | 0.2695 | 0.1127 |
 | **availability only** | gbdt | 113 | 0.7187 | [0.703, 0.733] | 0.2588 | 0.1131 |
@@ -311,43 +311,45 @@ Printed to stdout; no artifacts written. Rerun to reproduce — the run is fully
 
 ### Headline numbers
 
-| run | AUROC [95% CI] | AUPRC | Brier | NLL |
+| run | AUROC [95% CI] | average precision (AP) | Brier | NLL |
 |---|---|---|---|---|
-| prevalence | 0.4994 [0.4840, 0.5152] | 0.1401 | 0.1206 | 0.4054 |
+| prevalence | 0.5000 [0.5000, 0.5000] | 0.1403 | 0.1206 | 0.4054 |
 | LR mask-only | 0.7278 [0.7128, 0.7423] | 0.2783 | 0.1114 | 0.3657 |
-| GBDT mask-only | 0.7280 [0.7133, 0.7418] | 0.2734 | 0.1116 | 0.3652 |
+| XGBoost mask-only | 0.7319 [0.7169, 0.7457] | 0.2812 | 0.1111 | 0.3634 |
 | LR values-only | 0.8095 [0.7964, 0.8219] | 0.4273 | 0.0997 | 0.3276 |
-| GBDT values-only | 0.8233 [0.8109, 0.8352] | 0.4455 | 0.0972 | 0.3174 |
+| XGBoost values-only | 0.8279 [0.8162, 0.8395] | 0.4471 | 0.0970 | 0.3151 |
 | LR values+mask | 0.8240 [0.8121, 0.8359] | 0.4511 | 0.0969 | 0.3182 |
-| GBDT values+mask | **0.8323** [0.8206, 0.8442] | 0.4627 | 0.0956 | 0.3116 |
+| XGBoost values+mask | 0.8295 [0.8177, 0.8411] | 0.4502 | 0.0968 | 0.3141 |
 
 ### Paired differences (identical patients and folds)
 
 | Comparison | LR | GBDT |
 |---|---|---|
-| VALUES+MASK − VALUES ONLY (AUROC) | +0.0146 [+0.0089, +0.0204] | +0.0090 [+0.0043, +0.0137] |
-| VALUES ONLY − MASK ONLY (AUROC) | +0.0817 [+0.0655, +0.0975] | +0.0953 [+0.0810, +0.1101] |
-| values-only median − stochastic (AUROC) | +0.0111 [+0.0059, +0.0162] | +0.0145 [+0.0081, +0.0207] |
+| VALUES+MASK − VALUES ONLY (AUROC) | +0.0146 [+0.0089, +0.0204] | +0.0016 [−0.0028, +0.0059] |
+| VALUES ONLY − MASK ONLY (AUROC) | +0.0817 [+0.0655, +0.0975] | +0.0960 [+0.0819, +0.1104] |
+| values-only median − median-jitter (AUROC) | +0.0014 [+0.0002, +0.0028] | +0.0064 [+0.0025, +0.0104] |
+| values-only median − empirical-marginal (AUROC) | +0.0194 [+0.0142, +0.0247] | +0.0161 [+0.0105, +0.0220] |
 
-All intervals exclude zero.
+The XGBoost explicit-mask interval includes zero; all other intervals shown exclude zero.
 
 ### Findings
 
-1. **E-002 reproduces under the M2 protocol.** Mask-only reaches 0.7278/0.7280 versus E-002's
-   0.7223745892 with fixed `C=1.0`; the gain is attributable to in-fold hyperparameter selection.
-2. **Values dominate measurement patterns.** VALUES ONLY − MASK ONLY = +0.095 AUROC (GBDT).
-3. **Explicit mask features add little on top of values:** +0.0090 AUROC (GBDT).
-4. **The imputation artefact exceeds the explicit mask gain.** For GBDT, median-versus-stochastic
-   imputation is worth +0.0145 AUROC — more than the entire 113-feature mask block. Standard
-   "values-only" baselines therefore already absorb measurement-pattern information implicitly.
+1. **E-002 replicates qualitatively under a tuned protocol.** Its fixed-`C=1` artifact is 0.72237;
+   nested M2 selects mostly `C=0.01` and reaches 0.72779. This is not an exact reproduction.
+2. **Values dominate measurement patterns.** VALUES ONLY − MASK ONLY = +0.0960 AUROC (XGBoost).
+3. **The XGBoost explicit-mask headline does not survive repair:** +0.0016 AUROC with a paired
+   interval crossing zero. The LR gain remains +0.0146 and excludes zero.
+4. **Values-only retains missingness cues, but the old imputation attribution is unsupported.**
+   Empirical-marginal summaries are still highly missingness-reconstructible and are structurally
+   incoherent, so their mortality gap is a sensitivity result rather than a missingness estimate.
 5. **SAPS-I and SOFA omitted**: PhysioNet documents no time window for them and warns its own
    calculator disagrees with the outcomes file, so cutoff-safety is unverifiable.
 
 ### Interpretation
 
-Pre-declared **Outcome B**: availability carries real signal, but does not materially change a
-sufficiently strong physiological predictor. Reported as measured; the strong form of the
-measurement-shortcut framing is **not** supported and has been restated.
+**Thesis D is primary:** nesting, final refit, representation and imputation materially affect the
+conclusion. **Thesis B is secondary:** values dominate, while measurement presence and
+preprocessing retain smaller model-dependent signal. The strong shortcut framing is unsupported.
 
 ---
 

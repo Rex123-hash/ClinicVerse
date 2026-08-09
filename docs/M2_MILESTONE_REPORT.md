@@ -1,201 +1,131 @@
-# M2 Milestone Report — Representation Ablation
+# M2 Milestone Report — Corrected Representation Ablation
 
-**Date:** 2026-08-09
-**Task:** T1, in-hospital mortality, 24h information boundary
-**Cohort:** PhysioNet/CinC 2012 sets a+b, n = 8,000, prevalence 14.03%. **set-c never loaded.**
-**Recommendation:** **MODIFY** (§10)
+**Review date:** 2026-08-10
+**Task:** T1 in-hospital mortality at a 24-hour information boundary
+**Cohort:** PhysioNet/CinC 2012 sets a+b, n=8,000, mortality prevalence 14.025%; set-c excluded
+**Decision:** PASS M2 WITH NONBLOCKING RISKS
 
-Every number below is read from `experiments/baselines/results/m2/results.json`. None was typed
-by hand. Raw out-of-fold predictions are retained in `predictions.npz` for independent
-recomputation.
+The canonical values are in `experiments/baselines/results/m2/results.json`; raw aligned OOF
+predictions, labels, and record IDs are in `predictions.npz`. The NPZ SHA-256 is recorded in the
+manifest. Review #2 independently recalculated every AUROC, average precision, Brier score, and
+NLL from the NPZ and found maximum absolute disagreement of `1.4e-17`.
 
----
+## Corrected protocol
 
-## Protocol
+Five stratified outer folds give each patient one OOF prediction. Within each 6,400-patient outer
+training fold, a stratified 5,120/1,280 inner split selects hyperparameters. The inner imputer and
+scaler see only the 5,120 inner-training patients. After selection, preprocessing is refitted on
+all 6,400 outer-training patients. Logistic regression is fitted there; XGBoost uses the
+inner-selected boosting-round count and is also refitted on all 6,400 patients. The 1,600 outer
+test patients are used only once for prediction.
 
-Outer 5-fold stratified CV over patients gives each patient exactly one out-of-fold prediction.
-Hyperparameters are selected **inside** each outer training fold on a held-out inner validation
-split (20%), from a compact grid fixed before any result was seen. Imputation and scaling are
-fitted on training rows only. Comparisons use **paired patient-level bootstrap** (2,000 resamples)
-on identical out-of-fold predictions — never overlapping standalone intervals.
+This corrects two defects in the superseded M2 run: preprocessing had been fitted before the inner
+split, and the final XGBoost model had remained fitted on only the inner-training subset despite a
+comment claiming a full outer-training refit. Outer-test isolation was intact, but these defects
+made the previous XGBoost representation comparison unreliable.
 
 | Provenance | Value |
 |---|---|
-| git SHA | `be9549cbbad3` (**clean tree** — re-run after committing the M2 code) |
-| cohort fingerprint | `f59c44f07556b7a6` |
-| split hash | `21cbeab1b5bc308f` |
-| config hash | `a80e2d2829a09a95` |
-| seed | 20260809 |
+| executable git SHA | `ae7fbb8` (clean tree) |
+| cohort fingerprint | `f59c44f07556b7a6…` |
+| split hash | `21cbeab1b5bc308f…` |
+| seed / bootstrap | 20260809 / 2,000 patient resamples |
+| runtime | Python 3.12.13; NumPy 2.5.2; scikit-learn 1.9.0; XGBoost 3.4.0 |
 
-**Search spaces.** LR: `C ∈ {0.01, 0.1, 1.0, 10.0}`. XGBoost:
-`max_depth ∈ {3,5} × learning_rate ∈ {0.05, 0.1} × min_child_weight ∈ {1,10}`, with
-`n_estimators=600` and early stopping at 50 rounds. Selection metric: inner-validation AUROC.
+XGBoost means `XGBClassifier` with binary-logistic objective, no class reweighting
+(`scale_pos_weight=1`), depth `{3,5}`, learning rate `{0.05,0.1}`, minimum child weight `{1,10}`,
+subsample and column-subsample 0.8, L2=1, histogram trees, and seed per fold. Early stopping is
+used only on the inner split to choose the round count; the fixed count is then refitted without
+outer-test inspection.
 
-**SAPS-I / SOFA are omitted.** The PhysioNet documentation specifies no time window for the
-outcome-file scores, and explicitly warns that its own SAPS calculator's output "do not always
-match those given in the outcomes file." Cutoff-safety is therefore unverifiable. Including them
-as 24h predictors would be scientifically invalid, so they are excluded rather than reported with
-a caveat.
+## Corrected M2 table
 
----
+“AP” is scikit-learn `average_precision_score`, not trapezoidal PR-AUC.
 
-## Results
+| run | features | AUROC [95% CI] | AP | Brier | NLL | descriptive slope / intercept |
+|---|---:|---:|---:|---:|---:|---:|
+| prevalence reference | 0 | 0.5000 [0.5000, 0.5000] | 0.1403 | 0.1206 | 0.4054 | undefined |
+| LR mask-only | 113 | 0.7278 [0.7128, 0.7423] | 0.2783 | 0.1114 | 0.3657 | 1.000 / −0.003 |
+| XGBoost mask-only | 113 | 0.7319 [0.7169, 0.7457] | 0.2812 | 0.1111 | 0.3634 | 1.032 / +0.054 |
+| LR values-only | 185 | 0.8095 [0.7964, 0.8219] | 0.4273 | 0.0997 | 0.3276 | 0.979 / −0.037 |
+| XGBoost values-only | 185 | 0.8279 [0.8162, 0.8395] | 0.4471 | 0.0970 | 0.3151 | 1.003 / +0.060 |
+| LR values+mask | 298 | 0.8240 [0.8121, 0.8359] | 0.4511 | 0.0969 | 0.3182 | 0.965 / −0.057 |
+| XGBoost values+mask | 298 | 0.8295 [0.8177, 0.8411] | 0.4502 | 0.0968 | 0.3141 | 0.996 / +0.068 |
 
-| run | #feat | AUROC [95% CI] | AUPRC [95% CI] | Brier | NLL | slope | intercept |
-|---|---|---|---|---|---|---|---|
-| prevalence | 0 | 0.4994 [0.4840, 0.5152] | 0.1401 [0.1319, 0.1481] | 0.1206 | 0.4054 | — | — |
-| **LR mask-only** | 113 | **0.7278** [0.7128, 0.7423] | 0.2783 [0.2570, 0.3018] | 0.1114 | 0.3657 | 1.000 | −0.003 |
-| **GBDT mask-only** | 113 | **0.7280** [0.7133, 0.7418] | 0.2734 [0.2533, 0.2965] | 0.1116 | 0.3652 | 1.002 | +0.014 |
-| **LR values-only** | 185 | 0.8095 [0.7964, 0.8219] | 0.4273 [0.3981, 0.4564] | 0.0997 | 0.3276 | 0.979 | −0.037 |
-| **GBDT values-only** | 185 | 0.8233 [0.8109, 0.8352] | 0.4455 [0.4151, 0.4783] | 0.0972 | 0.3174 | 0.954 | −0.008 |
-| **LR values+mask** | 298 | 0.8240 [0.8121, 0.8359] | 0.4511 [0.4205, 0.4806] | 0.0969 | 0.3182 | 0.965 | −0.057 |
-| **GBDT values+mask** | 298 | **0.8323** [0.8206, 0.8442] | **0.4627** [0.4331, 0.4933] | 0.0956 | 0.3116 | 1.018 | +0.104 |
+Supplementary models used the identical protocol: statics-only AUROC is 0.6310 (LR) and 0.6777
+(XGBoost); values+mask+statics reaches 0.8309 and 0.8425 respectively. These are official
+comparators, not part of the binding three-way contrast.
 
-Supplementary (not part of the three-way contract):
+## Paired comparisons
 
-| run | #feat | AUROC [95% CI] | AUPRC | Brier | NLL |
-|---|---|---|---|---|---|
-| statics-only LR | 5 | 0.6310 [0.6127, 0.6493] | 0.2183 | 0.1173 | 0.3932 |
-| statics-only GBDT | 5 | 0.6789 [0.6625, 0.6951] | 0.2343 | 0.1150 | 0.3818 |
-| values+mask+statics LR | 303 | 0.8309 [0.8188, 0.8424] | 0.4586 | 0.0959 | 0.3141 |
-| values+mask+statics GBDT | 303 | **0.8397** [0.8286, 0.8506] | 0.4654 | 0.0950 | 0.3081 |
-| values-only **stochastic-imputation** LR | 185 | 0.7984 [0.7853, 0.8115] | 0.4174 | 0.1008 | 0.3321 |
-| values-only **stochastic-imputation** GBDT | 185 | 0.8088 [0.7962, 0.8221] | 0.4206 | 0.0997 | 0.3266 |
+| comparison | LR ΔAUROC [95% CI] | XGBoost ΔAUROC [95% CI] |
+|---|---:|---:|
+| values+mask − values-only | +0.0146 [+0.0089, +0.0204] | +0.0016 [−0.0028, +0.0059] |
+| values-only − mask-only | +0.0817 [+0.0655, +0.0975] | +0.0960 [+0.0819, +0.1104] |
+| values+mask − mask-only | +0.0962 [+0.0828, +0.1095] | +0.0976 [+0.0837, +0.1111] |
 
-## Paired differences (identical patients, identical folds)
+The prior XGBoost explicit-mask claim (`+0.0090`) does not survive repair. The corrected estimate
+is small and its paired interval includes zero. The LR gain remains statistically distinguishable.
 
-| Comparison | Model | AUROC Δ [95% CI] | AUPRC Δ [95% CI] |
-|---|---|---|---|
-| VALUES+MASK − VALUES ONLY | LR | **+0.0146** [+0.0089, +0.0204] * | +0.0238 [+0.0139, +0.0346] * |
-| VALUES+MASK − VALUES ONLY | GBDT | **+0.0090** [+0.0043, +0.0137] * | +0.0172 [+0.0030, +0.0301] * |
-| VALUES ONLY − MASK ONLY | LR | +0.0817 [+0.0655, +0.0975] * | +0.1490 [+0.1203, +0.1764] * |
-| VALUES ONLY − MASK ONLY | GBDT | +0.0953 [+0.0810, +0.1101] * | +0.1721 [+0.1427, +0.2009] * |
-| VALUES+MASK − MASK ONLY | LR | +0.0962 [+0.0828, +0.1095] * | +0.1728 [+0.1457, +0.1973] * |
-| VALUES+MASK − MASK ONLY | GBDT | +0.1042 [+0.0909, +0.1187] * | +0.1893 [+0.1618, +0.2163] * |
+## Imputation diagnostics
 
-`*` = 95% paired interval excludes zero.
+Median-jitter (1% train-derived IQR) breaks exact equality to the median while staying local.
+Empirical-marginal imputation samples every missing summary cell independently from that column’s
+outer-training observations. It is not a realistic multivariate imputer: 74.1% of imputed
+five-summary groups violate elementary last/mean/min/max ordering constraints.
 
-## Residual-missingness control — the most consequential result
+| values-only comparison | LR ΔAUROC [95% CI] | XGBoost ΔAUROC [95% CI] |
+|---|---:|---:|
+| median − median-jitter | +0.0014 [+0.0002, +0.0028] | +0.0064 [+0.0025, +0.0104] |
+| median − empirical-marginal | +0.0194 [+0.0142, +0.0247] | +0.0161 [+0.0105, +0.0220] |
 
-Median imputation writes the training median into every unmeasured cell, so a model can detect
-"exactly the median" and reconstruct the missingness indicator. Stochastic imputation samples from
-the training marginal, removing that signature. The gap bounds how much of values-only performance
-is recoverable missingness information rather than physiology.
+A fold-honest classifier attempted to recover whether each source variable was originally absent
+from its five post-imputation summaries. Median and median-jitter were almost perfectly
+reconstructible (micro AUROC 0.9994 and 1.0000); empirical-marginal remained highly reconstructible
+(0.9808). Thus values-only is not missingness-free under any tested control. However, because the
+empirical control both retains missingness cues and destroys joint structure, its mortality gap
+does **not** quantify how much median-coded absence helps prediction. The former `+0.0145` causal
+interpretation is withdrawn.
 
-| Comparison | Model | AUROC Δ [95% CI] | AUPRC Δ [95% CI] |
-|---|---|---|---|
-| values-only median − values-only stochastic | LR | **+0.0111** [+0.0059, +0.0162] * | +0.0098 [+0.0008, +0.0193] * |
-| values-only median − values-only stochastic | GBDT | **+0.0145** [+0.0081, +0.0207] * | +0.0249 [+0.0098, +0.0401] * |
+## Calibration and baseline interpretation
 
-**For GBDT, the implicit missingness signal leaking through median imputation (+0.0145 AUROC) is
-larger than the explicit gain from adding the whole 113-feature mask block (+0.0090 AUROC).**
+Slope/intercept are maximum-likelihood fits of `label ~ intercept + slope × logit(OOF prediction)`
+after probability clipping. They are fitted and reported on the same aggregate OOF labels and are
+therefore descriptive diagnostics, not unbiased calibration estimates or post-hoc calibration.
+For mask-only LR, aggregate 1.000/−0.003 hides fold slopes from 0.884 to 1.168 and intercepts from
+−0.180 to +0.214. Reliability plots use OOF predictions and equal-mass bins with counts retained.
 
-A "values-only" baseline that uses median imputation — standard practice throughout this
-literature — is therefore already absorbing more measurement-pattern information than it would
-gain from being handed explicit indicators. This is a methodological finding about how
-values-versus-mask ablations are conducted, and we did not anticipate it.
+The prevalence line is a constant global development-prevalence reference. AUROC is therefore 0.5
+by definition and AP equals prevalence. The superseded fold-specific constants created artificial
+cross-fold ranking and AUROC 0.4994.
 
----
+E-002 used fixed `C=1`; its retained artifact reports 0.7223745892. Re-executing that current
+pipeline produced 0.7222844 (a small environment/artifact drift), whereas nested M2 selected
+`C={0.01,0.01,0.1,0.01,0.01}` and produced 0.7277881. E-002 is qualitatively replicated; M2 is a
+tuned comparable estimate, not an exact reproduction.
 
-## Decision-gate answers
+## Mask decomposition and interpretation
 
-**1. Is mask-only AUROC 0.7224 reproduced and directly comparable?**
-Yes, and slightly exceeded. E-002 reported **0.7223745892** with a fixed `C=1.0`. Under the M2
-protocol with `C` selected inside each training fold, mask-only reaches **0.7278** (LR) and
-**0.7280** (GBDT). The difference is attributable to hyperparameter selection, not to a change in
-the data or the boundary. **The finding survives directly comparable, leakage-safe evaluation.**
+The fold-honest LR diagnostic gives AUROC 0.6898 for ever-measured flags, 0.7059 for counts and
+frequency, 0.6802 for recency, 0.7110 for ever+counts, and 0.7278 for all mask components. The
+signal is distributed, with frequency the strongest single component. Statics-only is weaker,
+though this comparison does not establish causation or clinician intent.
 
-**2. Best mask-only model.** GBDT at 0.7280 [0.7133, 0.7418]; LR is statistically
-indistinguishable at 0.7278. Mask-only is essentially linear — trees buy nothing here.
+The supported reading is: physiological summaries dominate mask-only features; measurement
+presence alone remains predictive; explicit mask features add a reliable small LR gain but no
+reliable XGBoost gain after repair; and preprocessing can retain missingness cues even without
+explicit indicators. This supports Thesis D most strongly (evaluation conclusions are sensitive
+to nesting, representation, model refit, and imputation), with Thesis B as a secondary summary.
 
-**3. Best values-only model.** GBDT at 0.8233 [0.8109, 0.8352], clearly above LR's 0.8095.
+## Artifacts and next gate
 
-**4. Best values+mask model.** GBDT at 0.8323 [0.8206, 0.8442]. Adding statics reaches 0.8397.
+`results.json` now includes all feature names, per-feature inventories, per-fold selections and
+calibration/reliability diagnostics, package versions, hashes, seeds, cutoff, and source sets. Raw
+OOF predictions and mask-decomposition OOF predictions are checksummed. Diagnostic results are in
+`imputation_diagnostics.json` and `mask_decomposition.json`.
 
-**5. How large is VALUES+MASK − VALUES ONLY?**
-**+0.0090 AUROC** (GBDT) and **+0.0146** (LR). Both exclude zero, so the effect is real — but it
-is small, and for GBDT it is smaller than the imputation artefact in §Residual-missingness.
-
-**6. How much predictive information remains without any values?**
-Substantial. Mask-only reaches AUROC 0.728 and AUPRC 0.278 against a prevalence floor of 0.4994 /
-0.1401, using zero clinical measurements. It also beats statics-only (0.6310 / 0.6789), i.e.
-measurement patterns carry more than age, sex, weight, height and ICU type combined. We report no
-ratio to full-model skill.
-
-**7. Is the measurement-policy-shortcut framing still strong enough to be the central hook?**
-**Partly — and it must be restated more precisely.**
-
-- *Supported:* a model with no clinical values at all reaches 0.728. Measurement presence is a
-  genuine, large signal.
-- *Supported and sharpened:* models exploit measurement patterns **even when you try to withhold
-  them**, via imputation. That is the more interesting and less obvious claim.
-- *Not supported:* the strong form — "measurement patterns are what these models mostly run on".
-  Given values, explicit patterns add only ~0.009 AUROC. Values dominate
-  (VALUES ONLY − MASK ONLY = +0.095).
-
-This maps to **Outcome B** in the pre-declared interpretation rules, with an unanticipated
-addition from the imputation control. We are not forcing the shortcut story.
-
-**8. Does GBDT dominate?**
-For values-bearing representations, yes (+0.014 to +0.008 AUROC over LR). For mask-only, no —
-LR and GBDT are identical to three decimal places. No deep model is justified: nothing indicates
-the tabular ceiling has been reached by architecture rather than by information.
-
-**9. Any result that weakens the thesis?**
-Yes, two, both reported rather than buried:
-- The explicit values+mask gain (+0.0090 GBDT) is small. A referee could fairly say measurement
-  patterns are largely redundant once physiology is available.
-- Values-only is much stronger than mask-only. Any framing implying models are "mostly reading the
-  care process" is not supported.
-
-**10. GO / MODIFY / PIVOT.** **MODIFY.**
-
----
-
-## What this means for M3/M4
-
-The acquisition experiment becomes *more* relevant, not less, and its emphasis shifts.
-
-The interesting quantity is no longer "how much does the mask add" — it is **how a model's
-performance and calibration behave when the measurement-pattern shortcut is disrupted**, which is
-exactly what support-blind replay tests. M2 shows models absorb that shortcut even through
-imputation, so an acquisition policy evaluated under support-aware replay is being scored in a
-regime where the shortcut is freely available.
-
-Two concrete changes to the M3/M4 plan:
-
-1. **Imputation strategy becomes an experimental axis, not a fixed detail.** Median versus
-   stochastic imputation changes GBDT AUROC by more than the entire mask block does. Acquisition
-   results must be reported under both, or the imputation choice silently sets the conclusion.
-2. **Calibration is where the story may be strongest.** GBDT values+mask has calibration slope
-   1.018 and intercept +0.104 — the worst intercept among the core three — while mask-only is
-   near-perfect (1.000 / −0.003). Whether calibration degrades faster than discrimination under
-   budget pressure (H3) is now the most promising open question.
-
-## Honest limitations
-
-- One dataset, one cutoff, one binning. No external validation.
-- Values-only cannot be made perfectly free of missingness information; the stochastic variant
-  bounds but does not eliminate it.
-- The XGBoost early-stopping refit reuses the inner split for its stopping signal, so the final
-  model is fitted on 80% of each outer training fold rather than 100%. This is conservative — it
-  slightly understates GBDT — and is applied identically to every representation.
-- Development cohort only. **set-c remains quarantined.**
-- Associational throughout. Nothing here is causal, and nothing claims a model infers clinician
-  intent.
-
-## Artifacts
-
-```
-experiments/baselines/results/m2/
-  results.json        metrics, intervals, per-fold hyperparameters, provenance
-  predictions.npz     raw out-of-fold predictions, labels, record ids
-  figures/            baseline comparison, representation contrast, reliability
-```
-
-Reproduce:
-
-```bash
-python experiments/baselines/m2_representation_ablation.py --folds 5 --n-boot 2000
-python experiments/baselines/m2_figures.py
-```
+M3 may proceed only after checkpoint sign-off. The recommended M3 is calibration robustness under
+structured group-level information loss, with an isolated calibration split and discrimination,
+proper-score, reliability, and risk-coverage reporting. M4 should later test acquisition-policy
+ranking stability across support protocol, masking mechanism, and cost regime. This report does
+not begin either milestone.

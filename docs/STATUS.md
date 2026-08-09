@@ -67,25 +67,26 @@ python scripts/verify_physionet2012.py
 | Criterion | Evidence |
 |---|---|
 | Three binding representations on identical splits | `mask_only` / `values_only` / `values_mask`, E-004 |
-| Prevalence floor | AUROC 0.4994 [0.4840, 0.5152] |
-| LR and GBDT for each representation | 13 runs in `results/m2/results.json` |
-| Tuning on development data only | Nested inner-validation selection; set-c never loaded |
+| Prevalence floor | constant reference: AUROC 0.5000, AP 0.14025 |
+| LR and XGBoost for each representation | corrected runs in `results/m2/results.json` |
+| Tuning on development data only | fold-honest nested preprocessing/selection; set-c never loaded |
 | Paired inference, not overlapping CIs | `paired_bootstrap_difference`, 2,000 patient resamples |
-| Calibration slope/intercept + reliability | Reported per run; reliability figure from artifacts |
-| Machine-readable artifacts with provenance | git SHA, cohort fingerprint, split hash, config hash, per-fold hyperparameters, raw OOF predictions |
+| Calibration slope/intercept + reliability | descriptive aggregate and per-fold OOF diagnostics retained |
+| Machine-readable artifacts with provenance | git/package versions, feature inventory, cohort/split/config/NPZ hashes, fold parameters, raw OOF predictions |
 | Figures generated from artifacts | `results/m2/figures/` |
-| E-002 reproduced under a comparable protocol | mask-only 0.7278/0.7280 vs 0.7223745892 |
+| E-002 reconciled | fixed-`C` artifact 0.72237; nested/tuned M2 LR 0.72779 |
 
 ## Key M2 result
 
-Mask-only reaches **AUROC 0.7278** with no clinical values. But values dominate
-(VALUES ONLY − MASK ONLY = **+0.095** AUROC, GBDT), and explicit mask features add only
-**+0.0090** on top of values. Meanwhile median-versus-stochastic imputation is worth **+0.0145** —
-larger than the entire mask block. Pre-declared **Outcome B**; the strong measurement-shortcut
-framing is not supported and has been restated.
+Mask-only reaches **AUROC 0.7319** with no clinical values, but values dominate
+(VALUES ONLY − MASK ONLY = **+0.0960** AUROC, XGBoost). After correcting nesting and final refit,
+explicit masks add only **+0.0016 [−0.0028,+0.0059]** to XGBoost values-only. Missingness remains
+highly reconstructible after every tested imputer, but the empirical-marginal control is
+structurally incoherent, so its mortality gap cannot quantify missingness contribution. Primary
+**Thesis D**, secondary **Thesis B**.
 
 ## Next actions
 
 **STOP at the M2 decision gate.** M3 (uncertainty/calibration) begins only after sign-off. The
-report recommends carrying imputation strategy as an experimental axis into M3/M4, and identifies
-calibration under budget pressure (H3) as the strongest remaining open question.
+report recommends calibration robustness under structured group-level information loss with an
+isolated calibration split before later policy-ranking stability work.
