@@ -184,6 +184,12 @@ def load_panel_catalogue(path: pathlib.Path | None = None) -> PanelCatalogue:
     }
     alternatives = raw.pop("alternative_schedules", {}) or {}
     raw["alternative_schedules"] = {key: value["costs"] for key, value in alternatives.items()}
+    # The per-panel `cost` entries already instantiate `default_regime`, so the
+    # loaded catalogue is *named* for that regime. Leaving it as the generic
+    # "default" would make re-pricing to the regime it already uses look like a
+    # change of schedule.
+    if raw.get("default_regime"):
+        raw["schedule_name"] = raw["default_regime"]
     try:
         return PanelCatalogue.model_validate(raw)
     except ValueError as exc:

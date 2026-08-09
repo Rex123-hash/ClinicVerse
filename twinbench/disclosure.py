@@ -165,6 +165,7 @@ class DisclosureEngine:
         self._epoch_hours = epoch_hours
         self._epoch = 0
         self._spent = 0.0
+        self._patient = int(patient)
         self._log: list[Purchase] = []
 
         # Cells the policy can currently see: observed, not hidden, within boundary.
@@ -191,6 +192,18 @@ class DisclosureEngine:
     @property
     def remaining(self) -> float:
         return self._budget - self._spent
+
+    @property
+    def budget(self) -> float:
+        return self._budget
+
+    @property
+    def protocol(self) -> Protocol:
+        return self._protocol
+
+    @property
+    def patient_index(self) -> int:
+        return self._patient
 
     @property
     def purchases(self) -> tuple[Purchase, ...]:

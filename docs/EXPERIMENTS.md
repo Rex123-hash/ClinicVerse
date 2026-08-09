@@ -241,6 +241,61 @@ protocol (D-009, `BENCHMARK_SPEC.md` §5) is necessary rather than merely tidy.
 
 ---
 
+## E-003 — Disclosure protocol mechanics on real patients (M1 integration check)
+
+- **Date:** 2026-08-09
+- **Status:** COMPLETE
+- **Command:** `python experiments/baselines/disclosure_smoke.py --n 300 --budget 5`
+- **Purpose:** Verify the M1 disclosure engine behaves as specified in
+  `BENCHMARK_SPEC.md` on real data. **Mechanics only — no model is fitted and no predictive
+  claim is made.**
+- **Setup:** 300 set-a patients, 24h cutoff, epochs (12, 18, 24), budget 5.0 units,
+  `panel_events@0.5#20260809` masking, `shared_plus_marginal` cost regime.
+
+### Results (means per patient)
+
+| Policy | Protocol | Spent | Requests | Values disclosed | Empty requests | Wasted spend |
+|---|---|---|---|---|---|---|
+| no_acquisition | support_aware | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| random | support_aware | 3.59 | 2.76 | **10.89** | 0.00 | 0.00 |
+| fixed_order | support_aware | 2.84 | 2.02 | **10.82** | 0.00 | 0.00 |
+| no_acquisition | support_blind | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| random | support_blind | 4.40 | 4.00 | **0.62** | 3.55 | 3.91 |
+| fixed_order | support_blind | 4.30 | 3.00 | **10.08** | 1.27 | 1.81 |
+
+### Specification conformance
+
+- Wasted spend is **exactly zero** under `support_aware`, as required: unavailable groups are not
+  requestable there.
+- Wasted spend is **positive** under `support_blind` — the budget cost of not being told what is
+  available. This is the mechanism that makes hidden-bearing and empty groups indistinguishable
+  before purchase (SO-2).
+- `no_acquisition` spends nothing under both protocols, giving the zero-budget reference point.
+
+### Observation worth flagging early
+
+Under `support_aware` the **random** policy discloses 10.89 values per patient; under
+`support_blind` the *same* policy discloses **0.62** — roughly a seventeen-fold collapse at
+comparable spend. The reason is structural rather than statistical: "random over the groups that
+happen to be available" is not a naive baseline at all, because the available set is itself
+derived from the historical record. Once availability must be paid for, a uniform policy spends
+most of its budget on rarely-measured groups (TroponinI 5.1%, Cholesterol 7.6% coverage) and
+receives nothing.
+
+The `fixed_order` policy degrades far less (10.82 → 10.08) because it targets commonly measured
+groups.
+
+**This is a mechanics observation, not a result.** It says nothing yet about predictive
+performance, which is M4. But it does indicate that the *random baseline* used throughout the
+acquisition literature is quietly advantaged under support-aware replay, which is precisely the
+effect H1 is designed to measure.
+
+### Output
+
+Printed to stdout; no artifacts written. Rerun to reproduce — the run is fully seeded.
+
+---
+
 ## Planned next runs
 
 **E-003** — T1 clinical baselines: prevalence, SAPS-I, SOFA as single-feature predictors, for
