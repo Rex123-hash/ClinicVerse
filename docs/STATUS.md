@@ -1,7 +1,7 @@
 # Cliniverse — Status
 
 **Updated:** 2026-08-09
-**Current milestone:** M2 complete — decision gate reached, awaiting sign-off before M3.
+**Current milestone:** M3 complete — decision gate reached, awaiting sign-off before M4.
 
 ## Where we are
 
@@ -13,8 +13,8 @@
 | M0 repo/tooling/CI | **Done** | See exit criteria below |
 | independent review #0 response | **Done** | `docs/REVIEW_RESPONSE_0.md`, `docs/NOVELTY_REASSESSMENT.md`, `docs/BENCHMARK_SPEC.md` |
 | M1 TwinBench v0 | **Done + repaired** | Adversarial audit in `docs/ADVERSARIAL_REVIEW_1.md` |
-| M2 Baselines | Ready to start | Must follow the contract in `docs/ADVERSARIAL_REVIEW_1.md` |
-| M3 Uncertainty | Not started | |
+| M2 Baselines | **Done + repaired** | E-004; `docs/M2_MILESTONE_REPORT.md`, audit in `docs/ADVERSARIAL_REVIEW_2.md` |
+| M3 Calibration robustness | **Done** | E-005; `docs/M3_MILESTONE_REPORT.md`. Verdict GO to M4 |
 | M4 Acquisition (core) | Not started | |
 | M5 Ablations/robustness/OOD | Not started | |
 | M6 API + minimal UI | Not started | |
@@ -85,8 +85,31 @@ highly reconstructible after every tested imputer, but the empirical-marginal co
 structurally incoherent, so its mortality gap cannot quantify missingness contribution. Primary
 **Thesis D**, secondary **Thesis B**.
 
+## Key M3 result
+
+Under structured group-level information loss, **discrimination is robust and calibration is not**.
+AUROC falls only 0.8270 to 0.8002 across a 78% loss of laboratory information, while the
+calibration intercept moves from -0.010 to **+0.573** and mean predicted risk falls to 0.0944
+against an unchanged 14.03% prevalence: the model systematically understates risk. At matched
+per-patient cell counts, structured loss is significantly worse than random-cell loss on NLL and
+Brier. Platt calibration fitted on clean data corrects slope but not the drift.
+
 ## Next actions
 
-**STOP at the M2 decision gate.** M3 (uncertainty/calibration) begins only after sign-off. The
-report recommends calibration robustness under structured group-level information loss with an
-isolated calibration split before later policy-ranking stability work.
+**STOP at the M3 decision gate.** M4 (acquisition-policy ranking stability) begins after sign-off,
+and should rank policies on probabilistic and calibration metrics rather than AUROC alone.
+
+## M3 exit criteria — all met
+
+| Criterion | Evidence |
+|---|---|
+| Design predeclared before execution | `docs/M3_DESIGN.md`, committed first |
+| Isolated calibration partition | model-train 4,800 / calibration 1,600 / outer test 1,600 per fold |
+| Imputer never refitted under stress | fitted once per fold on clean model-train data |
+| Loss applied before feature construction | `evaluation/information_loss.py` operates on the cohort |
+| Per-patient severity matching | asserted elementwise in `tests/test_information_loss.py` |
+| Paired contrasts, not standalone CIs | 2,000 patient-level resamples, identical patients and seeds |
+| Calibration ladder | uncalibrated / Platt / isotonic, all fitted on calibration data only |
+| Figures from artifacts | `results/m3/figures/` |
+| Demonstration patient by declared rule | median of 88 eligible cases, `m3_demo_patient.json` |
+| Determinism verified | two consecutive runs give bit-identical predictions |

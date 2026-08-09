@@ -1,18 +1,18 @@
 {
   "baseline": "values_mask|xgboost|platt|0.0|none",
-  "n_eligible_with_confidence_held": 109,
-  "n_flipped_correct_to_incorrect": 164,
+  "n_eligible_with_confidence_held": 88,
+  "n_flipped_correct_to_incorrect": 136,
   "rule": "docs/M3_DESIGN.md section 11",
   "selected": {
-    "calibration_error_deterioration": 0.2568083761918647,
-    "entropy_baseline": 0.6650406949851911,
-    "entropy_group_loss_50": 0.6540936731202983,
-    "index": 147,
+    "calibration_error_deterioration": 0.2221469577168419,
+    "entropy_baseline": 0.6740354762792913,
+    "entropy_group_loss_50": 0.6617134424929092,
+    "index": 2118,
     "label": 1.0,
-    "median_deterioration_of_eligible": 0.2568083761918647,
-    "p_baseline": 0.617987620199044,
-    "p_group_loss_50": 0.3611792440071792,
-    "record_id": 132893
+    "median_deterioration_of_eligible": 0.2256361742087653,
+    "p_baseline": 0.5974413619377595,
+    "p_group_loss_50": 0.3752944042209177,
+    "record_id": 137856
   },
   "stress": "values_mask|xgboost|platt|0.5|group_structured"
 }

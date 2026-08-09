@@ -353,6 +353,70 @@ preprocessing retain smaller model-dependent signal. The strong shortcut framing
 
 ---
 
+## E-005 - M3 calibration robustness under structured information loss
+
+- **Date:** 2026-08-09
+- **Status:** COMPLETE
+- **Design:** predeclared in [`M3_DESIGN.md`](M3_DESIGN.md), committed before execution
+- **Full report:** [`M3_MILESTONE_REPORT.md`](M3_MILESTONE_REPORT.md)
+- **Commands:**
+  `python experiments/robustness/m3_calibration_under_loss.py --n-boot 2000`
+  `python experiments/robustness/m3_figures.py`
+- **Artifacts:** `experiments/robustness/results/m3/`
+- **Setup:** T1 mortality, 24h boundary, 5-fold, sets a+b, n=8,000. Isolated three-way partition
+  per fold (model-train 4,800 / calibration 1,600 / outer test 1,600). Imputer fitted once per fold
+  on clean model-train data, never refitted under stress. Calibrators fitted on clean calibration
+  data only. set-c never loaded.
+
+### Realized severity (group loss is indivisible)
+
+| requested | realized mean | cells removed | matched per patient |
+|---|---|---|---|
+| 0.25 | 0.284 | 86,192 | yes |
+| 0.50 | 0.519 | 157,625 | yes |
+| 0.75 | 0.779 | 231,414 | yes |
+
+### Primary result (values_mask / XGBoost / Platt)
+
+| severity | condition | AUROC | NLL | cal. intercept | mean predicted risk |
+|---|---|---|---|---|---|
+| 0.00 | none | 0.8270 | 0.3151 | -0.010 | 0.1397 |
+| 0.284 | group | 0.8204 | 0.3212 | +0.204 | 0.1224 |
+| 0.519 | group | 0.8118 | 0.3308 | +0.360 | 0.1094 |
+| 0.779 | group | 0.8002 | 0.3445 | **+0.573** | **0.0944** |
+| 0.779 | cell_random | 0.8016 | 0.3345 | +0.115 | 0.1184 |
+
+True prevalence is 0.1403 throughout.
+
+### Paired contrast, group minus matched cell (Platt)
+
+| severity | NLL | Brier |
+|---|---|---|
+| 0.284 | +0.0029 [-0.0005, +0.0065] | +0.0007 [-0.0005, +0.0019] |
+| 0.519 | +0.0076 [+0.0028, +0.0122] | +0.0021 [+0.0005, +0.0036] |
+| 0.779 | +0.0100 [+0.0057, +0.0145] | +0.0027 [+0.0012, +0.0042] |
+
+### Findings
+
+1. Discrimination is robust; calibration is not. AUROC falls 0.827 to 0.800 across a 78% loss,
+   while the calibration intercept moves from -0.010 to +0.573 and mean predicted risk falls to
+   0.0944 against an unchanged 14.03% prevalence.
+2. Structure matters beyond amount. At matched per-patient cell counts, group loss is significantly
+   worse on NLL and Brier at 50% and 75%. Not distinguishable at 25%.
+3. Clean-data Platt calibration corrects slope but not the drift. Isotonic is actively harmful
+   under stress (slope 0.489, worst NLL).
+4. AURC barely separates the conditions - a negative result for that metric as a stress readout.
+5. The entropy decrease is not independent evidence of overconfidence; at a 14% base rate it
+   follows mechanically from predicted risks falling.
+
+### Reproducibility note
+
+An intermediate lint auto-fix changed behaviour in `information_loss.py` mid-milestone, so an
+earlier draft table differed. Reported numbers come from the final code, verified deterministic:
+two consecutive runs give bit-identical predictions (max difference 0.000e+00).
+
+---
+
 ## Planned next runs
 
 **E-004** — T1 clinical baselines: prevalence, SAPS-I, SOFA as single-feature predictors, for
