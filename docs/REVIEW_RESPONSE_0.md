@@ -250,9 +250,12 @@ In-hospital mortality at a 24h cutoff, 5-fold CV, n=8,000 (sets a+b), prevalence
 | availability + statics | gbdt | 0.7510 | [0.736, 0.765] |
 | all | gbdt | **0.8363** | [0.825, 0.847] |
 
-**A model that cannot see a single laboratory value reaches AUROC 0.72 — recovering 65–70% of the
-full model's discrimination above chance, purely from which tests were ordered, how often, and how
-recently.**
+**A model that never sees a single laboratory or vital value reaches AUROC 0.7224, using only
+measurement-presence patterns — counts, ever-measured flags and recency.**
+
+*No ratio to full-model skill is claimed here.* That requires a directly comparable, properly
+tuned full-value baseline on the identical cohort, split and protocol — M2 work. Until then the
+availability figure stands on its own.
 
 This is the empirical foundation of the revised thesis (D-008) and it directly justifies the
 support-blind protocol.

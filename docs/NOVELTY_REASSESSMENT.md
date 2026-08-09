@@ -54,8 +54,8 @@ Three things survive. They are narrow, and I state them at the size they actuall
 von Kleist et al. prove naive AFAPE is biased and propose estimators. They do not report *how
 large the inflation is* for concrete acquisition policies. Nobody has published: *"policy P
 reports X% cost savings under standard support-aware replay and Y% when availability is no longer
-a free signal."* Our E-002 result shows the gap should be large on this dataset — availability
-alone gives AUROC 0.72 — which makes the measurement worth making.
+a free signal."* Our E-002 result shows availability alone gives AUROC 0.7224 on this dataset, which makes the
+measurement worth making.
 
 **(b) Support-blind replay as an executable protocol, not an estimator.**
 The AFAPE response is *statistical correction* (IPW/DM/DRL) requiring assumptions that are false
@@ -79,8 +79,8 @@ measurement will rate this lower, and that is a real risk we are accepting delib
 ## 4. Defensible contribution — the revised thesis
 
 > **Question.** When an acquisition policy is evaluated by replaying a historical ICU record, how
-> much of its measured benefit comes from *information it acquired*, and how much from *knowing
-> which tests the clinician chose to order*?
+> much of its measured benefit survives when the historical measurement-policy shortcut is
+> disrupted — i.e. when measurement presence is no longer a free signal?
 >
 > **Method.** Evaluate identical policies under two disclosure protocols on identical patients,
 > masks and seeds — **support-aware** (standard practice: only historically recorded panels can be
@@ -90,8 +90,9 @@ measurement will rate this lower, and that is a real risk we are accepting delib
 >
 > **Foundation (already measured, E-002).** At a 24h decision point on 8,000 patients, a model
 > using **only** which tests were ordered — no measured value whatsoever — reaches
-> **AUROC 0.7224 [0.707, 0.738]**, versus 0.8184 for values-only and 0.8363 for the full model.
-> Availability recovers **65–70% of the full model's discrimination above chance.**
+> **AUROC 0.7224 [0.707, 0.738]**, versus 0.8184 for values-only and 0.8363 for the all-blocks
+> model. No ratio between these is claimed until M2 provides a directly comparable, tuned
+> full-value baseline on the identical cohort, split and protocol.
 
 This is falsifiable in both directions. If support-blind and support-aware give the same rankings
 and similar gains, we report that acquisition benefits are robust — a useful negative result. If
@@ -104,8 +105,9 @@ they diverge, we have quantified an evaluation bias the field currently corrects
 The five required answers, honestly:
 
 **1. One healthcare ML failure understandable in <20 seconds.**
-> "This ICU risk model scores 0.72 AUROC without reading a single lab result. It isn't reading the
-> patient — it's reading which tests the doctor decided to order."
+> "A model that never sees a single lab value reaches AUROC 0.7224 using only
+> measurement-presence patterns. Clinical AI can learn the care process itself — not just
+> patient physiology."
 
 **2. One technical mechanism.**
 Support-blind disclosure replay: a benchmark protocol where requesting an unavailable panel costs
@@ -119,7 +121,8 @@ panels that returned nothing.
 
 **4. One measurable result we can produce.**
 Paired ΔAUBC between protocols with bootstrap CIs, plus a rank-reversal count across cost regimes.
-The foundational number (availability-only AUROC 0.7224) is **already executed**, not projected.
+The foundational number (availability-only AUROC 0.7224, 95% CI [0.707, 0.738]) is **already
+executed**, not projected.
 
 **5. One reason this differs from the closest prior work.**
 Yu et al. optimise a policy *within* support-aware replay and report the resulting cost savings.

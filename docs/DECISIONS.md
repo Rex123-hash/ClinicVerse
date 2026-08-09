@@ -48,10 +48,11 @@ benchmark on credentialing-free data; (c) calibration-vs-budget rather than accu
 controlled generator for structured-missingness and OOD cases only. MIMIC-IV credentialing
 started in parallel but kept off the critical path.
 
-**Why.** Verified open access (ODC-BY, no credentialing, ~20 MB); natively irregular and
-≥76.7% missing; and — decisively — its variable-coverage structure is genuinely panel-shaped:
-routine labs are measured ~3.5× per 48h stay while vitals are near-continuous, giving real
-discrete acquisition events. Established literature baselines exist for the mortality task.
+**Why.** Verified open access (ODC-BY, no credentialing, ~20 MB); natively irregular, with
+**79.75% missingness on the binned hourly grid** (production parser, set-a — see D-007 for the
+corrected figures); and its coverage structure separates a near-continuous monitoring tier from a
+discretely measured laboratory tier (~3.5 measurements per 48h stay), which is what makes an
+acquisition problem well-posed. Established literature baselines exist for the mortality task.
 
 **Alternatives rejected.**
 - *MIMIC-IV full.* Credentialing is multi-day human review; cannot gate the project on it.
@@ -184,17 +185,18 @@ established. See `docs/NOVELTY_REASSESSMENT.md`.
 **Decision.** The project's question becomes:
 
 > When an acquisition policy is evaluated by replaying a historical ICU record, how much of its
-> measured benefit comes from information it acquired, and how much from knowing which tests the
-> clinician chose to order?
+> measured benefit survives when the historical measurement-policy shortcut is disrupted — i.e.
+> when measurement presence is no longer a free signal?
 
 Method: evaluate identical policies under **support-aware** and **support-blind** disclosure on
 identical patients, masks and seeds; report paired ΔAUBC; test whether policy rankings survive
 four cost regimes.
 
 **Empirical basis (already executed, E-002).** At a 24h cutoff on 8,000 patients, a model using
-only which tests were ordered — no measured value at all — reaches AUROC **0.7224 [0.707, 0.738]**
-versus 0.8184 values-only and 0.8363 full. Availability recovers 65-70% of the full model's
-discrimination above chance.
+only measurement-presence patterns — no measured value at all — reaches AUROC **0.7224
+[0.707, 0.738]**, versus 0.8184 values-only and 0.8363 all-blocks. No ratio between these is
+claimed until M2 provides a directly comparable tuned full-value baseline on the identical
+cohort, split and protocol.
 
 **What we may claim.** That we *quantify* the gap on open data with an assumption-light protocol,
 and test ranking stability. **What we may not claim:** that we discovered informative missingness

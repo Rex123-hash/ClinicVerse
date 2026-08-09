@@ -205,13 +205,17 @@ Three **disjoint** blocks, so each can be trained on alone:
 
 ### Finding
 
-**A model that sees no laboratory or vital value whatsoever — only which tests were ordered, how
-often, and how recently — reaches AUROC 0.7224.** Relative to the full model's discrimination
-above chance, availability alone recovers **69.9%** (logreg) and **65.0%** (gbdt).
+**A model that sees no laboratory or vital value whatsoever — only measurement-presence patterns
+(counts, ever-measured flags, recency) — reaches AUROC 0.7224 [0.707, 0.738].**
 
-Adding measured values on top of availability moves the full model from 0.7510 to 0.8363, so
-values do carry substantial independent signal. The point is not that values are useless; it is
-that the *ordering pattern by itself* is worth most of the model's apparent skill.
+Adding measured values on top moves the all-blocks model from 0.7510 to 0.8363, so values carry
+substantial independent signal. The point is not that values are useless; it is that
+measurement-presence patterns alone support non-trivial discrimination.
+
+**Reporting limit.** We do **not** state what fraction of full-model skill this represents. A ratio
+of the form `(AUROC_avail − 0.5) / (AUROC_full − 0.5)` depends on an arbitrary chance-normalisation
+and on an untuned full model. The comparable claim requires a properly tuned full-value baseline
+on the identical cohort, split and protocol — deferred to M2.
 
 ### Consistency with prior work
 

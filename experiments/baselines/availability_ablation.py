@@ -1,19 +1,21 @@
-"""How much of ICU mortality prediction is patient physiology, and how much is
-clinician behaviour?
+"""How much of ICU mortality prediction is carried by measurement-presence
+patterns rather than measured values?
 
 At a 24h decision point we fit the same models on three disjoint feature views:
 
-  AVAILABILITY  which tests were ordered, how often, how recently. No measured
-                value is included — the model cannot see a single lab result.
-  VALUES        the measured values only (last/mean/min/max/slope), imputed
-                within-fold, with no ordering or mask information.
-  BOTH          the union, plus admission statics.
+  AVAILABILITY  measurement-presence patterns only: per-variable counts,
+                ever-measured flags and recency. No measured value is included.
+  VALUES        measured values only (last/mean/min/max/slope), imputed
+                within-fold, with no presence or mask information.
+  STATICS       admission descriptors.
 
-If AVAILABILITY alone approaches the performance of VALUES, then a large part of
-what these models "know" is which tests the clinician chose to order — a signal
-that reflects the historical ordering policy rather than the patient's state.
-That matters directly for active-acquisition evaluation, where the acquirable
-set is itself derived from those same historical decisions.
+Measurement presence reflects the historical care process — which observations
+were recorded, how often, how recently — rather than physiology alone. This is
+an associational statement about what a model can predict from presence
+patterns; it asserts nothing causal, and nothing about clinician intent.
+
+It matters for acquisition evaluation because the acquirable set in a
+retrospective replay is derived from those same historical records.
 
 Everything is fold-honest: imputation and scaling are fit on training rows only.
 
@@ -190,18 +192,18 @@ def main(argv: list[str] | None = None) -> int:
             f"{r['auroc']:>9.4f}{ci:>18}{r['auprc']:>9.4f}{r['brier']:>9.4f}"
         )
 
-    # Headline: paired comparison of availability-only against values-only.
+    # Raw comparison only. We deliberately do NOT print a "share of full-model
+    # skill" ratio: it depends on an arbitrary chance-normalisation and on an
+    # untuned full model, and the comparable claim needs a properly tuned
+    # full-value baseline on the identical cohort/split/protocol (M2).
     for model_kind in ("logreg", "gbdt"):
         a = results[f"availability_only::{model_kind}"]
         v = results[f"values_only::{model_kind}"]
         gap = float(v["auroc"]) - float(a["auroc"])  # type: ignore[arg-type]
-        share = float(a["auroc"]) - 0.5  # type: ignore[arg-type]
-        total = float(results[f"all::{model_kind}"]["auroc"]) - 0.5  # type: ignore[index]
         print(
-            f"\n[{model_kind}] availability-only AUROC = {float(a['auroc']):.4f}; "  # type: ignore[arg-type]
-            f"values-only = {float(v['auroc']):.4f} (gap {gap:+.4f}); "  # type: ignore[arg-type]
-            f"availability recovers {share / total:.1%} of the full model's "
-            f"discrimination above chance."
+            f"\n[{model_kind}] availability-only AUROC = {float(a['auroc']):.4f} "  # type: ignore[arg-type]
+            f"(measurement-presence patterns only, no measured values); "
+            f"values-only = {float(v['auroc']):.4f}; difference {gap:+.4f}."  # type: ignore[arg-type]
         )
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
