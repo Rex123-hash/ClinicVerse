@@ -1,0 +1,101 @@
+{
+  "provenance": {
+    "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+    "config_hash": "92b7903f000dd8ba87e7c4037e5315202c6dd7711908b9e9d6883a97fb14a695",
+    "diagnostic": "value_summary_missingness_reconstructibility",
+    "git_dirty": true,
+    "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+    "n_patients": 8000,
+    "package_versions": {
+      "numpy": "2.5.2",
+      "scikit-learn": "1.9.0",
+      "xgboost": "3.4.0"
+    },
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python": "3.12.13",
+    "sets": [
+      "a",
+      "b"
+    ],
+    "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775"
+  },
+  "results": {
+    "empirical_marginal": {
+      "coherence_violation_rate_on_imputed_groups": 0.7413171949371824,
+      "max_variable_auroc": 0.9968474043906755,
+      "median_variable_auroc": 0.9719158313943081,
+      "micro_auroc": 0.9808490385117794,
+      "micro_average_precision": 0.9680821529283273,
+      "min_variable_auroc": 0.4873203247140123,
+      "missing_fraction": 0.3122398648648649,
+      "n_patient_variable_examples": 296000
+    },
+    "median": {
+      "coherence_violation_rate_on_imputed_groups": 0.0,
+      "max_variable_auroc": 1.0,
+      "median_variable_auroc": 1.0,
+      "micro_auroc": 0.9994429712343458,
+      "micro_average_precision": 0.9985024661105647,
+      "min_variable_auroc": 0.4873203247140123,
+      "missing_fraction": 0.3122398648648649,
+      "n_patient_variable_examples": 296000
+    },
+    "median_jitter": {
+      "coherence_violation_rate_on_imputed_groups": 0.27277396000241944,
+      "max_variable_auroc": 1.0,
+      "median_variable_auroc": 0.999999084211765,
+      "micro_auroc": 0.999980609876228,
+      "micro_average_precision": 0.9999565530703547,
+      "min_variable_auroc": 0.9996309558264153,
+      "missing_fraction": 0.3122398648648649,
+      "n_patient_variable_examples": 296000
+    }
+  },
+  "schema": "cliniverse.m2.imputation_diagnostics/1",
+  "statistics": [
+    "last",
+    "mean",
+    "min",
+    "max",
+    "slope"
+  ],
+  "variables": [
+    "ALP",
+    "ALT",
+    "AST",
+    "Albumin",
+    "BUN",
+    "Bilirubin",
+    "Cholesterol",
+    "Creatinine",
+    "DiasABP",
+    "FiO2",
+    "GCS",
+    "Glucose",
+    "HCO3",
+    "HCT",
+    "HR",
+    "K",
+    "Lactate",
+    "MAP",
+    "MechVent",
+    "Mg",
+    "NIDiasABP",
+    "NIMAP",
+    "NISysABP",
+    "Na",
+    "PaCO2",
+    "PaO2",
+    "Platelets",
+    "RespRate",
+    "SaO2",
+    "SysABP",
+    "Temp",
+    "TroponinI",
+    "TroponinT",
+    "Urine",
+    "WBC",
+    "Weight",
+    "pH"
+  ]
+}

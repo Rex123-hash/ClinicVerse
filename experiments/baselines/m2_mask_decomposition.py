@@ -90,7 +90,6 @@ def main(argv: list[str] | None = None) -> int:
 
     predictions_path = args.out.with_name("mask_decomposition_predictions.npz")
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    np.savez_compressed(predictions_path, **arrays)  # type: ignore[arg-type]
     provenance = build_provenance(
         cohort=cohort,
         splits=splits,
@@ -108,6 +107,7 @@ def main(argv: list[str] | None = None) -> int:
             "preprocessing": FittedImputer.__name__,
         },
     )
+    np.savez_compressed(predictions_path, **arrays)  # type: ignore[arg-type]
     payload = {
         "schema": "cliniverse.m2.mask_decomposition/1",
         "provenance": provenance,

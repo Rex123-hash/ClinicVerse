@@ -1,0 +1,873 @@
+{
+  "predictions_file": {
+    "name": "mask_decomposition_predictions.npz",
+    "sha256": "940aace7f493951764ae979547a5edc14e94796f74c471caa0ae1bc530f0fba9"
+  },
+  "provenance": {
+    "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+    "config_hash": "8fe34934d3a0fdc3b264729b83c4482b38ae73021e61003e6e9ac5949ce1ff64",
+    "diagnostic": "mask_only_component_decomposition",
+    "git_dirty": true,
+    "git_sha": "9628ff5da4810d4d3a9a79d933c273815f9c84a1",
+    "imputation": "median",
+    "n_patients": 8000,
+    "package_versions": {
+      "numpy": "2.5.2",
+      "scikit-learn": "1.9.0",
+      "xgboost": "3.4.0"
+    },
+    "platform": "Windows-11-10.0.26100-SP0",
+    "preprocessing": "FittedImputer",
+    "python": "3.12.13",
+    "sets": [
+      "a",
+      "b"
+    ],
+    "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775"
+  },
+  "results": {
+    "counts_frequency": {
+      "feature_names": [
+        "n_obs::ALP",
+        "n_obs::ALT",
+        "n_obs::AST",
+        "n_obs::Albumin",
+        "n_obs::BUN",
+        "n_obs::Bilirubin",
+        "n_obs::Cholesterol",
+        "n_obs::Creatinine",
+        "n_obs::DiasABP",
+        "n_obs::FiO2",
+        "n_obs::GCS",
+        "n_obs::Glucose",
+        "n_obs::HCO3",
+        "n_obs::HCT",
+        "n_obs::HR",
+        "n_obs::K",
+        "n_obs::Lactate",
+        "n_obs::MAP",
+        "n_obs::MechVent",
+        "n_obs::Mg",
+        "n_obs::NIDiasABP",
+        "n_obs::NIMAP",
+        "n_obs::NISysABP",
+        "n_obs::Na",
+        "n_obs::PaCO2",
+        "n_obs::PaO2",
+        "n_obs::Platelets",
+        "n_obs::RespRate",
+        "n_obs::SaO2",
+        "n_obs::SysABP",
+        "n_obs::Temp",
+        "n_obs::TroponinI",
+        "n_obs::TroponinT",
+        "n_obs::Urine",
+        "n_obs::WBC",
+        "n_obs::Weight",
+        "n_obs::pH",
+        "n_obs::TOTAL",
+        "n_distinct_vars::TOTAL"
+      ],
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.2761758883632506,
+          "ci_low": 0.23548326662911123,
+          "n_boot": 2000,
+          "point": 0.254406063108345
+        },
+        "auroc": {
+          "ci_high": 0.7202649622527715,
+          "ci_low": 0.6906279622478627,
+          "n_boot": 2000,
+          "point": 0.7059351576417925
+        },
+        "brier": {
+          "ci_high": 0.11854090420863811,
+          "ci_low": 0.1086186195004952,
+          "n_boot": 2000,
+          "point": 0.11357388355635972
+        },
+        "nll": {
+          "ci_high": 0.3875396863635651,
+          "ci_low": 0.3616823485519699,
+          "n_boot": 2000,
+          "point": 0.37465685020774253
+        }
+      },
+      "metrics": {
+        "auprc": 0.254406063108345,
+        "auroc": 0.7059351576417925,
+        "brier": 0.11357388355635972,
+        "calibration_intercept": 0.041281952889790585,
+        "calibration_slope": 1.025988032812129,
+        "n": 8000,
+        "nll": 0.37465685020774253,
+        "prevalence": 0.14025
+      },
+      "n_features": 39,
+      "per_fold_selection": [
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 0,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.7111868686868688,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 1,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.6966641414141415,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 2,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.6843636363636364,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 3,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.7307577164487338,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 4,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.705382105653063,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 1.0
+          }
+        }
+      ]
+    },
+    "ever_measured": {
+      "feature_names": [
+        "ever::ALP",
+        "ever::ALT",
+        "ever::AST",
+        "ever::Albumin",
+        "ever::BUN",
+        "ever::Bilirubin",
+        "ever::Cholesterol",
+        "ever::Creatinine",
+        "ever::DiasABP",
+        "ever::FiO2",
+        "ever::GCS",
+        "ever::Glucose",
+        "ever::HCO3",
+        "ever::HCT",
+        "ever::HR",
+        "ever::K",
+        "ever::Lactate",
+        "ever::MAP",
+        "ever::MechVent",
+        "ever::Mg",
+        "ever::NIDiasABP",
+        "ever::NIMAP",
+        "ever::NISysABP",
+        "ever::Na",
+        "ever::PaCO2",
+        "ever::PaO2",
+        "ever::Platelets",
+        "ever::RespRate",
+        "ever::SaO2",
+        "ever::SysABP",
+        "ever::Temp",
+        "ever::TroponinI",
+        "ever::TroponinT",
+        "ever::Urine",
+        "ever::WBC",
+        "ever::Weight",
+        "ever::pH"
+      ],
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.26346694899805784,
+          "ci_low": 0.2249600275501743,
+          "n_boot": 2000,
+          "point": 0.2429278672227638
+        },
+        "auroc": {
+          "ci_high": 0.7052075568973851,
+          "ci_low": 0.6736509251046437,
+          "n_boot": 2000,
+          "point": 0.6897761417607303
+        },
+        "brier": {
+          "ci_high": 0.11918381680905415,
+          "ci_low": 0.10939775164680732,
+          "n_boot": 2000,
+          "point": 0.11427000507755325
+        },
+        "nll": {
+          "ci_high": 0.3920759722400556,
+          "ci_low": 0.3656843443498907,
+          "n_boot": 2000,
+          "point": 0.37899049407775687
+        }
+      },
+      "metrics": {
+        "auprc": 0.2429278672227638,
+        "auroc": 0.6897761417607303,
+        "brier": 0.11427000507755325,
+        "calibration_intercept": -0.034144977881691574,
+        "calibration_slope": 0.9794108712390316,
+        "n": 8000,
+        "nll": 0.37899049407775687,
+        "prevalence": 0.14025
+      },
+      "n_features": 37,
+      "per_fold_selection": [
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 0,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.6953131313131313,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.1
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 1,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.7049141414141414,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 1.0
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 2,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.654590909090909,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 3,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.7190060838546979,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 4,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.7094743732208911,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        }
+      ]
+    },
+    "ever_plus_counts": {
+      "feature_names": [
+        "n_obs::ALP",
+        "n_obs::ALT",
+        "n_obs::AST",
+        "n_obs::Albumin",
+        "n_obs::BUN",
+        "n_obs::Bilirubin",
+        "n_obs::Cholesterol",
+        "n_obs::Creatinine",
+        "n_obs::DiasABP",
+        "n_obs::FiO2",
+        "n_obs::GCS",
+        "n_obs::Glucose",
+        "n_obs::HCO3",
+        "n_obs::HCT",
+        "n_obs::HR",
+        "n_obs::K",
+        "n_obs::Lactate",
+        "n_obs::MAP",
+        "n_obs::MechVent",
+        "n_obs::Mg",
+        "n_obs::NIDiasABP",
+        "n_obs::NIMAP",
+        "n_obs::NISysABP",
+        "n_obs::Na",
+        "n_obs::PaCO2",
+        "n_obs::PaO2",
+        "n_obs::Platelets",
+        "n_obs::RespRate",
+        "n_obs::SaO2",
+        "n_obs::SysABP",
+        "n_obs::Temp",
+        "n_obs::TroponinI",
+        "n_obs::TroponinT",
+        "n_obs::Urine",
+        "n_obs::WBC",
+        "n_obs::Weight",
+        "n_obs::pH",
+        "ever::ALP",
+        "ever::ALT",
+        "ever::AST",
+        "ever::Albumin",
+        "ever::BUN",
+        "ever::Bilirubin",
+        "ever::Cholesterol",
+        "ever::Creatinine",
+        "ever::DiasABP",
+        "ever::FiO2",
+        "ever::GCS",
+        "ever::Glucose",
+        "ever::HCO3",
+        "ever::HCT",
+        "ever::HR",
+        "ever::K",
+        "ever::Lactate",
+        "ever::MAP",
+        "ever::MechVent",
+        "ever::Mg",
+        "ever::NIDiasABP",
+        "ever::NIMAP",
+        "ever::NISysABP",
+        "ever::Na",
+        "ever::PaCO2",
+        "ever::PaO2",
+        "ever::Platelets",
+        "ever::RespRate",
+        "ever::SaO2",
+        "ever::SysABP",
+        "ever::Temp",
+        "ever::TroponinI",
+        "ever::TroponinT",
+        "ever::Urine",
+        "ever::WBC",
+        "ever::Weight",
+        "ever::pH",
+        "n_obs::TOTAL",
+        "n_distinct_vars::TOTAL"
+      ],
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.2848897550845034,
+          "ci_low": 0.24181369674491965,
+          "n_boot": 2000,
+          "point": 0.26219679029832593
+        },
+        "auroc": {
+          "ci_high": 0.725330936832496,
+          "ci_low": 0.6952283056975661,
+          "n_boot": 2000,
+          "point": 0.7109558156181662
+        },
+        "brier": {
+          "ci_high": 0.11784684006370924,
+          "ci_low": 0.1080550884612027,
+          "n_boot": 2000,
+          "point": 0.11285996267172117
+        },
+        "nll": {
+          "ci_high": 0.3853968343598473,
+          "ci_low": 0.35918694767693127,
+          "n_boot": 2000,
+          "point": 0.37255526411490836
+        }
+      },
+      "metrics": {
+        "auprc": 0.26219679029832593,
+        "auroc": 0.7109558156181662,
+        "brier": 0.11285996267172117,
+        "calibration_intercept": -0.018900353871546722,
+        "calibration_slope": 0.987432672373903,
+        "n": 8000,
+        "nll": 0.37255526411490836,
+        "prevalence": 0.14025
+      },
+      "n_features": 76,
+      "per_fold_selection": [
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 0,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.7134545454545456,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 1,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.7124570707070705,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.1
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 2,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.684449494949495,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 3,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.7338174031733469,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 4,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.7147083149396942,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        }
+      ]
+    },
+    "full_mask": {
+      "feature_names": [
+        "n_obs::ALP",
+        "n_obs::ALT",
+        "n_obs::AST",
+        "n_obs::Albumin",
+        "n_obs::BUN",
+        "n_obs::Bilirubin",
+        "n_obs::Cholesterol",
+        "n_obs::Creatinine",
+        "n_obs::DiasABP",
+        "n_obs::FiO2",
+        "n_obs::GCS",
+        "n_obs::Glucose",
+        "n_obs::HCO3",
+        "n_obs::HCT",
+        "n_obs::HR",
+        "n_obs::K",
+        "n_obs::Lactate",
+        "n_obs::MAP",
+        "n_obs::MechVent",
+        "n_obs::Mg",
+        "n_obs::NIDiasABP",
+        "n_obs::NIMAP",
+        "n_obs::NISysABP",
+        "n_obs::Na",
+        "n_obs::PaCO2",
+        "n_obs::PaO2",
+        "n_obs::Platelets",
+        "n_obs::RespRate",
+        "n_obs::SaO2",
+        "n_obs::SysABP",
+        "n_obs::Temp",
+        "n_obs::TroponinI",
+        "n_obs::TroponinT",
+        "n_obs::Urine",
+        "n_obs::WBC",
+        "n_obs::Weight",
+        "n_obs::pH",
+        "ever::ALP",
+        "ever::ALT",
+        "ever::AST",
+        "ever::Albumin",
+        "ever::BUN",
+        "ever::Bilirubin",
+        "ever::Cholesterol",
+        "ever::Creatinine",
+        "ever::DiasABP",
+        "ever::FiO2",
+        "ever::GCS",
+        "ever::Glucose",
+        "ever::HCO3",
+        "ever::HCT",
+        "ever::HR",
+        "ever::K",
+        "ever::Lactate",
+        "ever::MAP",
+        "ever::MechVent",
+        "ever::Mg",
+        "ever::NIDiasABP",
+        "ever::NIMAP",
+        "ever::NISysABP",
+        "ever::Na",
+        "ever::PaCO2",
+        "ever::PaO2",
+        "ever::Platelets",
+        "ever::RespRate",
+        "ever::SaO2",
+        "ever::SysABP",
+        "ever::Temp",
+        "ever::TroponinI",
+        "ever::TroponinT",
+        "ever::Urine",
+        "ever::WBC",
+        "ever::Weight",
+        "ever::pH",
+        "recency::ALP",
+        "recency::ALT",
+        "recency::AST",
+        "recency::Albumin",
+        "recency::BUN",
+        "recency::Bilirubin",
+        "recency::Cholesterol",
+        "recency::Creatinine",
+        "recency::DiasABP",
+        "recency::FiO2",
+        "recency::GCS",
+        "recency::Glucose",
+        "recency::HCO3",
+        "recency::HCT",
+        "recency::HR",
+        "recency::K",
+        "recency::Lactate",
+        "recency::MAP",
+        "recency::MechVent",
+        "recency::Mg",
+        "recency::NIDiasABP",
+        "recency::NIMAP",
+        "recency::NISysABP",
+        "recency::Na",
+        "recency::PaCO2",
+        "recency::PaO2",
+        "recency::Platelets",
+        "recency::RespRate",
+        "recency::SaO2",
+        "recency::SysABP",
+        "recency::Temp",
+        "recency::TroponinI",
+        "recency::TroponinT",
+        "recency::Urine",
+        "recency::WBC",
+        "recency::Weight",
+        "recency::pH",
+        "n_obs::TOTAL",
+        "n_distinct_vars::TOTAL"
+      ],
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.301787128259281,
+          "ci_low": 0.2569883956598629,
+          "n_boot": 2000,
+          "point": 0.27825013772553187
+        },
+        "auroc": {
+          "ci_high": 0.7423122893732672,
+          "ci_low": 0.7128101913851572,
+          "n_boot": 2000,
+          "point": 0.727788140025367
+        },
+        "brier": {
+          "ci_high": 0.11631649150604752,
+          "ci_low": 0.10674021801351455,
+          "n_boot": 2000,
+          "point": 0.11140950999883946
+        },
+        "nll": {
+          "ci_high": 0.37866400342358336,
+          "ci_low": 0.3529123383749127,
+          "n_boot": 2000,
+          "point": 0.36574508538963674
+        }
+      },
+      "metrics": {
+        "auprc": 0.27825013772553187,
+        "auroc": 0.727788140025367,
+        "brier": 0.11140950999883946,
+        "calibration_intercept": -0.0026185979937789557,
+        "calibration_slope": 0.9997244720248895,
+        "n": 8000,
+        "nll": 0.36574508538963674,
+        "prevalence": 0.14025
+      },
+      "n_features": 113,
+      "per_fold_selection": [
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 0,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.7235606060606061,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 1,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.7322323232323232,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 2,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.7026515151515151,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.1
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 3,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.7241410804804165,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 4,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.7290122235245764,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.01
+          }
+        }
+      ]
+    },
+    "recency_time_since_last": {
+      "feature_names": [
+        "recency::ALP",
+        "recency::ALT",
+        "recency::AST",
+        "recency::Albumin",
+        "recency::BUN",
+        "recency::Bilirubin",
+        "recency::Cholesterol",
+        "recency::Creatinine",
+        "recency::DiasABP",
+        "recency::FiO2",
+        "recency::GCS",
+        "recency::Glucose",
+        "recency::HCO3",
+        "recency::HCT",
+        "recency::HR",
+        "recency::K",
+        "recency::Lactate",
+        "recency::MAP",
+        "recency::MechVent",
+        "recency::Mg",
+        "recency::NIDiasABP",
+        "recency::NIMAP",
+        "recency::NISysABP",
+        "recency::Na",
+        "recency::PaCO2",
+        "recency::PaO2",
+        "recency::Platelets",
+        "recency::RespRate",
+        "recency::SaO2",
+        "recency::SysABP",
+        "recency::Temp",
+        "recency::TroponinI",
+        "recency::TroponinT",
+        "recency::Urine",
+        "recency::WBC",
+        "recency::Weight",
+        "recency::pH"
+      ],
+      "intervals": {
+        "auprc": {
+          "ci_high": 0.24983343638747188,
+          "ci_low": 0.21253744293579901,
+          "n_boot": 2000,
+          "point": 0.23013559323046412
+        },
+        "auroc": {
+          "ci_high": 0.6958318996862664,
+          "ci_low": 0.6641770812171446,
+          "n_boot": 2000,
+          "point": 0.6801743682484493
+        },
+        "brier": {
+          "ci_high": 0.12057958558574262,
+          "ci_low": 0.11080508522615636,
+          "n_boot": 2000,
+          "point": 0.1154850251068131
+        },
+        "nll": {
+          "ci_high": 0.39657460333568306,
+          "ci_low": 0.3702579094904102,
+          "n_boot": 2000,
+          "point": 0.3832470132325937
+        }
+      },
+      "metrics": {
+        "auprc": 0.23013559323046412,
+        "auroc": 0.6801743682484493,
+        "brier": 0.1154850251068131,
+        "calibration_intercept": -0.10663360422740388,
+        "calibration_slope": 0.9369406643656781,
+        "n": 8000,
+        "nll": 0.3832470132325937,
+        "prevalence": 0.14025
+      },
+      "n_features": 37,
+      "per_fold_selection": [
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 0,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.6747626262626263,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.1
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 1,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.6854242424242424,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.1
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 2,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.6421969696969698,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 1.0
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 3,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.6848116745061624,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 0.1
+          }
+        },
+        {
+          "final_preprocessing_fit_n": 6400,
+          "fold": 4,
+          "inner_preprocessing_fit_n": 5120,
+          "inner_validation_auroc": 0.6941226614707807,
+          "n_inner_train": 5120,
+          "n_inner_validation": 1280,
+          "n_train": 6400,
+          "n_validation": 1600,
+          "selected": {
+            "C": 1.0
+          }
+        }
+      ]
+    }
+  },
+  "schema": "cliniverse.m2.mask_decomposition/1"
+}
