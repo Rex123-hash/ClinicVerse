@@ -1,6 +1,7 @@
 # Data — never commit dataset blobs. Regenerate via scripts/.
-data/
-!data/.gitkeep
+# Leading slash anchors this to the repo root: an unanchored `data/` would also
+# match the `cliniverse/data/` and `twinbench/datasets/` source packages.
+/data/
 
 # Experiment outputs
 runs/
