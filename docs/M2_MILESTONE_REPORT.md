@@ -21,7 +21,7 @@ on identical out-of-fold predictions — never overlapping standalone intervals.
 
 | Provenance | Value |
 |---|---|
-| git SHA | `4bfed43a1b85` (working tree dirty: M2 code was uncommitted at run time) |
+| git SHA | `be9549cbbad3` (**clean tree** — re-run after committing the M2 code) |
 | cohort fingerprint | `f59c44f07556b7a6` |
 | split hash | `21cbeab1b5bc308f` |
 | config hash | `a80e2d2829a09a95` |

@@ -48,8 +48,8 @@
         "excluded_sets": [
           "c"
         ],
-        "git_dirty": true,
-        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "git_dirty": false,
+        "git_sha": "be9549cbbad39b46ba84a0bf333a003b08266c36",
         "n_patients": 8000,
         "platform": "Windows-11-10.0.26100-SP0",
         "python": "3.12.13",
@@ -222,9 +222,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 1.5046766999876127,
-        "git_dirty": true,
-        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "fit_seconds": 1.461277800030075,
+        "git_dirty": false,
+        "git_sha": "be9549cbbad39b46ba84a0bf333a003b08266c36",
         "imputation": "median",
         "n_patients": 8000,
         "platform": "Windows-11-10.0.26100-SP0",
@@ -459,9 +459,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 6.723191800061613,
-        "git_dirty": true,
-        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "fit_seconds": 7.449225899996236,
+        "git_dirty": false,
+        "git_sha": "be9549cbbad39b46ba84a0bf333a003b08266c36",
         "imputation": "median",
         "n_patients": 8000,
         "platform": "Windows-11-10.0.26100-SP0",
@@ -672,9 +672,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 1.8235484999604523,
-        "git_dirty": true,
-        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "fit_seconds": 1.9335689999861643,
+        "git_dirty": false,
+        "git_sha": "be9549cbbad39b46ba84a0bf333a003b08266c36",
         "imputation": "median",
         "n_patients": 8000,
         "platform": "Windows-11-10.0.26100-SP0",
@@ -909,9 +909,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 22.512959400075488,
-        "git_dirty": true,
-        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "fit_seconds": 22.168368700076826,
+        "git_dirty": false,
+        "git_sha": "be9549cbbad39b46ba84a0bf333a003b08266c36",
         "imputation": "median",
         "n_patients": 8000,
         "platform": "Windows-11-10.0.26100-SP0",
@@ -1122,9 +1122,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 3.182334400014952,
-        "git_dirty": true,
-        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "fit_seconds": 3.1217959000496194,
+        "git_dirty": false,
+        "git_sha": "be9549cbbad39b46ba84a0bf333a003b08266c36",
         "imputation": "median",
         "n_patients": 8000,
         "platform": "Windows-11-10.0.26100-SP0",
@@ -1359,9 +1359,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 30.140247900038958,
-        "git_dirty": true,
-        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "fit_seconds": 31.85086260002572,
+        "git_dirty": false,
+        "git_sha": "be9549cbbad39b46ba84a0bf333a003b08266c36",
         "imputation": "median",
         "n_patients": 8000,
         "platform": "Windows-11-10.0.26100-SP0",
@@ -1572,9 +1572,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 0.13461459998507053,
-        "git_dirty": true,
-        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "fit_seconds": 0.1389219999546185,
+        "git_dirty": false,
+        "git_sha": "be9549cbbad39b46ba84a0bf333a003b08266c36",
         "imputation": "median",
         "n_patients": 8000,
         "platform": "Windows-11-10.0.26100-SP0",
@@ -1809,9 +1809,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 2.451894999947399,
-        "git_dirty": true,
-        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "fit_seconds": 2.498370499932207,
+        "git_dirty": false,
+        "git_sha": "be9549cbbad39b46ba84a0bf333a003b08266c36",
         "imputation": "median",
         "n_patients": 8000,
         "platform": "Windows-11-10.0.26100-SP0",
@@ -2022,9 +2022,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 2.8871199999703094,
-        "git_dirty": true,
-        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "fit_seconds": 3.048412899952382,
+        "git_dirty": false,
+        "git_sha": "be9549cbbad39b46ba84a0bf333a003b08266c36",
         "imputation": "median",
         "n_patients": 8000,
         "platform": "Windows-11-10.0.26100-SP0",
@@ -2259,9 +2259,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 31.743458800017834,
-        "git_dirty": true,
-        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "fit_seconds": 31.610083899926394,
+        "git_dirty": false,
+        "git_sha": "be9549cbbad39b46ba84a0bf333a003b08266c36",
         "imputation": "median",
         "n_patients": 8000,
         "platform": "Windows-11-10.0.26100-SP0",
@@ -2472,9 +2472,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 1.237200399977155,
-        "git_dirty": true,
-        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "fit_seconds": 1.2044611000455916,
+        "git_dirty": false,
+        "git_sha": "be9549cbbad39b46ba84a0bf333a003b08266c36",
         "imputation": "stochastic",
         "n_patients": 8000,
         "platform": "Windows-11-10.0.26100-SP0",
@@ -2709,9 +2709,9 @@
         "excluded_sets": [
           "c"
         ],
-        "fit_seconds": 22.4637972000055,
-        "git_dirty": true,
-        "git_sha": "4bfed43a1b8533dce911dcc721846702fa76389d",
+        "fit_seconds": 21.38676519994624,
+        "git_dirty": false,
+        "git_sha": "be9549cbbad39b46ba84a0bf333a003b08266c36",
         "imputation": "stochastic",
         "n_patients": 8000,
         "platform": "Windows-11-10.0.26100-SP0",
