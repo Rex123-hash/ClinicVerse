@@ -1,0 +1,44 @@
+# Data — never commit dataset blobs. Regenerate via scripts/.
+data/
+!data/.gitkeep
+
+# Experiment outputs
+runs/
+outputs/
+artifacts/
+*.ckpt
+*.pt
+*.joblib
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+dist/
+build/
+.coverage
+htmlcov/
+
+# Secrets — never commit credentials
+.env
+.env.*
+!.env.example
+*-key.json
+*credentials*.json
+service-account*.json
+
+# Node / web
+node_modules/
+.next/
+.vite/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
