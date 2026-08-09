@@ -80,7 +80,8 @@ information absent from the dataset. Missingness is NMAR and informative.
 **Decision.** Do not estimate deployment value. Evaluate policies under a **synthetic masking
 mechanism we specify and control**: hide a seeded subset of *observed* cells; policies buy them
 back. Ground truth exists by construction, the mechanism is known by construction, so
-policy comparison is unbiased with respect to that mechanism. Naturally-missing cells are
+paired cases isolate implemented random variation with respect to that mechanism. This does not
+establish statistical or causal unbiasedness. Naturally-missing cells are
 permanently unavailable and never acquirable.
 
 **Cost.** Claims are limited to relative policy performance under a disclosed mechanism. This
@@ -219,9 +220,10 @@ calibration as the thesis (MOSAIC 2026 overlaps) — retained as secondary analy
 **Context.** the reviewer correctly observed that "at t=24h, buy a panel" was undefined: it can neither
 re-order a past observation nor reveal future data without leakage.
 
-**Decision.** The benchmark is **sequential selective disclosure (replay) of historically recorded
-panel-like events**. At epoch k with boundary t_k, a purchase discloses only hidden values with
-timestamp <= t_k. Targets lie strictly beyond the final boundary. Formal specification in
+**Decision.** The benchmark is **sequential retrospective selective disclosure of historically
+recorded values in panel-like feature groups**. At epoch k with boundary t_k, a purchase discloses
+all hidden recorded values for that group with timestamp <= t_k. It does not identify or replay
+orders, specimens, or events. Targets lie strictly beyond the final boundary. Formal specification in
 `docs/BENCHMARK_SPEC.md`.
 
 **Binding wording rule.** We do not describe this as prospective or temporal test ordering.

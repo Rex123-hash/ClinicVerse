@@ -1,11 +1,12 @@
-"""Derive the laboratory panel catalogue empirically from co-measurement structure.
+"""Derive the laboratory feature-group catalogue from co-presence structure.
 
-The panel-level acquisition framing (research_assessment.md 3.2a) rests on a
-factual claim: that laboratory analytes in this dataset are ordered together, in
-groups, as single events. That claim must be measured, not assumed.
+The group-level acquisition framing rests on a factual claim: laboratory
+analytes in this dataset are recorded together in clusters within hourly bins.
+This co-presence must be measured, not assumed, and does not identify real
+orders or specimens.
 
 Method. For every (patient, hour) cell in which at least one laboratory analyte
-was measured, record which analytes were measured. For each ordered pair (i, j)
+was measured, record which analytes were measured. For each variable pair (i, j)
 compute:
 
     jaccard(i, j)   = P(i and j measured | i or j measured)
@@ -47,11 +48,11 @@ def co_measurement_matrices(
     ``conditional[i, j] = P(j measured | i measured)`` in the same hour-cell.
     """
     cols = [cohort.variable_index(n) for n in lab_names]
-    # (n_patients, n_hours, n_labs) -> flatten patient/hour into "ordering events"
+    # (n_patients, n_hours, n_labs) -> flatten patient/hour into active lab bins.
     mask = cohort.m[:, :, cols].reshape(-1, len(cols))
-    # Only cells where at least one lab was drawn are ordering opportunities.
+    # Keep patient-hours where at least one lab was recorded.
     active = mask[mask.any(axis=1)]
-    log.info("ordering events", n_events=int(active.shape[0]), n_labs=len(lab_names))
+    log.info("active lab patient-hours", n_hours=int(active.shape[0]), n_labs=len(lab_names))
 
     counts = active.astype(np.int64)
     both = counts.T @ counts  # |i and j|
@@ -88,7 +89,7 @@ def main(argv: list[str] | None = None) -> int:
         type=float,
         default=0.5,
         help="Jaccard distance cut for cluster formation (default 0.5, i.e. "
-        "analytes co-drawn in >50%% of the events where either appears)",
+        "analytes co-present in >50%% of active hours where either appears)",
     )
     parser.add_argument(
         "--out",
@@ -132,19 +133,19 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  {score:.3f}  {a:<12} {b}")
 
     print("\n" + "=" * 78)
-    print("MARGINAL DRAW FREQUENCY (share of ordering events containing analyte)")
+    print("MARGINAL PRESENCE FREQUENCY (share of active lab hours containing analyte)")
     print("=" * 78)
     lab_cols = [cohort.variable_index(n) for n in lab_names]
-    n_events = int(np.count_nonzero(cohort.m[:, :, lab_cols].any(axis=2)))
+    n_active_hours = int(np.count_nonzero(cohort.m[:, :, lab_cols].any(axis=2)))
     for i in np.argsort(-marginal):
-        share = marginal[i] / n_events
+        share = marginal[i] / n_active_hours
         print(f"  {share:.3f}  {lab_names[i]:<12} ({int(marginal[i]):,} draws)")
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "sets": args.sets,
         "n_patients": cohort.n_patients,
-        "n_ordering_events": n_events,
+        "n_active_lab_patient_hours": n_active_hours,
         "threshold": args.threshold,
         "lab_names": list(lab_names),
         "jaccard": jaccard.round(4).tolist(),

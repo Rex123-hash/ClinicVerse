@@ -102,8 +102,10 @@ def report_timeseries(records: list[pathlib.Path], which: str) -> None:
         if len(ts) == 0:
             empty.append(path.stem)
             continue
-        present.update(ts["Parameter"].unique())
-        obs_rows.update(ts["Parameter"].value_counts().to_dict())
+        present.update(str(value) for value in ts["Parameter"].unique())
+        obs_rows.update(
+            {str(key): int(value) for key, value in ts["Parameter"].value_counts().items()}
+        )
 
     n_rec = len(records)
     s_rows, s_times = pd.Series(rows_per_rec), pd.Series(times_per_rec)

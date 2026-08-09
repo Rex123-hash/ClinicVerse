@@ -23,8 +23,10 @@ clinician was already concerned, using information (exam findings, gestalt, nurs
 is not in the dataset. Missingness is Not-Missing-At-Random and is itself strongly predictive.
 
 TwinBench therefore measures **relative policy performance under a synthetic masking mechanism
-that we specify, seed, and disclose**. Comparisons between policies are unbiased *with respect
-to that mechanism*. They do not transfer to a claim about clinical utility.
+that we specify, seed, and disclose**. Paired cases control the implemented randomness, but that
+does not make policy comparisons statistically or causally unbiased: estimates remain sensitive
+to policy selection, model fitting, finite samples, and the chosen mechanism. They do not
+transfer to a claim about clinical utility.
 
 A policy that wins on TwinBench has not been shown to be useful in a hospital.
 
@@ -55,9 +57,16 @@ real prices or as economic findings.**
 ## 5. Panel definitions are a simplification
 
 PhysioNet 2012 records analytes with timestamps; it does **not** record what was ordered.
-Our groups (`BMP_like`, `CBC_like`, `hepatic_like`, `ABG_like`) are co-measurement clusters
-that resemble familiar panels, not recovered laboratory orders. They are named `*-like`
-throughout and must be described that way. Real ordering varies by institution.
+Our groups (`BMP_like`, `CBC_like`, `hepatic_like`, `ABG_like`) are hourly-bin co-presence
+clusters that resemble familiar panels, not recovered laboratory orders, specimens, or events.
+An action retrospectively discloses all hidden recorded values for that feature group through the
+current boundary. It does not simulate a prospective order. The groups are named `*-like`
+throughout and must be described that way.
+
+The `support_aware` protocol and `random_support_oracle` baseline receive patient-specific
+availability and are diagnostic oracles, not deployable comparators. `random_uniform_all` is an
+honest support-blind floor but can be weak for rare groups; `random_train_frequency` therefore
+provides a stronger support-blind baseline fitted on training support only.
 
 ## 6. Uncertainty limitations
 

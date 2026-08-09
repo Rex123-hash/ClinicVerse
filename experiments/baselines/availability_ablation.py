@@ -31,6 +31,7 @@ import pathlib
 import sys
 import time
 from collections.abc import Callable
+from typing import Any
 
 import numpy as np
 from sklearn.ensemble import HistGradientBoostingClassifier
@@ -219,10 +220,13 @@ def main(argv: list[str] | None = None) -> int:
         },
     }
     args.out.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    oof_payload: Any = {
+        k.replace("::", "__"): np.asarray(r["oof"]) for k, r in results.items()
+    }
     np.savez_compressed(
         args.out.with_suffix(".oof.npz"),
         y=y,
-        **{k.replace("::", "__"): np.asarray(r["oof"]) for k, r in results.items()},
+        **oof_payload,
     )
     print(f"\nwrote {args.out}")
     return 0

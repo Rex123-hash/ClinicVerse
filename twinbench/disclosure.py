@@ -7,9 +7,9 @@ historical measurement pattern rather than by acquiring information.
 
 Two invariants, both enforced structurally rather than by convention:
 
-**SO-1** ``PolicyView`` holds no reference to evaluator state. It is built by
-copying only disclosed arrays, so there is no attribute path from what a policy
-receives to the hidden set, the historical support, or the targets.
+**SO-1** ``PolicyView`` holds no reference to evaluator state. It uses read-only
+array copies and a detached immutable action catalogue, so there is no attribute
+path from what a policy receives to hidden support, targets, or evaluator state.
 
 **SO-2** A group holding hidden values and a group holding none are
 indistinguishable *before purchase*. This is why an unavailable request is
@@ -20,10 +20,9 @@ protocol exists to remove.
 Protocols
 ---------
 ``support_aware``  Only groups with at least one hidden value within the current
-                   boundary may be requested. This reproduces standard
-                   retrospective replay practice, in which the acquirable set is
-                   derived from what was historically recorded — so availability
-                   is a free signal.
+                   boundary may be requested. This is a diagnostic availability
+                   oracle reproducing standard retrospective replay practice; it
+                   is not a deployable information contract.
 ``support_blind``  The whole catalogue may be requested. Availability costs
                    budget to discover.
 
@@ -34,6 +33,7 @@ from __future__ import annotations
 
 import dataclasses
 import enum
+import itertools
 from typing import Final
 
 import numpy as np
@@ -57,6 +57,33 @@ DEFAULT_EPOCH_HOURS: Final[tuple[int, ...]] = (12, 18, 24)
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class ActionSpec:
+    """Immutable policy-facing description of one feature-group action."""
+
+    name: str
+    members: tuple[str, ...]
+    cost: float
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class ActionCatalogue:
+    """Immutable policy-facing catalogue with no evaluator metadata or references."""
+
+    actions: tuple[ActionSpec, ...]
+
+    @property
+    def panel_names(self) -> tuple[str, ...]:
+        """Stable legal action names (legacy property name retained for callers)."""
+        return tuple(action.name for action in self.actions)
+
+    def cost_of(self, name: str) -> float:
+        for action in self.actions:
+            if action.name == name:
+                return action.cost
+        raise ConfigError(f"unknown action {name!r}")
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class PolicyView:
     """Everything a policy is allowed to see. Nothing here reveals the support.
 
@@ -77,7 +104,7 @@ class PolicyView:
     requestable: tuple[str, ...]
     variable_names: tuple[str, ...]
     static_names: tuple[str, ...]
-    catalogue: PanelCatalogue
+    catalogue: ActionCatalogue
 
     @property
     def n_disclosed(self) -> int:
@@ -135,10 +162,21 @@ class DisclosureEngine:
         protocol: Protocol = Protocol.SUPPORT_BLIND,
         epoch_hours: tuple[int, ...] = DEFAULT_EPOCH_HOURS,
     ) -> None:
-        if budget < 0:
-            raise BudgetError(f"budget must be non-negative, got {budget}")
-        if not epoch_hours or list(epoch_hours) != sorted(epoch_hours):
-            raise ConfigError(f"epoch_hours must be ascending and non-empty: {epoch_hours}")
+        if not np.isfinite(budget) or budget < 0:
+            raise BudgetError(f"budget must be finite and non-negative, got {budget}")
+        if patient < 0 or patient >= cohort.n_patients:
+            raise ConfigError(
+                f"patient index {patient} outside cohort with {cohort.n_patients} patients"
+            )
+        if (
+            not epoch_hours
+            or any(not isinstance(hour, int) or hour <= 0 for hour in epoch_hours)
+            or any(a >= b for a, b in itertools.pairwise(epoch_hours))
+        ):
+            raise ConfigError(
+                "epoch_hours must be positive, strictly ascending, and non-empty: "
+                f"{epoch_hours}"
+            )
         if epoch_hours[-1] > cohort.n_hours:
             raise ConfigError(
                 f"final boundary {epoch_hours[-1]}h exceeds horizon {cohort.n_hours}h"
@@ -160,6 +198,12 @@ class DisclosureEngine:
         self._static_names = cohort.static_names
 
         self._catalogue = catalogue
+        self._policy_catalogue = ActionCatalogue(
+            tuple(
+                ActionSpec(name=name, members=panel.members, cost=panel.cost)
+                for name, panel in sorted(catalogue.panels.items())
+            )
+        )
         self._budget = float(budget)
         self._protocol = protocol
         self._epoch_hours = epoch_hours
@@ -254,11 +298,16 @@ class DisclosureEngine:
         gate = self._within_boundary()
         visible = self._revealed & gate
         values = np.where(visible, self._values, np.nan).astype(np.float32)
+        disclosed_mask = visible.copy()
+        statics = self._statics.copy()
+        statics_mask = self._statics_mask.copy()
+        for array in (values, disclosed_mask, statics, statics_mask):
+            array.setflags(write=False)
         return PolicyView(
             disclosed_values=values,
-            disclosed_mask=visible.copy(),
-            statics=self._statics.copy(),
-            statics_mask=self._statics_mask.copy(),
+            disclosed_mask=disclosed_mask,
+            statics=statics,
+            statics_mask=statics_mask,
             epoch=self._epoch,
             n_epochs=self.n_epochs,
             boundary_hour=self.boundary_hour,
@@ -267,7 +316,7 @@ class DisclosureEngine:
             requestable=self.requestable_panels(),
             variable_names=self._variable_names,
             static_names=self._static_names,
-            catalogue=self._catalogue,
+            catalogue=self._policy_catalogue,
         )
 
     def request(self, panel_name: str) -> Purchase:

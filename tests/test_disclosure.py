@@ -114,6 +114,30 @@ class TestPolicyViewCarriesNoEvaluatorState:
         assert not view.disclosed_mask[2:, :].any()
         assert bool(np.isnan(view.disclosed_values[2:, :]).all())
 
+    def test_policy_arrays_are_read_only_copies(self, full_cohort: Cohort) -> None:
+        hidden = np.zeros((4, 4), dtype=bool)
+        hidden[0, 0] = True
+        eng = engine(full_cohort, hidden)
+        view = eng.view()
+        for array in (
+            view.disclosed_values,
+            view.disclosed_mask,
+            view.statics,
+            view.statics_mask,
+        ):
+            assert not array.flags.writeable
+        with pytest.raises(ValueError, match="read-only"):
+            view.disclosed_mask[0, 0] = True
+        assert not eng.view().disclosed_mask[0, 0]
+
+    def test_policy_catalogue_is_a_detached_immutable_type(self, full_cohort: Cohort) -> None:
+        eng = engine(full_cohort, np.zeros((4, 4), dtype=bool))
+        view = eng.view()
+        assert not isinstance(view.catalogue, PanelCatalogue)
+        assert view.catalogue.panel_names == ("alpha", "beta")
+        with pytest.raises(dataclasses.FrozenInstanceError):
+            view.catalogue.actions = ()  # type: ignore[misc]
+
     def test_advancing_epoch_extends_the_boundary(self, full_cohort: Cohort) -> None:
         eng = engine(full_cohort, np.zeros((4, 4), dtype=bool))
         before = eng.view().n_disclosed
@@ -239,6 +263,17 @@ class TestPurchasing:
         with pytest.raises(BudgetError, match="only"):
             eng.request("beta")  # costs 2.0, only 0.5 remains
 
+    def test_below_cheapest_action_rejects_without_spend(self, full_cohort: Cohort) -> None:
+        eng = engine(full_cohort, np.zeros((4, 4), dtype=bool), budget=0.5)
+        with pytest.raises(BudgetError, match="only"):
+            eng.request("alpha")
+        assert eng.spent == 0
+
+    def test_exact_action_cost_exhausts_budget(self, full_cohort: Cohort) -> None:
+        eng = engine(full_cohort, np.zeros((4, 4), dtype=bool), budget=1.0)
+        eng.request("alpha")
+        assert eng.remaining == pytest.approx(0.0)
+
     def test_unrequestable_panel_rejected_under_support_aware(
         self, full_cohort: Cohort
     ) -> None:
@@ -267,6 +302,17 @@ class TestConstruction:
         with pytest.raises(BudgetError, match="non-negative"):
             engine(full_cohort, np.zeros((4, 4), dtype=bool), budget=-1.0)
 
+    @pytest.mark.parametrize("budget", [np.nan, np.inf, -np.inf])
+    def test_non_finite_budget_rejected(self, full_cohort: Cohort, budget: float) -> None:
+        with pytest.raises(BudgetError, match="finite"):
+            engine(full_cohort, np.zeros((4, 4), dtype=bool), budget=budget)
+
+    def test_zero_and_huge_finite_budgets_are_valid(self, full_cohort: Cohort) -> None:
+        assert engine(full_cohort, np.zeros((4, 4), dtype=bool), budget=0).remaining == 0
+        assert engine(
+            full_cohort, np.zeros((4, 4), dtype=bool), budget=1e100
+        ).remaining == pytest.approx(1e100)
+
     def test_unsorted_epochs_rejected(self, full_cohort: Cohort) -> None:
         with pytest.raises(ConfigError, match="ascending"):
             DisclosureEngine(
@@ -287,6 +333,20 @@ class TestConstruction:
                 CATALOGUE,
                 budget=1.0,
                 epoch_hours=(2, 99),
+            )
+
+    @pytest.mark.parametrize("epochs", [(0, 2), (2, 2), (-1, 2)])
+    def test_epochs_must_be_positive_and_strict(
+        self, full_cohort: Cohort, epochs: tuple[int, ...]
+    ) -> None:
+        with pytest.raises(ConfigError, match="strictly ascending"):
+            DisclosureEngine(
+                full_cohort,
+                0,
+                np.zeros((4, 4), dtype=bool),
+                CATALOGUE,
+                budget=1.0,
+                epoch_hours=epochs,
             )
 
     def test_engine_does_not_mutate_the_cohort(self, full_cohort: Cohort) -> None:

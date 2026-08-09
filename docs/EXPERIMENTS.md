@@ -101,31 +101,30 @@ panel-level acquisition framing in `research_assessment.md` §3.2(a).
 - **Status:** COMPLETE
 - **Command:** `python experiments/baselines/derive_panels.py --sets a b --threshold 0.35`
 - **Git SHA:** recorded in commit for this milestone
-- **Purpose:** The panel-level acquisition framing rests on a factual claim — that
-  laboratory analytes are ordered *in groups, as single events*. This run tests that claim
-  instead of assuming it.
+- **Purpose:** Test whether laboratory variables have stable hourly-bin co-presence clusters.
+  This does not recover orders, specimens, or clinical events.
 
 ### Method
 
 For every `(patient, hour)` cell in which at least one of the 23 laboratory analytes was
-measured (**86,559 ordering events** across sets a+b, n=8,000 patients), record which analytes
+measured (**86,559 active lab patient-hours** across sets a+b, n=8,000 patients), record which analytes
 were measured together. Compute pairwise Jaccard co-measurement,
 `P(i and j | i or j)`, then agglomeratively cluster (average linkage) on Jaccard distance.
 
-**No clinical panel definitions were supplied to the clustering.** Recovery of recognised
-panels is therefore evidence, not construction.
+**No clinical panel definitions were supplied to the clustering.** Similarity to recognised
+panels supports cautious `*-like` labels; it is not evidence of actual orders.
 
 ### Result — clusters at Jaccard distance threshold 0.35
 
 | Derived cluster | Members | Mean within-cluster Jaccard | Corresponds to |
 |---|---|---|---|
-| 1 | pH, PaCO2, PaO2 | **0.969** | Arterial blood gas (ABG) |
-| 6 | ALP, ALT, AST, Bilirubin | **0.934** | Hepatic function panel (LFT) |
-| 4 | BUN, Creatinine, Glucose, HCO3, K, Mg, Na | **0.861** | Basic metabolic panel (BMP) |
-| 5 | HCT, Platelets, WBC | **0.782** | Complete blood count (CBC) |
+| 1 | pH, PaCO2, PaO2 | **0.969** | ABG-like |
+| 6 | ALP, ALT, AST, Bilirubin | **0.934** | hepatic-like |
+| 4 | BUN, Creatinine, Glucose, HCO3, K, Mg, Na | **0.861** | BMP-like |
+| 5 | HCT, Platelets, WBC | **0.782** | CBC-like |
 | singletons | SaO2, Lactate, Albumin, TroponinT, TroponinI, Cholesterol | — | Individual sends |
 
-The unsupervised clustering recovers the four standard clinical panels exactly.
+The unsupervised clusters resemble four familiar panels at this threshold.
 
 ### Threshold sensitivity
 
@@ -150,10 +149,9 @@ The three primary panels (ABG, LFT, BMP-core) are stable across the whole 0.15�
 
 ### Findings that changed the design
 
-1. **The panel claim is supported.** Within-panel co-measurement of 0.78–0.97 means treating
-   these analytes as independently acquirable features — as all surveyed AFA benchmarks do —
-   misrepresents how the data is generated. This is the empirical basis for
-   `research_assessment.md` §3.2(a).
+1. **Feature grouping is empirically supported.** Within-group hourly co-presence is 0.78–0.97.
+   That supports a feature-group sensitivity analysis, not a claim that the groups are real orders
+   or that independent acquisition is clinically impossible.
 2. **SaO2 is not part of ABG in this dataset.** It separated from the ABG cluster at every
    threshold (marginal draw frequency 0.176 vs 0.536 for pH). Assuming it belonged to ABG on
    clinical intuition would have been wrong; it is modelled as a singleton send.
@@ -167,13 +165,14 @@ consumed by `configs/panels.yaml`.
 
 ---
 
-## E-002 — Availability vs values: how much of ICU mortality prediction is clinician behaviour?
+## E-002 — Availability vs values: discrimination from measurement-presence patterns
 
 - **Date:** 2026-08-09
 - **Status:** COMPLETE
 - **Command:** `python experiments/baselines/availability_ablation.py --cutoff 24 --folds 5`
 - **Purpose:** The mandatory mask-only baseline (independent review #0, finding 11). Measures how much
-  discrimination is available from *which tests were ordered* alone, with no measured value.
+  discrimination is associated with recorded measurement-presence patterns, with no measured
+  value. It does not identify clinician intent or a causal process.
 - **Setup:** Task T1 (in-hospital mortality), 24h decision point, 5-fold stratified CV on sets
   a+b, **n = 8,000**, prevalence **14.03%**. Imputation and scaling fit on training rows only.
   Bootstrap CIs, 1,000 resamples. Run **after** the Weight leakage fix (D-007), so no feature
@@ -244,23 +243,26 @@ protocol (D-009, `BENCHMARK_SPEC.md` §5) is necessary rather than merely tidy.
 ## E-003 — Disclosure protocol mechanics on real patients (M1 integration check)
 
 - **Date:** 2026-08-09
-- **Status:** COMPLETE
-- **Command:** `python experiments/baselines/disclosure_smoke.py --n 300 --budget 5`
+- **Status:** RERUN AFTER ADVERSARIAL REVIEW #1; original ambiguous `random` rows superseded
+- **Command:** `python experiments/baselines/disclosure_smoke.py --n 300 --budget 5 --rate 0.5 --seed 20260809 --cutoff 24`
 - **Purpose:** Verify the M1 disclosure engine behaves as specified in
   `BENCHMARK_SPEC.md` on real data. **Mechanics only — no model is fitted and no predictive
   claim is made.**
-- **Setup:** 300 set-a patients, 24h cutoff, epochs (12, 18, 24), budget 5.0 units,
-  `panel_events@0.5#20260809` masking, `shared_plus_marginal` cost regime.
+- **Setup:** First 300 set-a patients, 24h cutoff, epochs (12, 18, 24), budget 5.0
+  units, `group_hours@0.5#20260809` masking, `shared_plus_marginal` cost regime.
+  `random_train_frequency` was fitted on the remaining 7,700 development patients, excluding
+  every evaluation patient. Patient-specific policy seeds are `20260809 + patient_index`.
 
 ### Results (means per patient)
 
 | Policy | Protocol | Spent | Requests | Values disclosed | Empty requests | Wasted spend |
 |---|---|---|---|---|---|---|
 | no_acquisition | support_aware | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
-| random | support_aware | 3.59 | 2.76 | **10.89** | 0.00 | 0.00 |
+| random_support_oracle | support_aware | 3.59 | 2.69 | **11.33** | 0.00 | 0.00 |
 | fixed_order | support_aware | 2.84 | 2.02 | **10.82** | 0.00 | 0.00 |
 | no_acquisition | support_blind | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
-| random | support_blind | 4.40 | 4.00 | **0.62** | 3.55 | 3.91 |
+| random_uniform_all | support_blind | 4.59 | 3.78 | **4.58** | 2.72 | 3.19 |
+| random_train_frequency | support_blind | 4.46 | 3.45 | **7.32** | 1.96 | 2.44 |
 | fixed_order | support_blind | 4.30 | 3.00 | **10.08** | 1.27 | 1.81 |
 
 ### Specification conformance
@@ -272,23 +274,21 @@ protocol (D-009, `BENCHMARK_SPEC.md` §5) is necessary rather than merely tidy.
   before purchase (SO-2).
 - `no_acquisition` spends nothing under both protocols, giving the zero-budget reference point.
 
-### Observation worth flagging early
+### Interpretation
 
-Under `support_aware` the **random** policy discloses 10.89 values per patient; under
-`support_blind` the *same* policy discloses **0.62** — roughly a seventeen-fold collapse at
-comparable spend. The reason is structural rather than statistical: "random over the groups that
-happen to be available" is not a naive baseline at all, because the available set is itself
-derived from the historical record. Once availability must be paid for, a uniform policy spends
-most of its budget on rarely-measured groups (TroponinI 5.1%, Cholesterol 7.6% coverage) and
-receives nothing.
+The old 10.89-versus-0.62 `random` contrast was not a comparison of the same information set:
+the support-aware implementation sampled an availability-filtered oracle list, while the
+support-blind implementation sampled all groups. Its labels and seventeen-fold interpretation
+are superseded. With explicit baselines, the diagnostic oracle discloses 11.33 values,
+support-blind uniform-all discloses 4.58, and the training-frequency support-blind baseline
+discloses 7.32. Frequency weighting is materially stronger than uniform-all without using any
+evaluation-patient support.
 
-The `fixed_order` policy degrades far less (10.82 → 10.08) because it targets commonly measured
-groups.
+The fixed ordering remains 10.82 versus 10.08 because it targets commonly recorded groups.
 
-**This is a mechanics observation, not a result.** It says nothing yet about predictive
-performance, which is M4. But it does indicate that the *random baseline* used throughout the
-acquisition literature is quietly advantaged under support-aware replay, which is precisely the
-effect H1 is designed to measure.
+**This is a mechanics observation, not a predictive result.** It confirms that baseline action
+information must be named explicitly; `random_support_oracle` cannot be presented as deployable
+or as the fair counterpart to a support-blind policy.
 
 ### Output
 
@@ -298,9 +298,9 @@ Printed to stdout; no artifacts written. Rerun to reproduce — the run is fully
 
 ## Planned next runs
 
-**E-003** — T1 clinical baselines: prevalence, SAPS-I, SOFA as single-feature predictors, for
+**E-004** — T1 clinical baselines: prevalence, SAPS-I, SOFA as single-feature predictors, for
 comparison against the model tiers above.
-**E-004** — support-aware vs support-blind disclosure, paired ΔAUBC across policies and cost
+**E-005** — support-aware vs support-blind disclosure, paired ΔAUBC across policies and cost
 regimes (the primary pre-registered comparison in `BENCHMARK_SPEC.md` §3).
 
 No numbers will be recorded here until executed.

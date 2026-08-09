@@ -69,9 +69,13 @@ def _assert_no_locked_set(cohort: Cohort) -> None:
 
 
 def development_cohort(cohort: Cohort) -> Cohort:
-    """Drop the locked final-holdout records from a cohort."""
-    keep = cohort.source_set != LOCKED_SET
-    return cohort.select(np.flatnonzero(keep).astype(np.int64))
+    """Validate and return a cohort containing development records only.
+
+    Refusing rather than silently dropping set-c prevents a command that loaded
+    the holdout by mistake from appearing to be a normal development run.
+    """
+    _assert_no_locked_set(cohort)
+    return cohort
 
 
 def stratified_folds(

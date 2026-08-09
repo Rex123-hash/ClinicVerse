@@ -139,8 +139,10 @@ sentinel rows and within-hour collisions*; the reported missingness statistic is
 the reviewer is right that the action was undefined. "At t=24h, buy a BMP" cannot mean *reveal a past
 observation as if newly ordered* (incoherent), nor *reveal a future observation* (leakage).
 
-**Resolution: Option A, stated honestly.** The benchmark is **sequential selective disclosure
-(replay) of historically recorded panel-like events**, not prospective test ordering. Formal
+**Resolution: Option A, stated honestly.** The benchmark is **sequential retrospective selective
+disclosure of historically recorded values in panel-like feature groups**, not prospective test
+ordering. Repair #1 narrowed the earlier "events" wording because hourly bins do not identify
+orders or specimens. Formal
 specification in `docs/BENCHMARK_SPEC.md`. Summary of the estimand:
 
 - Timeline is divided into **decision epochs**. The information boundary at epoch *k* is

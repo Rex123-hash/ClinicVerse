@@ -30,6 +30,8 @@ log = get_logger(__name__)
 
 BASE_URL: Final = "https://physionet.org/files/challenge-2012/1.0.0"
 RECORD_SETS: Final = ("a", "b", "c")
+DEVELOPMENT_RECORD_SETS: Final = ("a", "b")
+LOCKED_RECORD_SET: Final = "c"
 DEFAULT_CACHE: Final = pathlib.Path("data/raw/physionet2012")
 
 #: Expected sizes in bytes, verified 2026-08-09. A size mismatch means the
@@ -219,10 +221,11 @@ def _read_outcomes(path: pathlib.Path) -> dict[int, dict[str, float]]:
 # ------------------------------------------------------------------- load ----
 def load_cohort(
     cache_dir: pathlib.Path | str = DEFAULT_CACHE,
-    sets: tuple[str, ...] = RECORD_SETS,
+    sets: tuple[str, ...] = DEVELOPMENT_RECORD_SETS,
     *,
     config: VariableConfig | None = None,
     download: bool = True,
+    allow_final_holdout: bool = False,
 ) -> Cohort:
     """Load one or more record sets into a :class:`Cohort`.
 
@@ -231,7 +234,14 @@ def load_cohort(
         sets: which record sets to include.
         config: variable schema; defaults to ``configs/variables.yaml``.
         download: if False, fail rather than fetch missing files.
+        allow_final_holdout: explicit final-evaluation flag required to materialise
+            set-c. Normal development paths must leave this False.
     """
+    if LOCKED_RECORD_SET in sets and not allow_final_holdout:
+        raise DataError(
+            "set-c is quarantined; loading it requires allow_final_holdout=True "
+            "on an explicitly logged final-evaluation path"
+        )
     config = config or load_variable_config()
     cache = pathlib.Path(cache_dir)
     if download:

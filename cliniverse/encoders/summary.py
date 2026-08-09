@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import dataclasses
 import enum
+import warnings
 
 import numpy as np
 import numpy.typing as npt
@@ -103,9 +104,10 @@ def _value_features(
     """
     n, t, v = x.shape
     masked = np.where(m, x, np.nan)
-    with np.errstate(invalid="ignore", divide="ignore"):
-        # nanmean promotes to float64; keep every block in float32 so the
-        # concatenated design matrix has one dtype.
+    with warnings.catch_warnings(), np.errstate(invalid="ignore", divide="ignore"):
+        # All-NaN columns are expected for never-observed variables and remain
+        # NaN for fold-local imputation; suppress only those NumPy warnings.
+        warnings.simplefilter("ignore", category=RuntimeWarning)
         mean = np.nanmean(masked, axis=1).astype(np.float32)
         vmin = np.nanmin(masked, axis=1).astype(np.float32)
         vmax = np.nanmax(masked, axis=1).astype(np.float32)

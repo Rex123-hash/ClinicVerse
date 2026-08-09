@@ -1,6 +1,6 @@
 # TwinBench — Formal Specification
 
-**Version:** 0.2 (supersedes the informal description in `research_assessment.md` §13.3)
+**Version:** 0.3 (repair #1; supersedes version 0.2)
 **Date:** 2026-08-09
 
 This document fixes the estimand, the information boundary, and the policy/evaluator information
@@ -10,12 +10,13 @@ split **before** implementation, so that the protocol cannot be quietly reshaped
 
 ## 1. What this benchmark is, and is not
 
-TwinBench is **sequential selective disclosure (replay) of historically recorded panel-like
-events under a budget.**
+TwinBench is **sequential retrospective selective disclosure of values in panel-like feature
+groups under a budget.**
 
 It is **not** prospective test ordering. We do not use that phrase. A policy here cannot cause a
-test to be performed that was never performed; it can only cause an already-recorded value to be
-disclosed, or spend budget discovering that nothing is available.
+test to be performed that was never performed. An action reveals all synthetically hidden,
+historically recorded values in the chosen feature group at hourly bins before the current
+boundary. It does not reconstruct an order, specimen, or co-measurement event.
 
 This restriction is forced. Estimating what would have happened had a test genuinely been ordered
 requires the No-Unobserved-Confounding assumption of the AFAPE literature, and NUC is false in ICU
@@ -94,7 +95,7 @@ policy reads clinician behaviour.
 | `epoch`, `n_epochs` | Current and total epoch index |
 | `boundary_hour` | `t_k` for the current epoch |
 | `spent`, `remaining` | Budget consumed and left |
-| `catalogue` | Panel names, members, costs — identical for every patient |
+| `catalogue` | Detached immutable action names, members, and costs — identical for every patient |
 | `statics` | Admission descriptors within the boundary |
 
 ### 4.2 Evaluator-only (never reachable from `PolicyView`)
@@ -105,25 +106,27 @@ policy reads clinician behaviour.
 - Whether a given gap is natural or synthetic
 - Future availability, timestamps beyond `t_k`, and all targets
 
-**Invariant SO-1.** `PolicyView` holds no reference to evaluator state. It is constructed by copy,
-and policies receive nothing else.
+**Invariant SO-1.** `PolicyView` holds no reference to evaluator state. Arrays are read-only
+copies; its action catalogue is a separate immutable policy type, not the evaluator catalogue.
 
 **Invariant SO-2 (indistinguishability).** For any policy, a panel with hidden values and a panel
 with none must be indistinguishable *prior to purchase*.
 
 ### 4.3 Unavailable requests
 
-A policy may request **any** panel in the catalogue at **any** epoch.
+Under `support_blind`, a policy may request **any** feature group at **any** epoch.
 
 | Situation | Cost charged | Disclosed |
 |---|---|---|
-| Panel has values within the boundary in `S_hidden` | full panel cost | those values |
-| Panel has none (never recorded, or only outside boundary) | **full panel cost** | nothing |
-| Panel already fully disclosed | full panel cost | nothing new |
+| Group has hidden observed values within the boundary | full group cost | all such values across earlier hourly bins |
+| Group has none (never recorded, or only outside boundary) | **full group cost** | nothing |
+| Group already fully disclosed | full group cost | nothing new |
 
 Charging full price for an empty result is deliberate and load-bearing. Free failed requests would
 let a policy probe availability at no cost, reconstructing the historical ordering pattern — the
-exact leak SO-2 forbids.
+exact leak SO-2 forbids. After paying, `Purchase.n_disclosed == 0` and the unchanged next view
+legitimately reveal that this action produced nothing *within that boundary*. That acquired
+absence information is part of the estimand; it is never free.
 
 ---
 
@@ -131,10 +134,11 @@ exact leak SO-2 forbids.
 
 | Protocol | Requestable set | Purpose |
 |---|---|---|
-| **support_aware** | Only panels with at least one hidden value within the boundary | Reproduces standard AFA replay practice, where the acquirable set is derived from what was historically recorded — so availability is a free signal |
+| **support_aware** | Only groups with at least one hidden value within the boundary | Availability oracle that diagnoses standard replay practice; **not deployable or a fair standalone comparator** |
 | **support_blind** | The entire catalogue | Availability is no longer free; a wasted request costs full budget |
 
-The paired difference between these is the primary result.
+The paired protocol difference diagnoses sensitivity to free historical support. It must not be
+described as a comparison between two deployable policies.
 
 ---
 
@@ -145,13 +149,37 @@ is used or implied.
 
 | Regime | Definition |
 |---|---|
-| `uniform_event` | Every panel event costs 1.0 — isolates grouping from pricing |
-| `shared_plus_marginal` | `cost = 1.0 + 0.1 × (analytes in panel)` — a shared draw cost plus a marginal per-analyte cost |
-| `ordinal_tier` | Routine = 1, targeted = 2, specialised = 3, by observed ordering frequency |
+| `uniform_group` | Every feature-group action costs 1.0 — isolates grouping from pricing |
+| `shared_plus_marginal` | `cost = 1.0 + 0.1 × (group members)` — a shared action cost plus a marginal per-member cost |
+| `ordinal_tier` | Routine = 1, targeted = 2, specialised = 3, by development-data presence frequency |
 | `per_analyte` | `cost = number of analytes` — the implicit assumption of feature-level AFA; included as the comparison that tests whether grouping matters |
 
 A conclusion holding only under one regime is a conclusion about that regime, and is reported as
 such.
+
+Repeated actions pay the full declared cost and disclose only values not already disclosed.
+Groups partition the laboratory features, so overlap has no incremental-cost ambiguity. Budgets
+and every action cost must be finite; costs are strictly positive.
+
+### 6.1 Random baseline contract
+
+- `random_uniform_all`: support-blind, uniform over all affordable legal action types.
+- `random_train_frequency`: support-blind, weighted by group presence fitted on training
+  patient-hours only; no evaluation-patient support enters the weights.
+- `random_support_oracle`: support-aware diagnostic oracle over available groups only. Never
+  label this deployable, fair, or simply `random`.
+
+### 6.2 Masking mechanism contract
+
+| Name | Mechanism | Represents | Does not represent |
+|---|---|---|---|
+| `mcar_cells` | Independently samples observed analyte-hour cells | Synthetic cellwise ablation | Clinical ordering or realistic missingness |
+| `group_hours` | Samples active hourly bins per feature group and hides observed members in each selected bin | Synthetic preservation of binned within-group co-presence | Orders, specimens, assays, prospective events, or causal interventions |
+| `time_blocks` | Samples contiguous hour blocks across variables | Synthetic monitoring gaps | A clinical decision or patient-state process |
+
+All mechanisms are outcome-free, require only the cutoff-truncated observation mask, and are
+deterministic in `(mechanism parameters, seed, patient index)`. Paired protocol comparisons reuse
+the identical case and mask.
 
 ---
 
@@ -186,11 +214,13 @@ rank-reversal counts across cost regimes.
 
 ## 9. Reproducibility contract
 
-Every case carries `(mechanism_id, seed, protocol, cost_regime, git_sha, config_hash)`.
-Generated case manifests ship as **content hashes**, not blobs. Regeneration from a seed must
-reproduce identical hashes; this is asserted in CI.
+Manifest version 2 records dataset and sets, record ID and patient index, cutoff and epochs,
+mechanism ID/rate/seed, protocol, cost regime, finite budget, catalogue version/content hash,
+schema/config hash, cutoff-safe dataset fingerprint, and Git SHA. Every field contributes to the
+content hash; regeneration from identical state reproduces it, and tampering is rejected.
 
 **set-c** is **quarantined from model fitting and model selection following an aggregate cohort
 audit** (n=4,000, 585 deaths, 14.62%, read once during dataset assessment). It is unlocked exactly
-once, at the end, via `final_holdout()` with an explicit token, and that use is logged in
-`EXPERIMENTS.md`.
+once, at the end. `load_cohort()` defaults to sets a+b and requires the explicit
+`allow_final_holdout=True` flag even to materialise set-c; `final_holdout()` separately requires
+its unlock token. That use must be logged in `EXPERIMENTS.md`.

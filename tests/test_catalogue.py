@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 import pytest
 
 from cliniverse.acquisition import load_panel_catalogue
@@ -9,7 +10,7 @@ from cliniverse.acquisition.catalogue import Panel, PanelCatalogue
 from cliniverse.config import VariableConfig
 from cliniverse.exceptions import ConfigError
 
-REGIMES = ("uniform_event", "shared_plus_marginal", "ordinal_tier", "per_analyte")
+REGIMES = ("uniform_group", "shared_plus_marginal", "ordinal_tier", "per_analyte")
 
 
 @pytest.fixture(scope="module")
@@ -61,7 +62,7 @@ class TestCostRegimes:
             catalogue.with_schedule("free_labs")
 
     def test_uniform_regime_is_actually_uniform(self, catalogue: PanelCatalogue) -> None:
-        costs = {p.cost for p in catalogue.with_schedule("uniform_event").panels.values()}
+        costs = {p.cost for p in catalogue.with_schedule("uniform_group").panels.values()}
         assert costs == {1.0}
 
     def test_per_analyte_regime_matches_panel_sizes(self, catalogue: PanelCatalogue) -> None:
@@ -71,9 +72,24 @@ class TestCostRegimes:
 
     def test_regimes_disagree_on_ordering(self, catalogue: PanelCatalogue) -> None:
         """Sensitivity analysis is only meaningful if the regimes actually differ."""
-        uniform = catalogue.with_schedule("uniform_event")
+        uniform = catalogue.with_schedule("uniform_group")
         per_analyte = catalogue.with_schedule("per_analyte")
         assert uniform.cost_of("BMP_like") != per_analyte.cost_of("BMP_like")
+
+    @pytest.mark.parametrize("cost", [0.0, -1.0, np.nan, np.inf])
+    def test_invalid_panel_cost_rejected(self, cost: float) -> None:
+        with pytest.raises(ValueError):
+            Panel(name="bad", label="Bad", members=("X",), cost=cost)
+
+    @pytest.mark.parametrize("cost", [0.0, -1.0, np.nan, np.inf])
+    def test_invalid_alternative_schedule_cost_rejected(self, cost: float) -> None:
+        catalogue = PanelCatalogue(
+            version="test",
+            panels={"a": Panel(name="a", label="A", members=("X",), cost=1.0)},
+            alternative_schedules={"bad": {"a": cost}},
+        )
+        with pytest.raises(ConfigError, match="non-positive or non-finite"):
+            catalogue.with_schedule("bad")
 
 
 class TestLookup:

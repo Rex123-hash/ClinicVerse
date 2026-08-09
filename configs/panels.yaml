@@ -8,7 +8,7 @@
 #
 # PROVENANCE — membership is EMPIRICALLY DERIVED, not assumed.
 # experiments/baselines/derive_panels.py clusters the 23 laboratory analytes on
-# co-measurement Jaccard distance across 86,559 co-timestamped events in sets
+# co-presence Jaccard distance across 86,559 active patient-hour lab bins in sets
 # a+b, with no clinical panel definitions supplied. At Jaccard distance 0.35 the
 # clustering yields the groups below. See docs/EXPERIMENTS.md E-001.
 #
@@ -22,7 +22,7 @@ version: "2.0"
 derived_from:
   script: experiments/baselines/derive_panels.py
   sets: [a, b]
-  n_co_timestamped_events: 86559
+  n_active_lab_patient_hours: 86559
   jaccard_distance_threshold: 0.35
 
 # Default regime is `shared_plus_marginal` (see alternative_schedules); the
@@ -100,15 +100,15 @@ panels:
 # Cost regimes. Policy rankings are tested for sensitivity across ALL of these.
 # If rankings change materially between regimes, that is a headline result.
 alternative_schedules:
-  uniform_event:
-    description: Every acquisition event costs the same regardless of how many
+  uniform_group:
+    description: Every feature-group action costs the same regardless of how many
       analytes it returns. Isolates the effect of grouping from pricing.
     costs: {BMP_like: 1.0, CBC_like: 1.0, hepatic_like: 1.0, ABG_like: 1.0,
             Lactate: 1.0, SaO2: 1.0, Albumin: 1.0, TroponinT: 1.0,
             TroponinI: 1.0, Cholesterol: 1.0}
 
   shared_plus_marginal:
-    description: A shared per-event cost of 1.0 plus a marginal 0.1 per analyte
+    description: A shared per-action cost of 1.0 plus a marginal 0.1 per analyte
       returned. Reflects that a draw has fixed overhead and each assay adds a
       little. This is the default regime.
     costs: {BMP_like: 1.7, CBC_like: 1.3, hepatic_like: 1.4, ABG_like: 1.3,

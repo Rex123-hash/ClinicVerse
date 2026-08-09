@@ -9,14 +9,13 @@ drawn from a seed derived from both, so a patient's mask does not depend on how
 many patients were processed before it, and regenerating any single case
 reproduces exactly.
 
-Three mechanisms, in increasing realism:
+Three synthetic mechanisms:
 
 ``mcar_cells``   Hide individual analyte-hour cells independently. The easiest
                  setting, and the one implied by feature-level acquisition.
-``panel_events`` Hide whole co-measured events: every analyte of a group
-                 recorded in the same hour disappears together. This matches how
-                 the data is actually generated (E-001: within-group Jaccard
-                 0.78-0.97) and is the default.
+``group_hours``  For each panel-like feature group, sample hourly bins in which
+                 at least one member is observed and hide the observed members
+                 in that bin. These are not recovered orders or clinical events.
 ``time_blocks``  Hide contiguous hour ranges across all groups — a monitoring
                  gap rather than an unordered test.
 """
@@ -52,7 +51,7 @@ class MaskingMechanism(abc.ABC):
     seed: int
 
     def __post_init__(self) -> None:
-        if not 0.0 <= self.rate <= 1.0:
+        if not np.isfinite(self.rate) or not 0.0 <= self.rate <= 1.0:
             raise ConfigError(f"masking rate must be in [0, 1], got {self.rate}")
 
     @property
@@ -109,17 +108,16 @@ class McarCells(MaskingMechanism):
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
-class PanelEvents(MaskingMechanism):
-    """Hide whole co-measured events: a group's analytes in one hour, together.
+class GroupHours(MaskingMechanism):
+    """Hide observed members of a feature group within sampled hourly bins.
 
-    This is the default because it matches how the data is generated. Hiding
-    individual analytes from a group that was measured as a unit would create
-    patterns that do not occur in the source records.
+    This preserves hourly co-presence structure after binning. It does not
+    reconstruct an order, specimen, assay bundle, or prospective clinical event.
     """
 
     @property
     def mechanism_id(self) -> str:
-        return f"panel_events@{self.rate:g}#{self.seed}"
+        return f"group_hours@{self.rate:g}#{self.seed}"
 
     def _draw(
         self,
@@ -135,11 +133,10 @@ class PanelEvents(MaskingMechanism):
             if not cols:
                 continue
             block = observed[:, cols]
-            # An "event" is an hour in which any member of this group was measured.
-            event_hours = np.flatnonzero(block.any(axis=1))
-            if event_hours.size == 0:
+            group_hours = np.flatnonzero(block.any(axis=1))
+            if group_hours.size == 0:
                 continue
-            chosen = event_hours[rng.random(event_hours.size) < self.rate]
+            chosen = group_hours[rng.random(group_hours.size) < self.rate]
             for hour in chosen:
                 hidden[hour, cols] = True
         return hidden
@@ -173,7 +170,7 @@ class TimeBlocks(MaskingMechanism):
         del catalogue, variable_names
         n_hours = observed.shape[0]
         hidden = np.zeros_like(observed)
-        n_blocks = max(1, n_hours // self.block_hours)
+        n_blocks = max(1, (n_hours + self.block_hours - 1) // self.block_hours)
         for b in range(n_blocks):
             if rng.random() >= self.rate:
                 continue
@@ -184,7 +181,7 @@ class TimeBlocks(MaskingMechanism):
 
 MECHANISMS: Final[dict[str, type[MaskingMechanism]]] = {
     "mcar_cells": McarCells,
-    "panel_events": PanelEvents,
+    "group_hours": GroupHours,
     "time_blocks": TimeBlocks,
 }
 

@@ -12,6 +12,7 @@ any future variable with the same shape is caught automatically.
 
 from __future__ import annotations
 
+import dataclasses
 import pathlib
 
 import numpy as np
@@ -20,6 +21,7 @@ import pytest
 from cliniverse.config import VariableConfig
 from cliniverse.data.cohort import Cohort
 from cliniverse.data.physionet2012 import parse_record
+from cliniverse.encoders import build_features
 
 
 class TestStaticRoutingIsTimeGated:
@@ -77,6 +79,23 @@ class TestTruncationRemovesFuture:
         assert np.array_equal(
             np.nan_to_num(trunc.x, nan=-1.0),
             np.nan_to_num(toy_cohort.x[:, :cutoff, :], nan=-1.0),
+        )
+
+    def test_every_summary_feature_is_invariant_to_post_cutoff_changes(
+        self, toy_cohort: Cohort
+    ) -> None:
+        cutoff = 2
+        changed_x = toy_cohort.x.copy()
+        changed_m = toy_cohort.m.copy()
+        changed_x[:, cutoff:, :] = 12345.0
+        changed_m[:, cutoff:, :] = True
+        changed = dataclasses.replace(toy_cohort, x=changed_x, m=changed_m)
+
+        original_features = build_features(toy_cohort.truncate(cutoff))
+        changed_features = build_features(changed.truncate(cutoff))
+        np.testing.assert_array_equal(
+            np.nan_to_num(original_features.x, nan=-9999.0),
+            np.nan_to_num(changed_features.x, nan=-9999.0),
         )
 
 

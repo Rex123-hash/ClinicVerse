@@ -16,7 +16,7 @@ and not an assertion that any model infers clinician intent.
 ## What this is
 
 A benchmark and evaluation harness that runs identical acquisition policies under two disclosure
-protocols — **support-aware** (standard replay: only historically recorded groups are requestable)
+protocols — **support-aware** (diagnostic replay oracle: only historically recorded groups are requestable)
 and **support-blind** (any group may be requested; unavailable requests cost full price and return
 nothing) — and reports the paired difference, plus whether policy rankings survive four cost
 regimes.
@@ -27,7 +27,8 @@ setting; we do not claim it. Our contribution is a **measurement** one, not a ne
 
 ## Status
 
-M0 complete; M1 in progress. See [`docs/STATUS.md`](docs/STATUS.md).
+M0 and M1 complete; adversarial repair #1 is documented in
+[`docs/ADVERSARIAL_REVIEW_1.md`](docs/ADVERSARIAL_REVIEW_1.md). See [`docs/STATUS.md`](docs/STATUS.md).
 
 ## Start here
 
@@ -43,7 +44,7 @@ M0 complete; M1 in progress. See [`docs/STATUS.md`](docs/STATUS.md).
 
 ## Data
 
-Primary dataset: **PhysioNet/CinC Challenge 2012** — 12,000 ICU patients, 36 irregularly-sampled
+Primary dataset: **PhysioNet/CinC Challenge 2012** — 12,000 ICU patients, 37 irregularly-sampled
 clinical variables over 48 hours, **79.75% missing** on the binned hourly grid.
 Open Data Commons Attribution License v1.0, **no credentialing required**, ~20 MB.
 

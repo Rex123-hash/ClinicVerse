@@ -11,7 +11,7 @@ import pathlib
 import numpy as np
 import pytest
 
-from cliniverse.config import load_variable_config
+from cliniverse.config import VariableConfig, load_variable_config
 from cliniverse.data.cohort import Cohort
 from cliniverse.data.physionet2012 import DEFAULT_CACHE, load_cohort
 
@@ -19,7 +19,7 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
 @pytest.fixture(scope="session")
-def variable_config():
+def variable_config() -> VariableConfig:
     return load_variable_config()
 
 

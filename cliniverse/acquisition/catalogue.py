@@ -1,8 +1,8 @@
 """Co-measured analyte groups ("panel-like subsets") — what may be acquired, and
 at what relative cost.
 
-A policy does not buy an analyte; it buys a group, paying one cost and receiving
-every member. Group-level acquisition with shared cost is **not novel** — see
+A policy selects a feature-group action, paying one cost and receiving every
+disclosable member value. Group-level acquisition with shared cost is **not novel** — see
 Yu et al., ICLR 2023 (arXiv:2302.10261), which performs sequential panel-level
 selection with shared group costs. We adopt the setting; we do not claim it.
 
@@ -19,6 +19,7 @@ sensitivity to them; see ``configs/panels.yaml``.
 from __future__ import annotations
 
 import functools
+import math
 import pathlib
 from typing import Any
 
@@ -31,14 +32,14 @@ DEFAULT_SCHEDULE = "default"
 
 
 class Panel(BaseModel):
-    """One orderable unit: a set of analytes returned together for a single cost."""
+    """One benchmark action: a feature group returned for a single relative cost."""
 
     model_config = ConfigDict(frozen=True)
 
     name: str
     label: str
     members: tuple[str, ...] = Field(min_length=1)
-    cost: float = Field(gt=0)
+    cost: float = Field(gt=0, allow_inf_nan=False)
     within_panel_jaccard: float | None = Field(default=None, ge=0, le=1)
     tier: str | None = None
 
@@ -58,7 +59,7 @@ class Panel(BaseModel):
 
 
 class PanelCatalogue(BaseModel):
-    """The full set of orderable panels under one cost schedule."""
+    """The full set of panel-like feature-group actions under one cost schedule."""
 
     model_config = ConfigDict(frozen=True)
 
@@ -136,6 +137,15 @@ class PanelCatalogue(BaseModel):
         if missing:
             raise ConfigError(
                 f"cost schedule {name!r} is missing prices for {sorted(missing)}"
+            )
+        invalid = {
+            panel: cost
+            for panel, cost in costs.items()
+            if not math.isfinite(cost) or cost <= 0
+        }
+        if invalid:
+            raise ConfigError(
+                f"cost schedule {name!r} has non-positive or non-finite prices: {invalid}"
             )
         return self.model_copy(
             update={

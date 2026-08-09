@@ -250,9 +250,10 @@ makes an acquisition problem well-posed here.
 
 Full specification in [`BENCHMARK_SPEC.md`](BENCHMARK_SPEC.md). Summary:
 
-TwinBench is **sequential selective disclosure (replay) of historically recorded co-measured
-events under a budget**. It is **not** prospective test ordering, and is never described as such:
-a policy cannot cause a test to be performed that was never performed.
+TwinBench is **sequential retrospective selective disclosure of historically recorded values in
+panel-like feature groups under a budget**. An action reveals all hidden recorded values for a
+group through the current hourly boundary; it does not recover an order, specimen, or event. It
+is **not** prospective test ordering: a policy cannot cause an unperformed test to occur.
 
 - Decision epochs at `t = 12, 18, 24` hours; prediction time `T = 24`.
 - **BR-1:** no value with timestamp `> t_k` may enter the policy view, model input, or any
@@ -294,7 +295,8 @@ missingness pattern and budget. **CP-MDA is not applied to classification** — 
 method for missing covariates.
 
 **Acquisition policies.** No acquisition; full-observation ceiling (labelled an **unattainable
-diagnostic upper bound**); random; most-missing-first; static importance; cost-normalised
+diagnostic upper bound**); support-blind uniform-all random; support-blind training-frequency
+random; support-aware availability-oracle random (**diagnostic only**); most-missing-first; static importance; cost-normalised
 importance; **fixed domain-motivated ordering** (authored by the engineering team from observed
 frequency — *not* clinician-designed); ensemble-uncertainty heuristic; feature-level EIG (EDDI-style);
 group-level EIG; learned greedy discriminative policy. A faithful SM-DDPO reproduction is **out of

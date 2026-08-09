@@ -7,6 +7,7 @@ changes behaviour, these fail.
 
 from __future__ import annotations
 
+import inspect
 import pathlib
 
 import numpy as np
@@ -15,8 +16,10 @@ import pytest
 from cliniverse.config import VariableConfig
 from cliniverse.data.cohort import Cohort
 from cliniverse.data.physionet2012 import (
+    DEVELOPMENT_RECORD_SETS,
     LEAKY_OUTCOME_COLUMNS,
     cohort_fingerprint,
+    load_cohort,
     parse_record,
 )
 from cliniverse.exceptions import DataError
@@ -33,6 +36,18 @@ N_TIMESERIES_VARIABLES = 37
 #: raw rows including `-1` sentinels and multiple readings that collapse into one
 #: hour-cell. The production figure is `Cohort.describe()['grid_occupancy']`.
 RAW_OCCUPANCY_UPPER_BOUND = 0.2446
+
+
+class TestLoaderQuarantine:
+    def test_default_loader_sets_are_development_only(self) -> None:
+        default = inspect.signature(load_cohort).parameters["sets"].default
+        assert default == DEVELOPMENT_RECORD_SETS == ("a", "b")
+
+    def test_set_c_requires_explicit_final_evaluation_flag(
+        self, tmp_path: pathlib.Path
+    ) -> None:
+        with pytest.raises(DataError, match="quarantined"):
+            load_cohort(tmp_path, sets=("c",), download=False)
 
 
 # --------------------------------------------------------------- parsing ----

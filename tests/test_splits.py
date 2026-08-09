@@ -44,12 +44,11 @@ class TestLockedSet:
         with pytest.raises(LeakageError, match="locked set"):
             holdout_split(cohort_with_locked_set)
 
-    def test_development_cohort_drops_locked_records(
+    def test_development_cohort_refuses_locked_records(
         self, cohort_with_locked_set: Cohort
     ) -> None:
-        dev = development_cohort(cohort_with_locked_set)
-        assert dev.n_patients == 2
-        assert not np.any(dev.source_set == LOCKED_SET)
+        with pytest.raises(LeakageError, match="locked set"):
+            development_cohort(cohort_with_locked_set)
 
     def test_final_holdout_requires_token(self, cohort_with_locked_set: Cohort) -> None:
         with pytest.raises(LeakageError, match="unlock token"):
