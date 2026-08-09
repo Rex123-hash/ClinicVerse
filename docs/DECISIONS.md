@@ -6,7 +6,7 @@ supersede rather than silently edit.
 ---
 
 ## D-001 — Reframe the project's claimed contribution
-**Status:** PROPOSED — awaiting project-owner sign-off
+**Status:** ACCEPTED (project owner, 2026-08-09)
 **Date:** 2026-08-09
 
 **Context.** The brief names "active information acquisition applied to a longitudinal patient

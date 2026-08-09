@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Sync environment
+        run: uv sync --extra models --extra api
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Format check
+        run: uv run ruff format --check .
+
+      - name: Type check
+        run: uv run mypy cliniverse
+
+      # The fast suite must pass without any dataset present: tests needing the
+      # real data are marked `slow` and skip cleanly.
+      - name: Tests (no dataset)
+        run: uv run pytest -q -m "not slow"
+
+  dataset:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Sync environment
+        run: uv sync --extra models
+
+      # ~20 MB from PhysioNet (ODC-BY, open access, no credentialing).
+      - name: Download set-a
+        run: uv run python -c "from cliniverse.data import download_dataset; download_dataset(sets=('a',))"
+
+      - name: Tests (with dataset)
+        run: uv run pytest -q

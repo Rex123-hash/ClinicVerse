@@ -1,7 +1,7 @@
 # Cliniverse — Status
 
 **Updated:** 2026-08-09
-**Current milestone:** M0 (pre-implementation) — research assessment delivered, awaiting scope sign-off.
+**Current milestone:** M1 (TwinBench v0) — M0 complete.
 
 ## Where we are
 
@@ -9,9 +9,9 @@
 |---|---|---|
 | Research assessment | **Done** | `docs/research_assessment.md` |
 | Dataset selection + access verification | **Done** | PhysioNet/CinC 2012 verified downloadable, statistics reproduced by `scripts/verify_physionet2012.py` |
-| Scope sign-off on reframing | **Blocked — awaiting owner decision** | See `docs/DECISIONS.md` D-001 |
-| M0 repo/tooling/CI | Not started | |
-| M1 TwinBench v0 | Not started | |
+| Scope sign-off on reframing | **Done** | D-001 ACCEPTED — panel-level AFA framing |
+| M0 repo/tooling/CI | **Done** | See exit criteria below |
+| M1 TwinBench v0 | In progress | |
 | M2 Baselines | Not started | |
 | M3 Uncertainty | Not started | |
 | M4 Acquisition (core) | Not started | |
@@ -33,14 +33,21 @@ Reproduce with:
 python scripts/verify_physionet2012.py
 ```
 
-## Open questions for the project owner
+## M0 exit criteria — all met
 
-1. **D-001** — Accept the reframing from "we invented active acquisition for patient world
-   models" to "reproducible benchmark + evaluation of panel-level cost-aware acquisition"?
-   The original framing is not defensible (`research_assessment.md` §3.1).
-2. **Deadline** — the hackathon submission date determines how much of M5–M6 is reachable.
+| Criterion | Evidence |
+|---|---|
+| `uv` environment pinned to Python 3.12 | `pyproject.toml` (`requires-python >=3.12,<3.13`); torch 2.13, xgboost 3.4, sklearn 1.9 installed |
+| Lint / format / type / test in CI | `.github/workflows/ci.yml`; ruff + `ruff format --check` + mypy strict + pytest |
+| `pytest` green | 69 passed |
+| ruff clean | `All checks passed!` |
+| mypy strict clean | `Success: no issues found in 8 source files` |
+| Parser reproduces verified statistics | `tests/test_physionet2012.py::TestSetA` pins 4,000 records / 554 deaths / 36 variables / 3 degenerate records |
+| Binned occupancy below raw upper bound | 19.35% binned vs 23.28% raw row-count bound — correct direction (within-hour collapsing + implausible-value removal) |
+| Leakage test passes | `tests/test_splits.py`, `tests/test_physionet2012.py::TestLeakageGuards` |
+| set-c untouched | `final_holdout()` requires an explicit unlock token; every other split path raises `LeakageError` on set-c |
 
-## Next actions once unblocked
+## Next actions
 
-M0: `uv` environment pinned to Python 3.12, ruff/mypy/pytest CI, P12 parser + hourly binning +
-patient-level splits with set-c locked, and the leakage regression test.
+M1 — TwinBench v0: panel catalogue derived from empirical co-measurement structure, case
+schema, masking mechanisms, seeded case generation with content-hash manifests.

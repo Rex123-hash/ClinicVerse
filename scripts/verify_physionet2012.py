@@ -26,9 +26,7 @@ BASE_URL = "https://physionet.org/files/challenge-2012/1.0.0"
 OUTCOME_FILES = ("Outcomes-a.txt", "Outcomes-b.txt", "Outcomes-c.txt")
 
 # Recorded once at 00:00; not part of the time-series signal.
-STATIC_PARAMS = frozenset(
-    {"RecordID", "Age", "Gender", "Height", "ICUType", "Weight"}
-)
+STATIC_PARAMS = frozenset({"RecordID", "Age", "Gender", "Height", "ICUType", "Weight"})
 
 
 def _download(url: str, dest: pathlib.Path) -> pathlib.Path:
@@ -38,7 +36,7 @@ def _download(url: str, dest: pathlib.Path) -> pathlib.Path:
         return dest
     dest.parent.mkdir(parents=True, exist_ok=True)
     print(f"  fetch   {url}")
-    with urllib.request.urlopen(url, timeout=300) as resp:  # noqa: S310 - fixed https host
+    with urllib.request.urlopen(url, timeout=300) as resp:
         dest.write_bytes(resp.read())
     print(f"          -> {dest.name} ({dest.stat().st_size:,} bytes)")
     return dest
@@ -114,7 +112,7 @@ def report_timeseries(records: list[pathlib.Path], which: str) -> None:
     )
     print(f"\nDEGENERATE RECORDS (zero time-series observations): {len(empty)} {empty}")
     tiny = sorted(
-        (p.stem, n) for p, n in zip(records, rows_per_rec) if 0 < n < 20
+        (p.stem, n) for p, n in zip(records, rows_per_rec, strict=True) if 0 < n < 20
     )
     print(f"records with <20 observations: {len(tiny)} {tiny}")
 
@@ -148,7 +146,10 @@ def main(argv: list[str] | None = None) -> int:
         help="directory to cache downloads (default: data/raw/physionet2012)",
     )
     parser.add_argument(
-        "--set", dest="which", choices=("a", "b", "c"), default="a",
+        "--set",
+        dest="which",
+        choices=("a", "b", "c"),
+        default="a",
         help="which record set to analyse in detail (default: a)",
     )
     args = parser.parse_args(argv)

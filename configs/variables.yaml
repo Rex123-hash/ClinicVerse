@@ -1,0 +1,106 @@
+# PhysioNet/CinC Challenge 2012 variable schema.
+#
+# `plausible` bounds are INCLUSIVE. Values outside them are treated as MISSING
+# (not clipped) — clipping would fabricate a measurement that was never taken.
+# Bounds are deliberately wide: the goal is to remove physiologically impossible
+# recording errors, not to winsorize genuine extreme values, which in an ICU
+# cohort are exactly the clinically informative ones.
+#
+# `repairs` fix known unit-entry errors in this dataset before the plausibility
+# check runs. Each repair is unit-tested; see tests/test_physionet2012.py.
+
+dataset: physionet-cinc-2012
+version: "1.0.0"
+horizon_hours: 48
+
+# ------------------------------------------------------------------ statics --
+# Recorded once at 00:00. -1 is the dataset's missing sentinel.
+statics:
+  Age:
+    unit: years
+    plausible: [0, 90]        # 90 = de-identification cap, not a real ceiling
+    kind: demographic
+  Gender:
+    unit: binary
+    plausible: [0, 1]
+    kind: demographic
+  Height:
+    unit: cm
+    plausible: [20, 260]
+    kind: demographic
+  Weight:
+    unit: kg
+    plausible: [20, 300]
+    kind: demographic
+  ICUType:
+    unit: category
+    plausible: [1, 4]         # 1 Coronary, 2 Cardiac Surgery, 3 Medical, 4 Surgical
+    kind: context
+
+# -------------------------------------------------------------- time series --
+variables:
+  # --- near-continuous monitoring (not meaningfully "orderable") ---
+  HR:        {unit: bpm,      plausible: [0, 300],   kind: vital}
+  Temp:      {unit: degC,     plausible: [20, 45],   kind: vital}
+  RespRate:  {unit: bpm,      plausible: [0, 80],    kind: vital}
+  GCS:       {unit: score,    plausible: [3, 15],    kind: vital}
+  Urine:     {unit: mL,       plausible: [0, 5000],  kind: vital}
+  SysABP:    {unit: mmHg,     plausible: [0, 300],   kind: vital}
+  DiasABP:   {unit: mmHg,     plausible: [0, 200],   kind: vital}
+  MAP:       {unit: mmHg,     plausible: [0, 250],   kind: vital}
+  NISysABP:  {unit: mmHg,     plausible: [0, 300],   kind: vital}
+  NIDiasABP: {unit: mmHg,     plausible: [0, 200],   kind: vital}
+  NIMAP:     {unit: mmHg,     plausible: [0, 250],   kind: vital}
+
+  # --- ventilator settings (clinician-set, not measured) ---
+  FiO2:      {unit: fraction, plausible: [0.21, 1.0], kind: setting}
+  MechVent:  {unit: binary,   plausible: [0, 1],      kind: setting}
+
+  # --- discretely ordered laboratory analytes ---
+  Na:         {unit: mEq/L,     plausible: [80, 200],   kind: lab}
+  K:          {unit: mEq/L,     plausible: [0, 15],     kind: lab}
+  HCO3:       {unit: mmol/L,    plausible: [0, 60],     kind: lab}
+  BUN:        {unit: mg/dL,     plausible: [0, 200],    kind: lab}
+  Creatinine: {unit: mg/dL,     plausible: [0, 25],     kind: lab}
+  Glucose:    {unit: mg/dL,     plausible: [0, 1000],   kind: lab}
+  Mg:         {unit: mmol/L,    plausible: [0, 15],     kind: lab}
+  WBC:        {unit: cells/nL,  plausible: [0, 200],    kind: lab}
+  HCT:        {unit: percent,   plausible: [0, 70],     kind: lab}
+  Platelets:  {unit: cells/nL,  plausible: [0, 1500],   kind: lab}
+  AST:        {unit: IU/L,      plausible: [0, 10000],  kind: lab}
+  ALT:        {unit: IU/L,      plausible: [0, 5000],   kind: lab}
+  ALP:        {unit: IU/L,      plausible: [0, 2000],   kind: lab}
+  Bilirubin:  {unit: mg/dL,     plausible: [0, 50],     kind: lab}
+  Albumin:    {unit: g/dL,      plausible: [0, 6],      kind: lab}
+  Lactate:    {unit: mmol/L,    plausible: [0, 30],     kind: lab}
+  pH:         {unit: pH,        plausible: [6.5, 8.0],  kind: lab}
+  PaO2:       {unit: mmHg,      plausible: [0, 600],    kind: lab}
+  PaCO2:      {unit: mmHg,      plausible: [0, 150],    kind: lab}
+  SaO2:       {unit: percent,   plausible: [0, 100],    kind: lab}
+  TroponinI:  {unit: ug/L,      plausible: [0, 100],    kind: lab}
+  TroponinT:  {unit: ug/L,      plausible: [0, 50],     kind: lab}
+  Cholesterol: {unit: mg/dL,    plausible: [0, 600],    kind: lab}
+
+# ---------------------------------------------------------------- repairs ----
+# Known unit-entry errors in this dataset, corrected before plausibility filtering.
+# Each rule: if the raw value falls in `when`, apply `op` with `factor`/`offset`.
+repairs:
+  Temp:
+    # Fahrenheit entered in a Celsius field. 90-115 F == 32.2-46.1 C, and the
+    # band cannot collide with a plausible Celsius reading (max 45).
+    - when: [90.0, 115.0]
+      op: fahrenheit_to_celsius
+  pH:
+    # pH recorded x100 (e.g. 735 for 7.35).
+    - when: [650.0, 800.0]
+      op: scale
+      factor: 0.01
+    # pH recorded /10 (e.g. 0.735).
+    - when: [0.65, 0.80]
+      op: scale
+      factor: 10.0
+  FiO2:
+    # FiO2 recorded as a percentage (e.g. 40 for 0.40).
+    - when: [21.0, 100.0]
+      op: scale
+      factor: 0.01
