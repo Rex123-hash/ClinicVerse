@@ -67059,7 +67059,7 @@
         "policy": "greedy_eig_per_cost"
       }
     ],
-    "seconds": 246.3,
+    "seconds": 340.2,
     "spend": [
       {
         "budget_fraction": 0.0,
@@ -73897,8 +73897,8 @@
     "excluded_sets": [
       "c"
     ],
-    "git_dirty": true,
-    "git_sha": "abaeb44d221ebc19a6810e6054fa6de16637439d",
+    "git_dirty": false,
+    "git_sha": "ba9b5986e0413ce08989186c52904cc3756ee855",
     "n_patients": 8000,
     "package_versions": {
       "numpy": "2.5.2",
