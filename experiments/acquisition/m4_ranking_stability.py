@@ -58,6 +58,7 @@ from cliniverse.evaluation.representations import (
     Representation,
     build_representation,
 )
+from cliniverse.exceptions import ConfigError
 from cliniverse.log import get_logger
 from twinbench.cases import build_manifest, engine_for
 from twinbench.disclosure import Protocol
@@ -150,6 +151,19 @@ class FoldModel:
         raw = np.asarray(self.model.predict_proba(x)[:, 1], dtype=np.float64)
         return np.asarray(self.calibrator.transform(raw), dtype=np.float64)
 
+    @property
+    def n_features_used(self) -> int:
+        """How many features the fitted booster actually splits on.
+
+        Zero means every tree is a stump and the model is a constant. That is a
+        silent disaster for an acquisition experiment: no disclosure can change a
+        constant prediction, so every policy scores identically and the run looks
+        like a propagation bug. It is what happens when the training partition is
+        too small for the frozen `min_child_weight`.
+        """
+        trees = self.model.get_booster().trees_to_dataframe()
+        return len(set(trees["Feature"]) - {"Leaf"})
+
 
 def fit_folds(cohort: Cohort, y: np.ndarray, seed: int, folds: int) -> list[FoldModel]:
     """Fit the frozen pipeline per fold on CLEAN data only."""
@@ -184,12 +198,23 @@ def fit_folds(cohort: Cohort, y: np.ndarray, seed: int, folds: int) -> list[Fold
                 calibrator=calibrator,
             )
         )
+        fold_model = out[-1]
+        used = fold_model.n_features_used
+        if used == 0:
+            raise ConfigError(
+                f"fold {split.fold}: the fitted model splits on zero features, so it "
+                f"is a constant and no acquisition can change its prediction. "
+                f"n_model_train={len(train_idx)} with min_child_weight="
+                f"{XGB_PARAMS['min_child_weight']} is too small. Increase the cohort "
+                f"rather than changing the frozen hyperparameters."
+            )
         log.info(
             "fold fitted",
             fold=split.fold,
             n_model_train=len(train_idx),
             n_calibration=len(calib_idx),
             n_test=len(split.validation),
+            n_features_used=used,
         )
     return out
 
