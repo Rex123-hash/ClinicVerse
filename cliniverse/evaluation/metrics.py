@@ -270,6 +270,24 @@ def paired_bootstrap_difference(
     point = float(metric(y, p_b)) - float(metric(y, p_a))
     draws = _patient_resamples(y.size, n_boot, seed)
 
+    # Exact equality occurs for controls that are mathematically constrained to
+    # produce the same predictions. Re-scoring identical arrays cannot change a
+    # paired difference from zero, but sorting them thousands of times for AURC
+    # is needlessly expensive. Still count valid patient resamples so n_boot has
+    # the same semantics as the general path.
+    if np.array_equal(p_a, p_b):
+        n_valid = sum(len(np.unique(y[idx])) == 2 for idx in draws)
+        return PairedDifference(
+            metric=metric_name,
+            name_a=name_a,
+            name_b=name_b,
+            difference=point,
+            low=0.0,
+            high=0.0,
+            n_boot=n_valid,
+            excludes_zero=False,
+        )
+
     diffs: list[float] = []
     for idx in draws:
         yb = y[idx]

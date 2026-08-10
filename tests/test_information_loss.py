@@ -27,6 +27,7 @@ from cliniverse.evaluation.information_loss import (
     matched_pair,
     matched_trio,
 )
+from cliniverse.evaluation.metrics import paired_bootstrap_difference
 from cliniverse.evaluation.selective import (
     aurc,
     confidence,
@@ -316,6 +317,31 @@ class TestSelectivePrediction:
     def test_unknown_loss_rejected(self) -> None:
         with pytest.raises(ConfigError, match="unknown loss"):
             risk_coverage_curve(np.array([0.0, 1.0]), np.array([0.2, 0.8]), loss="hinge")
+
+    def test_identical_paired_predictions_have_exact_zero_interval(self) -> None:
+        y = np.array([0.0, 1.0] * 20)
+        p = np.linspace(0.05, 0.95, len(y))
+        calls = 0
+
+        def counted_metric(labels: np.ndarray, predictions: np.ndarray) -> float:
+            nonlocal calls
+            calls += 1
+            return float(np.mean((labels - predictions) ** 2))
+
+        result = paired_bootstrap_difference(
+            y,
+            p,
+            p.copy(),
+            counted_metric,
+            metric_name="test",
+            name_a="a",
+            name_b="b",
+            n_boot=50,
+            seed=1,
+        )
+        assert result.difference == result.low == result.high == 0.0
+        assert result.n_boot == 50
+        assert calls == 2  # point estimate only; bootstrap rescoring is unnecessary
 
 
 class TestCalibrators:
