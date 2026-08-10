@@ -25,6 +25,7 @@ from cliniverse.evaluation.information_loss import (
     apply_information_loss,
     eligible_columns,
     matched_pair,
+    matched_trio,
 )
 from cliniverse.evaluation.selective import (
     aurc,
@@ -140,8 +141,19 @@ class TestLossMechanics:
         np.testing.assert_array_equal(a.cohort.m, b.cohort.m)
 
     def test_invalid_severity_rejected(self, cohort: Cohort) -> None:
-        with pytest.raises(ConfigError, match="severity"):
-            apply_information_loss(cohort, LossCondition.CELL_RANDOM, 1.5, CATALOGUE, seed=1)
+        for severity in (-0.01, 1.01):
+            with pytest.raises(ConfigError, match="severity"):
+                apply_information_loss(
+                    cohort, LossCondition.CELL_RANDOM, severity, CATALOGUE, seed=1
+                )
+
+    @pytest.mark.parametrize("severity", [0.0, 1.0])
+    def test_boundary_severities(self, cohort: Cohort, severity: float) -> None:
+        out = apply_information_loss(
+            cohort, LossCondition.GROUP_STRUCTURED, severity, CATALOGUE, seed=1
+        )
+        expected = 0 if severity == 0.0 else int(out.eligible_cells.sum())
+        assert int(out.removed_cells.sum()) == expected
 
 
 class TestMatchedSeverity:
@@ -158,6 +170,49 @@ class TestMatchedSeverity:
         """Same amount removed, different cells — otherwise there is no contrast."""
         group, cell = matched_pair(cohort, 0.5, CATALOGUE, seed=11)
         assert not np.array_equal(group.cohort.m, cell.cohort.m)
+
+    def test_variable_matched_control_matches_each_analyte(self, cohort: Cohort) -> None:
+        group, variable, cell = matched_trio(cohort, 0.5, CATALOGUE, seed=11)
+        np.testing.assert_array_equal(group.removed_by_variable, variable.removed_by_variable)
+        np.testing.assert_array_equal(group.removed_cells, cell.removed_cells)
+        assert not bool(variable.match_mismatch_cells.any())
+
+    def test_whole_window_semantics_make_variable_control_identical(
+        self, cohort: Cohort
+    ) -> None:
+        """Exact analyte matching has no freedom when all occurrences are removed."""
+        group, variable, _ = matched_trio(cohort, 0.5, CATALOGUE, seed=11)
+        np.testing.assert_array_equal(group.cohort.m, variable.cohort.m)
+        np.testing.assert_array_equal(group.cohort.x, variable.cohort.x)
+
+    def test_variable_control_is_deterministic(self, cohort: Cohort) -> None:
+        first = matched_trio(cohort, 0.5, CATALOGUE, seed=29)[1]
+        second = matched_trio(cohort, 0.5, CATALOGUE, seed=29)[1]
+        np.testing.assert_array_equal(first.cohort.m, second.cohort.m)
+
+    def test_variable_control_requires_counts(self, cohort: Cohort) -> None:
+        with pytest.raises(ConfigError, match="requires match_variable_counts"):
+            apply_information_loss(
+                cohort,
+                LossCondition.VARIABLE_MATCHED_SCATTERED,
+                0.5,
+                CATALOGUE,
+                seed=1,
+            )
+
+    def test_variable_control_reports_unavailable_shortfall(self, cohort: Cohort) -> None:
+        requested = np.zeros((cohort.n_patients, len(cohort.variable_names)), dtype=np.int64)
+        requested[:, 0] = cohort.n_hours + 1
+        out = apply_information_loss(
+            cohort,
+            LossCondition.VARIABLE_MATCHED_SCATTERED,
+            0.5,
+            CATALOGUE,
+            seed=1,
+            match_variable_counts=requested,
+        )
+        assert bool((out.match_mismatch_cells > 0).all())
+        assert out.summary()["n_patients_with_match_mismatch"] == cohort.n_patients
 
     def test_realized_severity_is_recorded_and_bounded(self, cohort: Cohort) -> None:
         group, _ = matched_pair(cohort, 0.5, CATALOGUE, seed=11)
@@ -176,6 +231,35 @@ class TestMatchedSeverity:
         # With only two groups the granularity is coarse, so this is a loose
         # bound; it still fails for a rule that always overshoots.
         assert float(realized.mean()) <= 0.6
+
+    def test_single_large_group_is_skipped_when_zero_is_closer(self) -> None:
+        one_group = PanelCatalogue(
+            version="test",
+            panels={"all": Panel(name="all", label="All", members=("a1", "a2"), cost=1.0)},
+        )
+        n, t, v = 1, 8, 5
+        m = np.zeros((n, t, v), dtype=bool)
+        m[:, :, :2] = True
+        x = np.where(m, 1.0, np.nan).astype(np.float32)
+        tiny = Cohort(
+            record_ids=np.array([1], dtype=np.int64),
+            source_set=np.array(["a"], dtype=np.str_),
+            x=x,
+            m=m,
+            statics=np.zeros((n, 1), dtype=np.float32),
+            statics_mask=np.ones((n, 1), dtype=bool),
+            labels={"mortality": np.array([0], dtype=np.float32)},
+            variable_names=VARIABLES,
+            static_names=("Age",),
+        )
+        low = apply_information_loss(
+            tiny, LossCondition.GROUP_STRUCTURED, 0.25, one_group, seed=1
+        )
+        full = apply_information_loss(
+            tiny, LossCondition.GROUP_STRUCTURED, 1.0, one_group, seed=1
+        )
+        assert int(low.removed_cells[0]) == 0
+        assert int(full.removed_cells[0]) == int(full.eligible_cells[0])
 
     def test_matching_survives_patients_with_no_eligible_cells(self) -> None:
         n, t, v = 3, 4, 5
@@ -245,18 +329,20 @@ class TestCalibrators:
         p = np.clip(p_true * 0.5, 1e-6, 1 - 1e-6)
         return y, p
 
-    def test_identity_is_a_no_op(self, calib_data) -> None:
+    def test_identity_is_a_no_op(self, calib_data: tuple[np.ndarray, np.ndarray]) -> None:
         y, p = calib_data
         out = IdentityCalibrator().fit(p, y).transform(p)
         np.testing.assert_array_equal(out, p)
 
-    def test_platt_corrects_a_systematic_shift(self, calib_data) -> None:
+    def test_platt_corrects_a_systematic_shift(
+        self, calib_data: tuple[np.ndarray, np.ndarray]
+    ) -> None:
         y, p = calib_data
         cal = PlattCalibrator().fit(p, y)
         out = cal.transform(p)
         assert abs(out.mean() - y.mean()) < abs(p.mean() - y.mean())
 
-    def test_platt_preserves_ranking(self, calib_data) -> None:
+    def test_platt_preserves_ranking(self, calib_data: tuple[np.ndarray, np.ndarray]) -> None:
         """Monotone map: it cannot change AUROC."""
         y, p = calib_data
         out = PlattCalibrator().fit(p, y).transform(p)
@@ -276,11 +362,27 @@ class TestCalibrators:
         with pytest.raises(ConfigError, match="at least"):
             IsotonicCalibrator().fit(rng.random(n), rng.binomial(1, 0.3, n).astype(float))
 
-    def test_isotonic_output_never_saturates(self, calib_data) -> None:
+    def test_isotonic_output_never_saturates(
+        self, calib_data: tuple[np.ndarray, np.ndarray]
+    ) -> None:
         """Exact 0 or 1 would make log-loss infinite."""
         y, p = calib_data
         out = IsotonicCalibrator().fit(p, y).transform(p)
         assert out.min() > 0.0 and out.max() < 1.0
+
+    def test_isotonic_reports_support_and_steps(
+        self, calib_data: tuple[np.ndarray, np.ndarray]
+    ) -> None:
+        y, p = calib_data
+        config = IsotonicCalibrator().fit(p, y).config()
+        assert config["calibration_min"] == pytest.approx(float(p.min()))
+        assert config["calibration_max"] == pytest.approx(float(p.max()))
+        n_thresholds = config["n_thresholds"]
+        n_steps = config["n_distinct_steps"]
+        assert isinstance(n_thresholds, int)
+        assert isinstance(n_steps, int)
+        assert n_thresholds >= n_steps > 1
+        assert config["out_of_bounds"] == "clip"
 
     def test_builder_returns_each_kind(self) -> None:
         for kind in CalibratorKind:

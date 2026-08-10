@@ -115,6 +115,10 @@ class IsotonicCalibrator(Calibrator):
     kind: CalibratorKind = CalibratorKind.ISOTONIC
     model: IsotonicRegression | None = None
     n_calibration: int = 0
+    calibration_min: float = float("nan")
+    calibration_max: float = float("nan")
+    n_thresholds: int = 0
+    n_distinct_steps: int = 0
 
     def fit(self, p: FloatArray, y: FloatArray) -> IsotonicCalibrator:
         p = np.asarray(p, dtype=np.float64).ravel()
@@ -129,6 +133,10 @@ class IsotonicCalibrator(Calibrator):
         self.model = IsotonicRegression(out_of_bounds="clip", y_min=0.0, y_max=1.0)
         self.model.fit(p, y)
         self.n_calibration = int(p.size)
+        self.calibration_min = float(p.min())
+        self.calibration_max = float(p.max())
+        self.n_thresholds = int(self.model.X_thresholds_.size)
+        self.n_distinct_steps = int(np.unique(self.model.y_thresholds_).size)
         return self
 
     def transform(self, p: FloatArray) -> FloatArray:
@@ -139,7 +147,15 @@ class IsotonicCalibrator(Calibrator):
         return np.clip(np.asarray(out, dtype=np.float64), _EPS, 1 - _EPS)
 
     def config(self) -> dict[str, object]:
-        return {"kind": str(self.kind), "n_calibration": self.n_calibration}
+        return {
+            "kind": str(self.kind),
+            "n_calibration": self.n_calibration,
+            "calibration_min": self.calibration_min,
+            "calibration_max": self.calibration_max,
+            "n_thresholds": self.n_thresholds,
+            "n_distinct_steps": self.n_distinct_steps,
+            "out_of_bounds": "clip",
+        }
 
 
 def build_calibrator(kind: CalibratorKind) -> Calibrator:

@@ -1,7 +1,10 @@
 # M3 Design — Calibration Robustness Under Structured Information Loss
 
-**Status:** PREDECLARED. Written and committed **before** any M3 experiment was executed.
+**Status:** HISTORICAL PREDECLARATION, amended after results by Independent Review #3.
 **Date:** 2026-08-09
+
+The original choices remain visible below. Review #3 corrections are explicitly
+labelled and must not be mistaken for predeclared analyses.
 
 Every choice below — primary representation, hyperparameters, severity ladder, primary contrast,
 patient-selection rule — is fixed here so that none of them can be chosen after seeing results.
@@ -121,15 +124,17 @@ taken.
 therefore done **per patient**, not on average:
 
 1. For a patient at severity `s`, group loss shuffles that patient's present groups with a seeded
-   generator and removes them one at a time until the removed fraction of eligible cells first
-   reaches `s`, or no groups remain.
+   generator and accepts a candidate group only when adding it moves the removed-cell count
+   strictly closer to the target than stopping. This is the final repaired algorithm; the original
+   reach-or-exceed implementation was superseded before the retained M3 artifacts.
 2. The exact number of cells removed, `N`, is recorded.
 3. Matched `cell_random` loss for that same patient removes **exactly `N`** cells, drawn uniformly
    from the same eligible pool.
 
 By construction the two conditions remove an identical number of cells from the same patient, so
-any difference isolates the **structure** of the loss rather than its **amount**. Realized severity
-is recorded per patient for both conditions and reported.
+the comparison controls the **amount** removed. It does not control variable identity and therefore
+does not, by itself, isolate structure. Realized severity is recorded per patient for both
+conditions and reported.
 
 ## 8. Severity ladder — predeclared
 
@@ -211,3 +216,56 @@ Permitted framing: associational, measurement-presence and preprocessing languag
   important, not less.
 
 We will not force a safety-failure story.
+
+---
+
+## Review #3 amendment (2026-08-10; post-result repair)
+
+This section is a falsification amendment, not part of the 2026-08-09
+predeclaration.
+
+### Variable-matched control
+
+Review #3 adds `variable_matched_scattered`. For each patient it requests the
+same number of removed cells from every variable as that patient's
+`group_structured` realization, uses no labels, and samples timestamps
+independently within each variable. Any naturally unavailable shortfall is
+deterministically clipped and reported as a mismatch.
+
+The implementation audit established that `group_structured` removes every
+occurrence of each member variable of a selected co-measurement group across the
+entire truncated window. It does not remove a laboratory-order event,
+patient-hour group instance, or subset of repeated measurements. Consequently,
+exact per-variable matching has no scattering freedom: matching a variable for
+which all observed cells were removed necessarily selects those same cells. A
+mask-identical control is retained and reported because it proves that the
+original group-versus-cell contrast cannot identify a coherence or
+co-occurrence-structure effect separately from analyte identity.
+
+The repaired three-way comparison is:
+
+1. `group_structured`;
+2. `variable_matched_scattered` (identity- and amount-matched; expected to be
+   mask-identical under the audited semantics);
+3. `cell_random` (amount-matched only).
+
+NLL and Brier are the Review #3 decision metrics. The new variable-matched
+contrasts are post-hoc falsification controls, not original confirmatory tests.
+The original group-versus-cell NLL, Brier, and AURC contrasts retain their
+historical predeclared status, but comprise nine severity-by-metric comparisons;
+calibrator, secondary-representation, and model-class comparisons are
+exploratory. No multiplicity-adjusted claim is made.
+
+### Demonstration-patient rule
+
+The original 0.5-threshold/entropy rule is superseded because 0.5 is arbitrary
+for a 14% endpoint and entropy decline is mechanically coupled to probabilities
+moving toward zero. The repaired illustrative rule is:
+
+> At requested 50% structured loss, among outcome-positive outer-test patients
+> whose predicted mortality risk decreases and whose absolute probability error
+> worsens, select the record nearest the median deterioration; break exact ties
+> by lowest record ID.
+
+Labels are used only for this declared post-hoc illustration. The selected case
+is not evaluation evidence.

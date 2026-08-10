@@ -27,15 +27,21 @@ from cliniverse.evaluation.selective import predictive_entropy
 
 PRIMARY_REP = "values_mask"
 PRIMARY_MODEL = "xgboost"
-COND_COLOUR = {"group_structured": "#B91C1C", "cell_random": "#1D4ED8", "none": "#111827"}
+COND_COLOUR = {
+    "group_structured": "#B91C1C",
+    "variable_matched_scattered": "#D97706",
+    "cell_random": "#1D4ED8",
+    "none": "#111827",
+}
 COND_LABEL = {
     "group_structured": "structured group-level loss",
+    "variable_matched_scattered": "variable-matched scattered (mask-identical)",
     "cell_random": "matched random-cell loss",
     "none": "no loss",
 }
 
 
-def _rows(data: dict[str, Any], calibrator: str) -> dict[tuple[float, str], dict]:
+def _rows(data: dict[str, Any], calibrator: str) -> dict[tuple[float, str], dict[str, Any]]:
     return {
         (r["severity"], r["condition"]): r
         for r in data["rows"]
@@ -46,7 +52,10 @@ def _rows(data: dict[str, Any], calibrator: str) -> dict[tuple[float, str], dict
 
 
 def _series(
-    rows: dict[tuple[float, str], dict], condition: str, metric: str, severities: list[float]
+    rows: dict[tuple[float, str], dict[str, Any]],
+    condition: str,
+    metric: str,
+    severities: list[float],
 ) -> tuple[list[float], list[float]]:
     xs, ys = [], []
     for s in severities:
@@ -78,7 +87,11 @@ def figure_degradation(data: dict[str, Any], out: pathlib.Path) -> pathlib.Path:
     fig, axes = plt.subplots(1, 4, figsize=(19, 4.3))
 
     for ax, (metric, title, lower_better) in zip(axes, panels, strict=True):
-        for cond in ("group_structured", "cell_random"):
+        for cond in (
+            "variable_matched_scattered",
+            "group_structured",
+            "cell_random",
+        ):
             ys = []
             for s in severities:
                 key = (s, "none" if s == 0.0 else cond)
@@ -87,7 +100,8 @@ def figure_degradation(data: dict[str, Any], out: pathlib.Path) -> pathlib.Path:
                 x,
                 ys,
                 marker="o",
-                linewidth=2,
+                linewidth=3 if cond == "variable_matched_scattered" else 2,
+                linestyle="--" if cond == "group_structured" else "-",
                 color=COND_COLOUR[cond],
                 label=COND_LABEL[cond],
             )
@@ -111,7 +125,8 @@ def figure_degradation(data: dict[str, Any], out: pathlib.Path) -> pathlib.Path:
     axes[0].legend(fontsize=8, loc="lower left")
     fig.suptitle(
         "M3 — XGBoost values+mask, Platt-calibrated on clean data. "
-        "Ranking survives; risk estimates drift downward, and structured loss is worse.",
+        "Ranking degrades modestly while risk estimates drift downward; "
+        "variable matching reveals an identity effect.",
         y=1.02,
         fontsize=11,
     )
@@ -174,6 +189,12 @@ def figure_reliability(data: dict[str, Any], out: pathlib.Path) -> pathlib.Path:
     for sev, cond, colour, label in (
         (0.0, "none", "#111827", "no loss"),
         (0.75, "cell_random", "#1D4ED8", "matched random-cell loss"),
+        (
+            0.75,
+            "variable_matched_scattered",
+            "#D97706",
+            "variable-matched scattered (mask-identical)",
+        ),
         (0.75, "group_structured", "#B91C1C", "structured group-level loss"),
     ):
         rel = rows[(sev, cond)]["reliability"]
@@ -190,7 +211,7 @@ def figure_reliability(data: dict[str, Any], out: pathlib.Path) -> pathlib.Path:
     ax.set_ylabel("observed mortality rate")
     ax.set_title(
         "M3 - reliability at the highest severity\n"
-        "(points below the diagonal understate risk)",
+        "(points above the diagonal indicate risk underestimation)",
         fontsize=10,
     )
     ax.legend(fontsize=8)
@@ -205,39 +226,39 @@ def figure_reliability(data: dict[str, Any], out: pathlib.Path) -> pathlib.Path:
 def select_demo_patient(
     data: dict[str, Any], arrays: dict[str, np.ndarray], out: pathlib.Path
 ) -> pathlib.Path:
-    """Apply the M3_DESIGN section 11 rule mechanically."""
+    """Apply the repaired outcome-positive median-deterioration rule."""
     y = arrays["labels"].astype(float)
     ids = arrays["record_ids"]
     base_key = f"{PRIMARY_REP}|{PRIMARY_MODEL}|platt|0.0|none"
     loss_key = f"{PRIMARY_REP}|{PRIMARY_MODEL}|platt|0.5|group_structured"
     p0, p1 = arrays[base_key].astype(float), arrays[loss_key].astype(float)
 
-    correct_before = (p0 >= 0.5).astype(float) == y
-    wrong_after = (p1 >= 0.5).astype(float) != y
-    flipped = correct_before & wrong_after
-
     e0, e1 = predictive_entropy(p0), predictive_entropy(p1)
-    # Confidence must not have fallen: entropy did not rise.
-    confidence_held = e1 <= e0
-    eligible = flipped & confidence_held
+    deterioration = np.abs(p1 - y) - np.abs(p0 - y)
+    eligible = (y == 1.0) & (p1 < p0) & (deterioration > 0.0)
 
     payload: dict[str, Any] = {
-        "rule": "docs/M3_DESIGN.md section 11",
+        "rule": (
+            "At requested 50% structured loss, among outcome-positive outer-test "
+            "patients whose predicted mortality risk decreases and absolute probability "
+            "error worsens, select the record nearest the median deterioration; break "
+            "ties by lowest record ID. Illustrative post-hoc selection only."
+        ),
         "baseline": base_key,
         "stress": loss_key,
-        "n_flipped_correct_to_incorrect": int(flipped.sum()),
-        "n_eligible_with_confidence_held": int(eligible.sum()),
+        "n_outcome_positive": int((y == 1.0).sum()),
+        "n_eligible": int(eligible.sum()),
     }
 
     if not eligible.any():
         payload["selected"] = None
         payload["note"] = "eligible set empty; no patient selected, reported as a finding"
     else:
-        # Calibration error deterioration = |p - y| increase.
-        deterioration = np.abs(p1 - y) - np.abs(p0 - y)
         cand = np.flatnonzero(eligible)
         median_value = float(np.median(deterioration[cand]))
-        chosen = cand[int(np.argmin(np.abs(deterioration[cand] - median_value)))]
+        distance = np.abs(deterioration[cand] - median_value)
+        nearest = cand[distance == distance.min()]
+        chosen = nearest[int(np.argmin(ids[nearest]))]
         payload["selected"] = {
             "record_id": int(ids[chosen]),
             "index": int(chosen),

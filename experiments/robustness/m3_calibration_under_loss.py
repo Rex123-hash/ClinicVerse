@@ -24,6 +24,8 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import pathlib
 import sys
 import time
@@ -45,7 +47,8 @@ from cliniverse.evaluation.information_loss import (
     LossCondition,
     LossOutcome,
     apply_information_loss,
-    matched_pair,
+    eligible_columns,
+    matched_trio,
 )
 from cliniverse.evaluation.metrics import (
     auprc,
@@ -139,15 +142,156 @@ def _predict(model: Any, scaler: StandardScaler | None, x: np.ndarray) -> np.nda
 def _build_loss_variants(
     cohort: Cohort, catalogue: Any, severity: float, seed: int
 ) -> dict[str, LossOutcome]:
-    """Loss conditions for one severity, with group and cell matched per patient."""
+    """Loss conditions with amount- and variable-matched controls."""
     if severity == 0.0:
         return {
             "none": apply_information_loss(
                 cohort, LossCondition.NONE, 0.0, catalogue, seed=seed
             )
         }
-    group, cell = matched_pair(cohort, severity, catalogue, seed=seed)
-    return {"group_structured": group, "cell_random": cell}
+    group, variable, cell = matched_trio(cohort, severity, catalogue, seed=seed)
+    return {
+        "group_structured": group,
+        "variable_matched_scattered": variable,
+        "cell_random": cell,
+    }
+
+
+def _loss_audit(
+    cohort: Cohort,
+    variants: dict[tuple[float, str], LossOutcome],
+    catalogue: Any,
+) -> dict[str, Any]:
+    """Quantify variable identity, group selection, and mask matching."""
+    columns, groups = eligible_columns(cohort, catalogue)
+    variable_names = list(cohort.variable_names)
+    report: dict[str, Any] = {
+        "eligible_variable_names": [variable_names[int(col)] for col in columns],
+        "semantics": (
+            "A selected co-measurement group removes every naturally observed cell of each "
+            "member variable across the full truncated patient window. It does not remove "
+            "individual orders or patient-hour group instances."
+        ),
+        "variable_matched_fallback": (
+            "Per-variable requests are deterministically clipped to naturally observed "
+            "availability and the shortfall is recorded. No fallback was needed in the "
+            "matched M3 trios because reference counts came from the same patient mask."
+        ),
+        "variants": {},
+        "groups": {},
+    }
+
+    for (severity, condition), outcome in variants.items():
+        key = f"{severity}|{condition}"
+        group = variants.get((severity, "group_structured"))
+        variables: list[dict[str, Any]] = []
+        removed_totals = outcome.removed_by_variable.sum(axis=0)
+        for col in columns:
+            column = int(col)
+            baseline = cohort.m[:, :, column].sum(axis=1, dtype=np.int64)
+            removed = outcome.removed_by_variable[:, column]
+            total_observed = int(baseline.sum())
+            variables.append(
+                {
+                    "variable": variable_names[column],
+                    "total_observed_cells": total_observed,
+                    "total_removed_cells": int(removed.sum()),
+                    "removed_proportion": (
+                        float(removed.sum() / total_observed) if total_observed else 0.0
+                    ),
+                    "n_patients_with_removed_cells": int((removed > 0).sum()),
+                    "mean_removed_cells_per_patient": float(removed.mean()),
+                    "median_removed_cells_per_patient": float(np.median(removed)),
+                }
+            )
+
+        total_removed = int(removed_totals.sum())
+        variant_report: dict[str, Any] = {
+            "mask_sha256": hashlib.sha256(outcome.cohort.m.tobytes()).hexdigest(),
+            "total_removed_cells": total_removed,
+            "variables": variables,
+            "n_patients_with_match_mismatch": int((outcome.match_mismatch_cells > 0).sum()),
+            "total_match_mismatch_cells": int(outcome.match_mismatch_cells.sum()),
+        }
+        if group is not None:
+            group_totals = group.removed_by_variable.sum(axis=0).astype(np.float64)
+            candidate_totals = removed_totals.astype(np.float64)
+            if group_totals.sum() and candidate_totals.sum():
+                tv = (
+                    0.5
+                    * np.abs(
+                        group_totals / group_totals.sum()
+                        - candidate_totals / candidate_totals.sum()
+                    ).sum()
+                )
+            else:
+                tv = 0.0
+            patient_diff = np.any(outcome.cohort.m != group.cohort.m, axis=(1, 2))
+            per_variable_diff = np.any(
+                outcome.removed_by_variable != group.removed_by_variable, axis=1
+            )
+            variant_report.update(
+                {
+                    "removed_variable_distribution_tv_from_group": float(tv),
+                    "n_patients_mask_differs_from_group": int(patient_diff.sum()),
+                    "n_patients_variable_counts_differ_from_group": int(
+                        per_variable_diff.sum()
+                    ),
+                }
+            )
+        report["variants"][key] = variant_report
+
+    for severity in SEVERITIES:
+        if severity == 0.0:
+            continue
+        group_outcome = variants[(severity, "group_structured")]
+        group_rows: list[dict[str, Any]] = []
+        for name, cols in groups.items():
+            baseline = cohort.m[:, :, cols].sum(axis=(1, 2), dtype=np.int64)
+            removed = group_outcome.removed_by_variable[:, cols].sum(axis=1, dtype=np.int64)
+            selected = (baseline > 0) & (removed == baseline)
+            group_rows.append(
+                {
+                    "group": name,
+                    "variables": [variable_names[int(col)] for col in cols],
+                    "n_patients_present": int((baseline > 0).sum()),
+                    "n_patients_removed": int(selected.sum()),
+                    "total_removed_cells": int(removed.sum()),
+                }
+            )
+        report["groups"][str(severity)] = group_rows
+    return report
+
+
+def _baseline_variable_importance(
+    importances: list[np.ndarray], feature_names: tuple[str, ...], eligible: list[str]
+) -> dict[str, Any]:
+    """Aggregate XGBoost gain importance by source variable, descriptively."""
+    rows: list[dict[str, Any]] = []
+    for variable in eligible:
+        indices = [
+            i
+            for i, name in enumerate(feature_names)
+            if name.split("::", maxsplit=1)[1] == variable
+        ]
+        values = np.array([float(importance[indices].sum()) for importance in importances])
+        rows.append(
+            {
+                "variable": variable,
+                "mean_normalized_gain": float(values.mean()),
+                "min_fold": float(values.min()),
+                "max_fold": float(values.max()),
+            }
+        )
+    return {
+        "description": (
+            "Descriptive mean of XGBoost normalized gain importance across the five clean "
+            "model-training folds, aggregated over all values_mask features for each analyte. "
+            "Not a causal importance measure."
+        ),
+        "n_folds": len(importances),
+        "variables": rows,
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -177,26 +321,40 @@ def main(argv: list[str] | None = None) -> int:
     truncated = cohort.truncate(args.cutoff)
     variants: dict[tuple[float, str], LossOutcome] = {}
     for severity in SEVERITIES:
-        for name, outcome in _build_loss_variants(
-            truncated, catalogue, severity, args.seed
-        ).items():
+        built = _build_loss_variants(truncated, catalogue, severity, args.seed)
+        repeated = _build_loss_variants(truncated, catalogue, severity, args.seed)
+        for name, outcome in built.items():
+            if not np.array_equal(outcome.cohort.m, repeated[name].cohort.m):
+                raise RuntimeError(
+                    f"information loss is not deterministic for {severity}|{name}"
+                )
             variants[(severity, name)] = outcome
     severity_report = {
         f"{sev}|{name}": outcome.summary() for (sev, name), outcome in variants.items()
     }
     for key, summary in severity_report.items():
         log.info("loss variant", variant=key, **summary)
+    loss_audit = _loss_audit(truncated, variants, catalogue)
 
     # Features are deterministic per patient, so build them once per variant.
     feature_cache: dict[tuple[float, str, str], np.ndarray] = {}
+    feature_names: dict[str, tuple[str, ...]] = {}
     for (sev, name), outcome in variants.items():
         for rep in representations:
-            feature_cache[(sev, name, str(rep))] = build_representation(outcome.cohort, rep).x
+            view = build_representation(outcome.cohort, rep)
+            feature_cache[(sev, name, str(rep))] = view.x
+            if str(rep) in feature_names and feature_names[str(rep)] != view.names:
+                raise RuntimeError(f"feature names changed under stress for {rep}")
+            feature_names[str(rep)] = view.names
 
     # ---- fit per fold, evaluate every condition on the outer test ----------
     keys: list[tuple[str, str, str, float, str]] = []
     predictions: dict[tuple[str, str, str, float, str], np.ndarray] = {}
     fold_report: list[dict[str, Any]] = []
+    fold_id = np.full(cohort.n_patients, -1, dtype=np.int64)
+    xgb_importances: list[np.ndarray] = []
+    calibration_fit_report: list[dict[str, Any]] = []
+    calibration_application_report: list[dict[str, Any]] = []
 
     for split in splits:
         # model-train / calibration split, carved from outer-train only.
@@ -207,6 +365,7 @@ def main(argv: list[str] | None = None) -> int:
             stratify=y[split.train],
         )
         test_idx = split.validation
+        fold_id[test_idx] = split.fold
         fold_report.append(
             {
                 "fold": split.fold,
@@ -230,6 +389,10 @@ def main(argv: list[str] | None = None) -> int:
             for kind in models:
                 t0 = time.perf_counter()
                 model, scaler = _fit_fold(x_train, y[train_idx], kind, args.seed + split.fold)
+                if rep is PRIMARY_REPRESENTATION and kind == "xgboost":
+                    xgb_importances.append(
+                        np.asarray(model.feature_importances_, dtype=np.float64)
+                    )
                 # Calibrators fit on CLEAN calibration predictions.
                 p_calib = _predict(model, scaler, x_calib)
                 fitted: dict[CalibratorKind, Any] = {}
@@ -237,6 +400,18 @@ def main(argv: list[str] | None = None) -> int:
                     cal = build_calibrator(ck)
                     cal.fit(p_calib, y[calib_idx])
                     fitted[ck] = cal
+                calibration_fit_report.append(
+                    {
+                        "fold": split.fold,
+                        "representation": str(rep),
+                        "model": kind,
+                        "n_calibration": len(calib_idx),
+                        "n_events": int(y[calib_idx].sum()),
+                        "raw_prediction_min": float(p_calib.min()),
+                        "raw_prediction_max": float(p_calib.max()),
+                        "calibrators": {str(ck): cal.config() for ck, cal in fitted.items()},
+                    }
+                )
 
                 for (sev, cond), _ in variants.items():
                     x_test = imputer.transform(
@@ -244,12 +419,27 @@ def main(argv: list[str] | None = None) -> int:
                         draw_seed=200 + split.fold,
                     )
                     p_raw = _predict(model, scaler, x_test)
+                    isotonic_config = fitted[CalibratorKind.ISOTONIC].config()
+                    support_min = float(isotonic_config["calibration_min"])
+                    support_max = float(isotonic_config["calibration_max"])
+                    calibration_application_report.append(
+                        {
+                            "fold": split.fold,
+                            "representation": str(rep),
+                            "model": kind,
+                            "severity": sev,
+                            "condition": cond,
+                            "n_outer_test": len(test_idx),
+                            "n_below_clean_isotonic_support": int((p_raw < support_min).sum()),
+                            "n_above_clean_isotonic_support": int((p_raw > support_max).sum()),
+                        }
+                    )
                     for ck, cal in fitted.items():
-                        key = (str(rep), kind, str(ck), sev, cond)
-                        if key not in predictions:
-                            predictions[key] = np.full(cohort.n_patients, np.nan)
-                            keys.append(key)
-                        predictions[key][test_idx] = cal.transform(p_raw)
+                        prediction_key = (str(rep), kind, str(ck), sev, cond)
+                        if prediction_key not in predictions:
+                            predictions[prediction_key] = np.full(cohort.n_patients, np.nan)
+                            keys.append(prediction_key)
+                        predictions[prediction_key][test_idx] = cal.transform(p_raw)
                 log.info(
                     "fold done",
                     fold=split.fold,
@@ -258,28 +448,35 @@ def main(argv: list[str] | None = None) -> int:
                     seconds=round(time.perf_counter() - t0, 1),
                 )
 
-    for key, arr in predictions.items():
+    for prediction_key, arr in predictions.items():
         if not np.isfinite(arr).all():
-            raise RuntimeError(f"incomplete out-of-fold predictions for {key}")
+            raise RuntimeError(f"incomplete out-of-fold predictions for {prediction_key}")
+    if bool((fold_id < 0).any()):
+        raise RuntimeError("fold identity is incomplete")
+
+    eligible_names = list(loss_audit["eligible_variable_names"])
+    baseline_importance = _baseline_variable_importance(
+        xgb_importances, feature_names[str(PRIMARY_REPRESENTATION)], eligible_names
+    )
 
     # ---- metrics -----------------------------------------------------------
     rows: list[dict[str, Any]] = []
-    for key in keys:
-        rep, kind, ck, sev, cond = key
-        p = predictions[key]
+    for prediction_key in keys:
+        row_rep, row_kind, row_calibrator, row_severity, row_condition = prediction_key
+        p = predictions[prediction_key]
         row: dict[str, Any] = {
-            "representation": rep,
-            "model": kind,
-            "calibrator": ck,
-            "severity": sev,
-            "condition": cond,
+            "representation": row_rep,
+            "model": row_kind,
+            "calibrator": row_calibrator,
+            "severity": row_severity,
+            "condition": row_condition,
             "metrics": {name: float(fn(y, p)) for name, fn in METRICS.items()},
             "reliability": reliability_curve(y, p),
             "risk_coverage": downsample_curve(risk_coverage_curve(y, p)),
         }
         rows.append(row)
 
-    # ---- predeclared primary contrast: group - matched cell ---------------
+    # ---- original and Review #3 controls: group - matched controls --------
     contrasts: list[dict[str, Any]] = []
     for rep in representations:
         for kind in models:
@@ -287,31 +484,77 @@ def main(argv: list[str] | None = None) -> int:
                 for sev in SEVERITIES:
                     if sev == 0.0:
                         continue
-                    a = (str(rep), kind, str(ck), sev, "cell_random")
-                    b = (str(rep), kind, str(ck), sev, "group_structured")
-                    if a not in predictions or b not in predictions:
-                        continue
-                    for metric_name in PRIMARY_CONTRAST:
-                        diff = paired_bootstrap_difference(
-                            y,
-                            predictions[a],
-                            predictions[b],
-                            METRICS[metric_name],
-                            metric_name=metric_name,
-                            name_a=f"cell_random@{sev}",
-                            name_b=f"group_structured@{sev}",
-                            n_boot=args.n_boot,
-                            seed=args.seed,
-                        )
-                        contrasts.append(
-                            {
-                                "representation": str(rep),
-                                "model": kind,
-                                "calibrator": str(ck),
-                                "severity": sev,
-                                **diff.as_dict(),
-                            }
-                        )
+                    for control in ("cell_random", "variable_matched_scattered"):
+                        a = (str(rep), kind, str(ck), sev, control)
+                        b = (str(rep), kind, str(ck), sev, "group_structured")
+                        if a not in predictions or b not in predictions:
+                            continue
+                        for metric_name in PRIMARY_CONTRAST:
+                            diff = paired_bootstrap_difference(
+                                y,
+                                predictions[a],
+                                predictions[b],
+                                METRICS[metric_name],
+                                metric_name=metric_name,
+                                name_a=f"{control}@{sev}",
+                                name_b=f"group_structured@{sev}",
+                                n_boot=args.n_boot,
+                                seed=args.seed,
+                            )
+                            contrasts.append(
+                                {
+                                    "representation": str(rep),
+                                    "model": kind,
+                                    "calibrator": str(ck),
+                                    "severity": sev,
+                                    "inferential_status": (
+                                        "original_predeclared"
+                                        if control == "cell_random"
+                                        else "review_3_post_hoc_control"
+                                    ),
+                                    **diff.as_dict(),
+                                }
+                            )
+
+    calibration_contrasts: list[dict[str, Any]] = []
+    for sev in SEVERITIES:
+        condition = "none" if sev == 0.0 else "group_structured"
+        raw_key = (
+            str(PRIMARY_REPRESENTATION),
+            "xgboost",
+            str(CalibratorKind.IDENTITY),
+            sev,
+            condition,
+        )
+        platt_key = (
+            str(PRIMARY_REPRESENTATION),
+            "xgboost",
+            str(CalibratorKind.PLATT),
+            sev,
+            condition,
+        )
+        for metric_name in ("nll", "brier"):
+            diff = paired_bootstrap_difference(
+                y,
+                predictions[raw_key],
+                predictions[platt_key],
+                METRICS[metric_name],
+                metric_name=metric_name,
+                name_a=f"raw@{sev}|{condition}",
+                name_b=f"platt@{sev}|{condition}",
+                n_boot=args.n_boot,
+                seed=args.seed,
+            )
+            calibration_contrasts.append(
+                {
+                    "representation": str(PRIMARY_REPRESENTATION),
+                    "model": "xgboost",
+                    "severity": sev,
+                    "condition": condition,
+                    "inferential_status": "exploratory_calibrator_comparison",
+                    **diff.as_dict(),
+                }
+            )
 
     provenance = build_provenance(
         cohort=truncated,
@@ -325,6 +568,7 @@ def main(argv: list[str] | None = None) -> int:
             "imputation": str(ImputationStrategy.MEDIAN),
             "cutoff": args.cutoff,
             "seed": args.seed,
+            "review_3_control": str(LossCondition.VARIABLE_MATCHED_SCATTERED),
         },
         extra={
             "task": "T1_in_hospital_mortality",
@@ -332,20 +576,27 @@ def main(argv: list[str] | None = None) -> int:
             "calibration_split_hash": stable_hash(fold_report),
             "fold_partitions": fold_report,
             "design_document": "docs/M3_DESIGN.md",
+            "review_status": (
+                "Review #3 post-hoc falsification control; not part of the original "
+                "predeclared M3 contrasts"
+            ),
         },
     )
 
     args.out.mkdir(parents=True, exist_ok=True)
-    import json
-
     (args.out / "results.json").write_text(
         json.dumps(
             {
-                "schema": "cliniverse.m3/1",
+                "schema": "cliniverse.m3/2",
                 "provenance": provenance,
                 "severity_report": severity_report,
+                "information_loss_audit": loss_audit,
+                "baseline_variable_importance": baseline_importance,
+                "calibration_fit_report": calibration_fit_report,
+                "calibration_application_report": calibration_application_report,
                 "rows": rows,
                 "contrasts": contrasts,
+                "calibration_contrasts": calibration_contrasts,
             },
             indent=2,
             sort_keys=True,
@@ -354,12 +605,30 @@ def main(argv: list[str] | None = None) -> int:
         encoding="utf-8",
         newline="\n",
     )
-    np.savez_compressed(
-        args.out / "predictions.npz",
-        labels=y,
-        record_ids=cohort.record_ids,
-        **{"|".join(str(k) for k in key): predictions[key] for key in keys},  # type: ignore[arg-type]
-    )
+    array_payload = {
+        "labels": y,
+        "record_ids": cohort.record_ids,
+        "source_set": cohort.source_set,
+        "fold_id": fold_id,
+        "loss_variable_names": np.asarray(cohort.variable_names, dtype=np.str_),
+        **{
+            f"loss|{sev}|{name}|removed_cells": outcome.removed_cells
+            for (sev, name), outcome in variants.items()
+        },
+        **{
+            f"loss|{sev}|{name}|eligible_cells": outcome.eligible_cells
+            for (sev, name), outcome in variants.items()
+        },
+        **{
+            f"loss|{sev}|{name}|removed_by_variable": outcome.removed_by_variable
+            for (sev, name), outcome in variants.items()
+        },
+        **{
+            "|".join(str(part) for part in prediction_key): predictions[prediction_key]
+            for prediction_key in keys
+        },
+    }
+    np.savez_compressed(args.out / "predictions.npz", **array_payload)  # type: ignore[arg-type]
 
     _report(rows, contrasts, severity_report, y)
     print(f"\nwrote {args.out / 'results.json'}")
@@ -414,14 +683,12 @@ def _report(
                 )
 
     print("\n" + "=" * 118)
-    print(
-        "M3 PRIMARY CONTRAST - GROUP_STRUCTURED minus MATCHED CELL_RANDOM "
-        "(paired, same patients)"
-    )
+    print("M3 CONTRASTS - GROUP_STRUCTURED minus MATCHED CONTROLS (paired, same patients)")
     print("Positive = group loss is worse. * = 95% interval excludes zero.")
     print("=" * 118)
     print(
-        f"{'representation':<14}{'model':<9}{'calibrator':<14}{'sev':>6}{'metric':<8}{'difference':>28}"
+        f"{'representation':<14}{'model':<9}{'calibrator':<14}{'sev':>6}"
+        f"{'control':<36}{'metric':<8}{'difference':>28}"
     )
     print("-" * 118)
     for c in contrasts:
@@ -429,7 +696,7 @@ def _report(
         text = f"{c['difference']:+.4f} [{c['low']:+.4f}, {c['high']:+.4f}]"
         print(
             f"{flag}{c['representation']:<13}{c['model']:<9}{c['calibrator']:<14}"
-            f"{c['severity']:>6.2f}{c['metric']:<8}{text:>28}"
+            f"{c['severity']:>6.2f}{c['name_a']:<36}{c['metric']:<8}{text:>28}"
         )
 
 
