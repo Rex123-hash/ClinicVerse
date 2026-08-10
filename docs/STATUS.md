@@ -15,7 +15,7 @@
 | M1 TwinBench v0 | **Done + repaired** | Adversarial audit in `docs/ADVERSARIAL_REVIEW_1.md` |
 | M2 Baselines | **Done + repaired** | E-004; `docs/M2_MILESTONE_REPORT.md`, audit in `docs/ADVERSARIAL_REVIEW_2.md` |
 | M3 Calibration robustness | **Done + repaired** | E-005; `docs/M3_MILESTONE_REPORT.md`, `docs/ADVERSARIAL_REVIEW_3.md`. M3-B |
-| M4 Acquisition (core) | Not started | |
+| M4 Acquisition ranking stability | **Done** | `docs/M4_MILESTONE_REPORT.md`. Verdict **M4-B**, recommendation MODIFY |
 | M5 Ablations/robustness/OOD | Not started | |
 | M6 API + minimal UI | Not started | |
 | M7 Final + review response | Not started | |
@@ -94,7 +94,20 @@ per-patient/per-analyte control is mask-identical, so structured-minus-variable-
 Brier are exactly zero. The old excess over count-random is an analyte-identity effect, not an
 identified coherence effect. **M3-B.** Platt improves proper scores/slope but not intercept drift.
 
-## Next actions
+## Key M4 result
+
+Under the fair support-blind protocol, acquisition-policy ordering is **broadly stable** to cost
+regime and disclosure rate (mean Kendall tau-b **+0.743**, min +0.467; `fixed_domain_order` wins 7
+of 8 conditions; only **1 of 7** within-protocol winner changes is statistically supported, and it
+is marginal). Rankings scatter only once the diagnostic availability oracle is introduced (27 of 34
+supported reversals are across-protocol). Classification **M4-B**, not M4-A.
+
+Honest negative result: the surrogate expected-information-gain policy **loses to trivial
+baselines**, disclosing 2.4 cells at a 95% failed-request rate versus 11.6 cells at 76% for the
+training-frequency random baseline. Knowing what would be informative is worth less than knowing
+what is usually available.
+
+## Superseded M3 gate note
 
 **STOP at the M3 decision gate.** M4 begins only after sign-off on the contract in
 `docs/ADVERSARIAL_REVIEW_3.md`: predeclare NLL-vs-budget primary, Brier co-primary, direct calibration

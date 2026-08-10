@@ -1,0 +1,136 @@
+2026-08-10T18:24:34.751181Z [info     ] parsing set                    n_records=4000 set=a
+2026-08-10T18:24:39.705460Z [info     ] parsing set                    n_records=4000 set=b
+2026-08-10T18:24:44.575616Z [info     ] cohort loaded                  degenerate_records=9 grid_occupancy=0.2027660472972973 missing_fraction=0.7972339527027027 n_hours=48 n_patients=8000 n_variables=37 observed_cells=2880900 sets=('a', 'b')
+2026-08-10T18:24:44.588242Z [info     ] cohort                         n=8000 prevalence=0.14025
+2026-08-10T18:24:46.552950Z [info     ] fold fitted                    fold=0 n_calibration=1600 n_features_used=223 n_model_train=4800 n_test=1600
+2026-08-10T18:24:47.442185Z [info     ] fold fitted                    fold=1 n_calibration=1600 n_features_used=225 n_model_train=4800 n_test=1600
+2026-08-10T18:24:48.291596Z [info     ] fold fitted                    fold=2 n_calibration=1600 n_features_used=227 n_model_train=4800 n_test=1600
+2026-08-10T18:24:49.126931Z [info     ] fold fitted                    fold=3 n_calibration=1600 n_features_used=225 n_model_train=4800 n_test=1600
+2026-08-10T18:24:49.960751Z [info     ] fold fitted                    fold=4 n_calibration=1600 n_features_used=229 n_model_train=4800 n_test=1600
+
+==============================================================================================================
+M4 PRIMARY — support_blind / shared_plus_marginal / mask 0.6 | n=8,000 | prevalence=14.03%
+==============================================================================================================
+policy                    beta   spend    disc      NLL    Brier    AUROC      AP  intcpt   slope
+--------------------------------------------------------------------------------------------------------------
+no_acquisition            0.00    0.00     0.0   0.3270   0.1003   0.8109  0.4159  -0.013   0.928
+no_acquisition            0.10    0.00     0.0   0.3270   0.1003   0.8109  0.4159  -0.013   0.928
+no_acquisition            0.20    0.00     0.0   0.3270   0.1003   0.8109  0.4159  -0.013   0.928
+no_acquisition            0.30    0.00     0.0   0.3270   0.1003   0.8109  0.4159  -0.013   0.928
+no_acquisition            0.40    0.00     0.0   0.3270   0.1003   0.8109  0.4159  -0.013   0.928
+no_acquisition            0.50    0.00     0.0   0.3270   0.1003   0.8109  0.4159  -0.013   0.928
+no_acquisition            0.75    0.00     0.0   0.3270   0.1003   0.8109  0.4159  -0.013   0.928
+no_acquisition            1.00    0.00     0.0   0.3270   0.1003   0.8109  0.4159  -0.013   0.928
+random_uniform_all        0.00    0.00     0.0   0.3270   0.1003   0.8109  0.4159  -0.013   0.928
+random_uniform_all        0.10    1.10     0.2   0.3269   0.1003   0.8110  0.4162  -0.013   0.929
+random_uniform_all        0.20    2.14     2.0   0.3253   0.0998   0.8128  0.4226  -0.008   0.937
+random_uniform_all        0.30    3.28     3.0   0.3247   0.0996   0.8132  0.4254  -0.014   0.940
+random_uniform_all        0.40    4.48     4.2   0.3243   0.0995   0.8135  0.4265  -0.021   0.942
+random_uniform_all        0.50    5.71     5.2   0.3231   0.0991   0.8149  0.4304  -0.021   0.949
+random_uniform_all        0.75    8.73     7.2   0.3218   0.0987   0.8169  0.4316  -0.032   0.953
+random_uniform_all        1.00   11.84     8.8   0.3216   0.0987   0.8174  0.4297  -0.046   0.951
+random_train_frequency    0.00    0.00     0.0   0.3270   0.1003   0.8109  0.4159  -0.013   0.928
+random_train_frequency    0.10    1.10     0.4   0.3268   0.1003   0.8113  0.4156  -0.017   0.928
+random_train_frequency    0.20    2.08     4.1   0.3234   0.0992   0.8151  0.4271  -0.029   0.942
+random_train_frequency    0.30    2.99     6.2   0.3222   0.0989   0.8169  0.4295  -0.036   0.948
+random_train_frequency    0.40    4.39     8.1   0.3207   0.0985   0.8193  0.4309  -0.040   0.956
+random_train_frequency    0.50    5.69     9.2   0.3193   0.0981   0.8209  0.4372  -0.033   0.966
+random_train_frequency    0.75    8.77    10.7   0.3185   0.0978   0.8218  0.4395  -0.041   0.968
+random_train_frequency    1.00   11.90    11.6   0.3183   0.0977   0.8220  0.4413  -0.048   0.967
+fixed_domain_order        0.00    0.00     0.0   0.3270   0.1003   0.8109  0.4159  -0.013   0.928
+fixed_domain_order        0.10    1.10     0.6   0.3266   0.1002   0.8114  0.4159  -0.023   0.929
+fixed_domain_order        0.20    1.70     5.1   0.3197   0.0982   0.8208  0.4366  -0.054   0.960
+fixed_domain_order        0.30    3.40     5.1   0.3197   0.0982   0.8208  0.4366  -0.054   0.960
+fixed_domain_order        0.40    4.70     7.7   0.3191   0.0979   0.8214  0.4379  -0.054   0.965
+fixed_domain_order        0.50    5.10     5.1   0.3197   0.0982   0.8208  0.4366  -0.054   0.960
+fixed_domain_order        0.75    8.50     5.1   0.3197   0.0982   0.8208  0.4366  -0.054   0.960
+fixed_domain_order        1.00   11.90     5.1   0.3197   0.0982   0.8208  0.4366  -0.054   0.960
+greedy_eig                0.00    0.00     0.0   0.3270   0.1003   0.8109  0.4159  -0.013   0.928
+greedy_eig                0.10    1.10     0.3   0.3270   0.1003   0.8110  0.4157  -0.009   0.927
+greedy_eig                0.20    2.20     2.4   0.3265   0.1002   0.8123  0.4222   0.016   0.923
+greedy_eig                0.30    2.96     2.4   0.3265   0.1002   0.8126  0.4216   0.014   0.923
+greedy_eig                0.40    4.19     2.6   0.3264   0.1002   0.8127  0.4224   0.019   0.924
+greedy_eig                0.50    5.35     2.4   0.3265   0.1002   0.8126  0.4215   0.013   0.923
+greedy_eig                0.75    8.89     2.4   0.3265   0.1002   0.8126  0.4215   0.014   0.923
+greedy_eig                1.00   11.90     2.4   0.3266   0.1002   0.8125  0.4214   0.013   0.922
+greedy_eig_per_cost       0.00    0.00     0.0   0.3270   0.1003   0.8109  0.4159  -0.013   0.928
+greedy_eig_per_cost       0.10    1.10     0.3   0.3270   0.1003   0.8110  0.4157  -0.009   0.927
+greedy_eig_per_cost       0.20    2.21     2.3   0.3267   0.1002   0.8121  0.4209   0.018   0.924
+greedy_eig_per_cost       0.30    2.97     2.3   0.3267   0.1003   0.8125  0.4204   0.016   0.923
+greedy_eig_per_cost       0.40    4.19     2.5   0.3265   0.1002   0.8127  0.4215   0.022   0.925
+greedy_eig_per_cost       0.50    5.35     2.3   0.3267   0.1003   0.8125  0.4201   0.016   0.923
+greedy_eig_per_cost       0.75    8.89     2.3   0.3267   0.1003   0.8125  0.4203   0.017   0.923
+greedy_eig_per_cost       1.00   11.90     2.3   0.3267   0.1003   0.8125  0.4201   0.016   0.923
+
+INTEGRATED AUNLLC (lower is better):
+  0.32071  fixed_domain_order
+  0.32095  random_train_frequency
+  0.32366  random_uniform_all
+  0.32659  greedy_eig
+  0.32671  greedy_eig_per_cost
+  0.32696  no_acquisition
+2026-08-10T18:29:17.925851Z [info     ] grid subsample                 n=2000 prevalence=0.13
+2026-08-10T18:30:34.856890Z [info     ] condition done                 condition=support_blind|shared_plus_marginal|0.3 seconds=76.9 winner=fixed_domain_order
+2026-08-10T18:31:37.774944Z [info     ] condition done                 condition=support_blind|shared_plus_marginal|0.6 seconds=62.9 winner=fixed_domain_order
+2026-08-10T18:32:41.505539Z [info     ] condition done                 condition=support_blind|uniform_group|0.3 seconds=63.7 winner=fixed_domain_order
+2026-08-10T18:33:46.775469Z [info     ] condition done                 condition=support_blind|uniform_group|0.6 seconds=65.3 winner=fixed_domain_order
+2026-08-10T18:35:17.979330Z [info     ] condition done                 condition=support_blind|ordinal_tier|0.3 seconds=91.2 winner=random_train_frequency
+2026-08-10T18:36:49.910796Z [info     ] condition done                 condition=support_blind|ordinal_tier|0.6 seconds=91.9 winner=fixed_domain_order
+2026-08-10T18:38:21.890579Z [info     ] condition done                 condition=support_blind|per_analyte|0.3 seconds=92.0 winner=fixed_domain_order
+2026-08-10T18:39:55.910390Z [info     ] condition done                 condition=support_blind|per_analyte|0.6 seconds=94.0 winner=fixed_domain_order
+2026-08-10T18:42:55.523975Z [info     ] condition done                 condition=support_aware|shared_plus_marginal|0.3 seconds=179.6 winner=random_train_frequency
+2026-08-10T18:46:48.742126Z [info     ] condition done                 condition=support_aware|shared_plus_marginal|0.6 seconds=233.2 winner=fixed_domain_order
+2026-08-10T18:49:49.626185Z [info     ] condition done                 condition=support_aware|uniform_group|0.3 seconds=180.9 winner=random_uniform_all
+2026-08-10T18:53:08.693490Z [info     ] condition done                 condition=support_aware|uniform_group|0.6 seconds=199.1 winner=fixed_domain_order
+2026-08-10T18:56:24.056484Z [info     ] condition done                 condition=support_aware|ordinal_tier|0.3 seconds=195.4 winner=random_train_frequency
+2026-08-10T19:00:06.002255Z [info     ] condition done                 condition=support_aware|ordinal_tier|0.6 seconds=221.9 winner=fixed_domain_order
+2026-08-10T19:03:09.865528Z [info     ] condition done                 condition=support_aware|per_analyte|0.3 seconds=183.9 winner=random_uniform_all
+2026-08-10T19:06:28.393349Z [info     ] condition done                 condition=support_aware|per_analyte|0.6 seconds=198.5 winner=greedy_eig_per_cost
+
+==============================================================================================================
+M4 STABILITY GRID — n=2,000 fixed paired subsample
+==============================================================================================================
+condition                                       winner                  ranking (best first)
+--------------------------------------------------------------------------------------------------------------
+support_blind|shared_plus_marginal|0.3          fixed_domain_order      fixed_domain_order > random_train_frequency > random_uniform_all ...
+support_blind|shared_plus_marginal|0.6          fixed_domain_order      fixed_domain_order > random_train_frequency > random_uniform_all ...
+support_blind|uniform_group|0.3                 fixed_domain_order      fixed_domain_order > random_train_frequency > random_uniform_all ...
+support_blind|uniform_group|0.6                 fixed_domain_order      fixed_domain_order > random_train_frequency > random_uniform_all ...
+support_blind|ordinal_tier|0.3                  random_train_frequency  random_train_frequency > fixed_domain_order > random_uniform_all ...
+support_blind|ordinal_tier|0.6                  fixed_domain_order      fixed_domain_order > random_train_frequency > random_uniform_all ...
+support_blind|per_analyte|0.3                   fixed_domain_order      fixed_domain_order > random_train_frequency > random_uniform_all ...
+support_blind|per_analyte|0.6                   fixed_domain_order      fixed_domain_order > random_train_frequency > random_uniform_all ...
+support_aware|shared_plus_marginal|0.3          random_train_frequency  random_train_frequency > random_uniform_all > greedy_eig_per_cost ...
+support_aware|shared_plus_marginal|0.6          fixed_domain_order      fixed_domain_order > random_train_frequency > random_uniform_all ...
+support_aware|uniform_group|0.3                 random_uniform_all      random_uniform_all > random_train_frequency > fixed_domain_order ...
+support_aware|uniform_group|0.6                 fixed_domain_order      fixed_domain_order > random_train_frequency > random_uniform_all ...
+support_aware|ordinal_tier|0.3                  random_train_frequency  random_train_frequency > random_uniform_all > fixed_domain_order ...
+support_aware|ordinal_tier|0.6                  fixed_domain_order      fixed_domain_order > random_train_frequency > random_uniform_all ...
+support_aware|per_analyte|0.3                   random_uniform_all      random_uniform_all > random_train_frequency > greedy_eig ...
+support_aware|per_analyte|0.6                   greedy_eig_per_cost     greedy_eig_per_cost > fixed_domain_order > random_train_frequency ...
+
+distinct winners: ['fixed_domain_order', 'greedy_eig_per_cost', 'random_train_frequency', 'random_uniform_all']
+Kendall tau-b across condition pairs: mean=0.569  min=-0.067
+supported reversals: 34
+  [UNRESOLVED / EFFECTIVELY TIED] fixed_domain_order vs random_train_frequency
+  [SUPPORTED REVERSAL] fixed_domain_order vs random_train_frequency
+  [UNRESOLVED / EFFECTIVELY TIED] fixed_domain_order vs random_uniform_all
+  [UNRESOLVED / EFFECTIVELY TIED] fixed_domain_order vs random_train_frequency
+  [SUPPORTED REVERSAL] fixed_domain_order vs random_uniform_all
+  [SUPPORTED REVERSAL] fixed_domain_order vs greedy_eig_per_cost
+  [UNRESOLVED / EFFECTIVELY TIED] fixed_domain_order vs random_train_frequency
+  [SUPPORTED REVERSAL] fixed_domain_order vs random_train_frequency
+  [SUPPORTED REVERSAL] fixed_domain_order vs random_uniform_all
+  [UNRESOLVED / EFFECTIVELY TIED] fixed_domain_order vs random_train_frequency
+  [SUPPORTED REVERSAL] fixed_domain_order vs random_uniform_all
+  [SUPPORTED REVERSAL] fixed_domain_order vs greedy_eig_per_cost
+  [UNRESOLVED / EFFECTIVELY TIED] fixed_domain_order vs random_train_frequency
+  [SUPPORTED REVERSAL] fixed_domain_order vs random_train_frequency
+  [UNRESOLVED / EFFECTIVELY TIED] fixed_domain_order vs random_uniform_all
+  [UNRESOLVED / EFFECTIVELY TIED] fixed_domain_order vs random_train_frequency
+  [SUPPORTED REVERSAL] fixed_domain_order vs random_uniform_all
+  [SUPPORTED REVERSAL] fixed_domain_order vs greedy_eig_per_cost
+  [UNRESOLVED / EFFECTIVELY TIED] fixed_domain_order vs random_train_frequency
+  [SUPPORTED REVERSAL] fixed_domain_order vs random_train_frequency
+
+wrote experiments\acquisition\results\m4\results.json
