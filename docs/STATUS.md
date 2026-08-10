@@ -1,7 +1,7 @@
 # Cliniverse — Status
 
 **Updated:** 2026-08-11
-**Current milestone:** M4 repaired, accepted, and classified M4-C; M5 not started.
+**Current milestone:** M4 repaired, accepted, and classified M4-C; M5 predeclared and in progress.
 
 ## Where we are
 
@@ -16,7 +16,7 @@
 | M2 Baselines | **Done + repaired** | E-004; `docs/M2_MILESTONE_REPORT.md`, audit in `docs/ADVERSARIAL_REVIEW_2.md` |
 | M3 Calibration robustness | **Done + repaired** | E-005; `docs/M3_MILESTONE_REPORT.md`, `docs/ADVERSARIAL_REVIEW_3.md`. M3-B |
 | M4 Acquisition ranking stability | **Done + repaired** | `docs/M4_MILESTONE_REPORT.md`, `docs/ADVERSARIAL_REVIEW_4.md`. Verdict **M4-C**, ACCEPT |
-| M5 Ablations/robustness/OOD | Not started | |
+| M5 Discrimination-silent failure search | **Predeclared** | Design fixed in `docs/M5_DESIGN.md` before any search ran. Direction A selected after literature review; B and C not selected |
 | M6 API + minimal UI | Not started | |
 | M7 Final + review response | Not started | |
 
