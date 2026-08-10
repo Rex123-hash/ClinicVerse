@@ -1,7 +1,7 @@
 # Cliniverse — Status
 
 **Updated:** 2026-08-11
-**Current milestone:** M4 repaired, accepted, and classified M4-C; M5 predeclared and in progress.
+**Current milestone:** M5 discovery + confirmation complete and classified M5-C; recovery arm pending.
 
 ## Where we are
 
@@ -16,7 +16,7 @@
 | M2 Baselines | **Done + repaired** | E-004; `docs/M2_MILESTONE_REPORT.md`, audit in `docs/ADVERSARIAL_REVIEW_2.md` |
 | M3 Calibration robustness | **Done + repaired** | E-005; `docs/M3_MILESTONE_REPORT.md`, `docs/ADVERSARIAL_REVIEW_3.md`. M3-B |
 | M4 Acquisition ranking stability | **Done + repaired** | `docs/M4_MILESTONE_REPORT.md`, `docs/ADVERSARIAL_REVIEW_4.md`. Verdict **M4-C**, ACCEPT |
-| M5 Discrimination-silent failure search | **Predeclared** | Design fixed in `docs/M5_DESIGN.md` before any search ran. Direction A selected after literature review; B and C not selected |
+| M5 Discrimination-silent failure search | **Discovery + confirmation done** | `docs/M5_DESIGN.md` (predeclared), `docs/M5_MILESTONE_REPORT.md`. Verdict **M5-C**: primary test T1 failed, transfer test T4 passed. Recovery arm not yet run |
 | M6 API + minimal UI | Not started | |
 | M7 Final + review response | Not started | |
 
@@ -105,6 +105,20 @@ In the primary condition, the surrogate expected-entropy-reduction heuristic dis
 cells at a 94.59% zero-new-cell request rate versus 11.556 cells at 75.99% for the training-frequency
 random baseline. This is benchmark-specific descriptive evidence, not a general availability-versus-
 information claim.
+
+## Key M5 result
+
+Exhaustive enumeration of all 1,023 non-empty co-measurement-group subsets against the frozen model,
+each scored as an **excess over an amount-matched random control**, selected on discovery folds 0-2
+and confirmed on folds 3-4. The primary test **failed**: rank-1 confirmation excess NLL +0.00587
+[-0.00174, +0.01365]. The transfer test **passed** decisively: Spearman tau between discovery and
+confirmation excess across all 1,023 configurations is **+0.865**, permutation p = 1.0e-4.
+
+Descriptively (post-hoc, not confirmatory), a single group carries the effect: mean confirmation
+excess is +0.01005 for the 512 configurations containing `BMP_like` and -0.00007 for the 511 without
+it, and `BMP_like` appears in 50 of the top 50. Withholding `BMP_like` alone moves AUROC only
+0.8179 -> 0.8078 while the calibration intercept moves -0.141 -> **+0.520** and mean predicted risk
+falls 0.1432 -> **0.0984** against ~14% prevalence. **M5-C.**
 
 ## Superseded M3 gate note
 

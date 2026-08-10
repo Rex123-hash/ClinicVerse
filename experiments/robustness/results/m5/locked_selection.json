@@ -1,0 +1,28 @@
+{
+  "auroc_delta": 0.02,
+  "clean_discovery_auroc": 0.8335099725452197,
+  "locked_selection": [
+    [
+      "BMP_like",
+      "TroponinI"
+    ],
+    [
+      "BMP_like",
+      "Cholesterol"
+    ],
+    [
+      "BMP_like",
+      "Cholesterol",
+      "SaO2"
+    ],
+    [
+      "BMP_like"
+    ],
+    [
+      "BMP_like",
+      "Cholesterol",
+      "TroponinI"
+    ]
+  ],
+  "selected_on": "discovery folds 0-2 only"
+}
