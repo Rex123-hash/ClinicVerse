@@ -8,7 +8,7 @@ numbers may appear here. Every entry records the command, environment, and obser
 ## E-000 — Dataset access verification and structural statistics
 
 - **Date:** 2026-08-09
-- **Status:** COMPLETE
+- **Status:** COMPLETE, REPAIRED BY INDEPENDENT REVIEW #3 (M3-B)
 - **Command:** `python scripts/verify_physionet2012.py --cache data/raw/physionet2012 --set a`
 - **Environment:** Windows 11, Python 3.14.4, pandas 3.0.2, numpy 2.4.4
 - **Purpose:** Confirm the primary dataset is obtainable without credentialing, and establish
@@ -384,6 +384,7 @@ preprocessing retain smaller model-dependent signal. The strong shortcut framing
 | 0.284 | group | 0.8204 | 0.3212 | +0.204 | 0.1224 |
 | 0.519 | group | 0.8118 | 0.3308 | +0.360 | 0.1094 |
 | 0.779 | group | 0.8002 | 0.3445 | **+0.573** | **0.0944** |
+| 0.779 | variable-matched scattered | 0.8002 | 0.3445 | **+0.573** | **0.0944** |
 | 0.779 | cell_random | 0.8016 | 0.3345 | +0.115 | 0.1184 |
 
 True prevalence is 0.1403 throughout.
@@ -401,10 +402,13 @@ True prevalence is 0.1403 throughout.
 1. Discrimination is robust; calibration is not. AUROC falls 0.827 to 0.800 across a 78% loss,
    while the calibration intercept moves from -0.010 to +0.573 and mean predicted risk falls to
    0.0944 against an unchanged 14.03% prevalence.
-2. Structure matters beyond amount. At matched per-patient cell counts, group loss is significantly
-   worse on NLL and Brier at 50% and 75%. Not distinguishable at 25%.
-3. Clean-data Platt calibration corrects slope but not the drift. Isotonic is actively harmful
-   under stress (slope 0.489, worst NLL).
+2. The old count-matched comparison does not isolate structure. Exact per-patient/per-analyte
+   matching is mask-identical to group loss under the implemented whole-window variable-removal
+   semantics, giving NLL and Brier differences exactly 0.0000 [0.0000, 0.0000]. The old excess
+   over count-random combines analyte identity with amount.
+3. Clean-data Platt improves NLL/Brier and moves slope closer to one, but does not remove the
+   intercept/risk-level drift. Under this clean-calibration/shifted-test protocol, isotonic has
+   worse stress NLL and slope than Platt; no general harmfulness claim is made.
 4. AURC barely separates the conditions - a negative result for that metric as a stress readout.
 5. The entropy decrease is not independent evidence of overconfidence; at a 14% base rate it
    follows mechanically from predicted risks falling.
@@ -412,8 +416,9 @@ True prevalence is 0.1403 throughout.
 ### Reproducibility note
 
 An intermediate lint auto-fix changed behaviour in `information_loss.py` mid-milestone, so an
-earlier draft table differed. Reported numbers come from the final code, verified deterministic:
-two consecutive runs give bit-identical predictions (max difference 0.000e+00).
+earlier draft table differed. Review #3 now generates every loss mask twice, pins semantics in
+regression tests, and verified two reduced end-to-end runs across 155 arrays as bit-identical
+(max difference 0.000e+00). Repaired artifacts use schema v2 and clean source provenance.
 
 ---
 

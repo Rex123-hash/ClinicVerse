@@ -1,7 +1,7 @@
 # Cliniverse — Status
 
-**Updated:** 2026-08-09
-**Current milestone:** M3 complete — decision gate reached, awaiting sign-off before M4.
+**Updated:** 2026-08-10
+**Current milestone:** M3 repaired and classified M3-B; paused at the M4 decision gate.
 
 ## Where we are
 
@@ -14,7 +14,7 @@
 | independent review #0 response | **Done** | `docs/REVIEW_RESPONSE_0.md`, `docs/NOVELTY_REASSESSMENT.md`, `docs/BENCHMARK_SPEC.md` |
 | M1 TwinBench v0 | **Done + repaired** | Adversarial audit in `docs/ADVERSARIAL_REVIEW_1.md` |
 | M2 Baselines | **Done + repaired** | E-004; `docs/M2_MILESTONE_REPORT.md`, audit in `docs/ADVERSARIAL_REVIEW_2.md` |
-| M3 Calibration robustness | **Done** | E-005; `docs/M3_MILESTONE_REPORT.md`. Verdict GO to M4 |
+| M3 Calibration robustness | **Done + repaired** | E-005; `docs/M3_MILESTONE_REPORT.md`, `docs/ADVERSARIAL_REVIEW_3.md`. M3-B |
 | M4 Acquisition (core) | Not started | |
 | M5 Ablations/robustness/OOD | Not started | |
 | M6 API + minimal UI | Not started | |
@@ -87,29 +87,31 @@ structurally incoherent, so its mortality gap cannot quantify missingness contri
 
 ## Key M3 result
 
-Under structured group-level information loss, **discrimination is robust and calibration is not**.
-AUROC falls only 0.8270 to 0.8002 across a 78% loss of laboratory information, while the
-calibration intercept moves from -0.010 to **+0.573** and mean predicted risk falls to 0.0944
-against an unchanged 14.03% prevalence: the model systematically understates risk. At matched
-per-patient cell counts, structured loss is significantly worse than random-cell loss on NLL and
-Brier. Platt calibration fitted on clean data corrects slope but not the drift.
+Under whole-window removal of selected co-measurement-group variables, AUROC falls modestly from
+0.8270 to 0.8002 while the calibration intercept moves from -0.010 to **+0.573** and mean predicted
+risk falls to 0.0944 against 14.03% prevalence: systematic risk underestimation. The stronger
+per-patient/per-analyte control is mask-identical, so structured-minus-variable-matched NLL and
+Brier are exactly zero. The old excess over count-random is an analyte-identity effect, not an
+identified coherence effect. **M3-B.** Platt improves proper scores/slope but not intercept drift.
 
 ## Next actions
 
-**STOP at the M3 decision gate.** M4 (acquisition-policy ranking stability) begins after sign-off,
-and should rank policies on probabilistic and calibration metrics rather than AUROC alone.
+**STOP at the M3 decision gate.** M4 begins only after sign-off on the contract in
+`docs/ADVERSARIAL_REVIEW_3.md`: predeclare NLL-vs-budget primary, Brier co-primary, direct calibration
+diagnostics secondary, and a fixed AUBC integration rule. No M4 work has started.
 
 ## M3 exit criteria — all met
 
 | Criterion | Evidence |
 |---|---|
-| Design predeclared before execution | `docs/M3_DESIGN.md`, committed first |
+| Design provenance | Original predeclaration retained; Review #3 amendments explicitly post-hoc |
 | Isolated calibration partition | model-train 4,800 / calibration 1,600 / outer test 1,600 per fold |
 | Imputer never refitted under stress | fitted once per fold on clean model-train data |
 | Loss applied before feature construction | `evaluation/information_loss.py` operates on the cohort |
-| Per-patient severity matching | asserted elementwise in `tests/test_information_loss.py` |
+| Amount and variable matching | per-patient totals and per-patient/per-variable counts retained and asserted |
 | Paired contrasts, not standalone CIs | 2,000 patient-level resamples, identical patients and seeds |
 | Calibration ladder | uncalibrated / Platt / isotonic, all fitted on calibration data only |
 | Figures from artifacts | `results/m3/figures/` |
-| Demonstration patient by declared rule | median of 88 eligible cases, `m3_demo_patient.json` |
-| Determinism verified | two consecutive runs give bit-identical predictions |
+| Demonstration patient by repaired rule | record 142380; median deterioration among 866 eligible deaths |
+| Determinism verified | two reduced runs, 155 arrays, maximum difference 0.0; masks regenerated twice |
+| Clean artifact provenance | schema v2; source `df18f97`; `git_dirty=false`; fold/source arrays retained |

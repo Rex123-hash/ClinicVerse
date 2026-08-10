@@ -1,241 +1,141 @@
-# M3 Milestone Report — Calibration Robustness Under Structured Information Loss
+# M3 Milestone Report - Repaired After Independent Review #3
 
-**Date:** 2026-08-09
-**Design:** predeclared in [`M3_DESIGN.md`](M3_DESIGN.md), committed before any experiment ran.
-**Recommendation:** **GO to M4** (§12)
+**Original run:** 2026-08-09
+**Repair:** 2026-08-10
+**Classification:** **M3-B - FEATURE-IDENTITY EFFECT**
+**Recommendation:** **PASS M3 WITH NONBLOCKING RISKS; M4 may proceed only under the repaired contract.**
 
-All numbers are read from `experiments/robustness/results/m3/results.json`. Raw and calibrated
-predictions are retained in `predictions.npz` for independent recomputation.
+The original metrics reproduce, but the original claim that group structure
+matters beyond amount does not survive the stronger control. The implemented
+`group_structured` condition removes every occurrence of each variable in a
+selected co-measurement group across the full 24-hour window. It does not remove
+an order event or a patient-hour co-measurement instance.
 
-> **Reproducibility note, recorded because it happened.** An intermediate lint auto-fix altered
-> behaviour in `information_loss.py` part-way through this milestone, so an earlier draft table
-> differed from the final one. Every figure below comes from the final code, which was then
-> verified deterministic: two consecutive runs produce **bit-identical** predictions
-> (max difference 0.000e+00 across all conditions). Only the final numbers are reported.
+## Protocol and provenance
 
----
+Five patient-stratified outer folds use PhysioNet 2012 sets a+b only (4,000 each;
+n=8,000; prevalence 0.14025). Per fold, 4,800 clean model-training patients fit
+the imputer, scaler, and frozen M2 model; 1,600 clean calibration patients fit
+only the calibrator; 1,600 outer-test patients fit nothing. Loss is applied to
+the truncated cohort before representation construction. Preprocessing is never
+refitted under stress.
 
-## 1. Calibration protocol (exact)
+The repaired artifact is `cliniverse.m3/2`, generated from clean source
+`df18f97e72ad389260a5a11bb5a2c708bd40f44c` (`git_dirty=false`). It stores labels,
+unique record IDs, source set, fold identity, predictions, per-patient removal
+counts, and per-patient/per-variable removal counts. Set-c records were not
+materialized; the local cache contains no set-c record directory or archive.
 
-Per outer fold — 5-fold stratified over patients, sets a+b, n = 8,000, prevalence 14.03%:
+## Repaired three-way result
 
-| partition | n | fits imputer/scaler | fits model | fits calibrator | evaluated |
-|---|---:|---|---|---|---|
-| model-train | 4,800 | **yes** | **yes** | no | no |
-| calibration | 1,600 | no | no | **yes** | no |
-| outer test | 1,600 | no | no | no | **yes** |
+Primary view: `values_mask` / XGBoost / clean-fitted Platt. Realized loss is the
+mean fraction of eligible laboratory cells removed.
 
-- The imputer (median) is fitted **once per fold on clean model-train data** and is **never
-  refitted under stress**, so the pipeline cannot adapt to the stress distribution.
-- The calibration partition is **always clean**. The question is what happens when a
-  normally-calibrated model meets information loss.
-- The outer test partition trains nothing at all.
-- **set-c was never loaded.** Provenance records sets `[a, b]`, excluded `[c]`.
+| realized loss | condition | AUROC | AP | Brier | NLL | slope | intercept | mean p |
+|---:|---|---:|---:|---:|---:|---:|---:|---:|
+| 0.000 | no loss | 0.8270 | 0.4473 | 0.0968 | 0.3151 | 0.988 | -0.010 | 0.1397 |
+| 0.779 | count-matched random cell | 0.8016 | 0.4018 | 0.1022 | 0.3345 | 0.926 | +0.115 | 0.1184 |
+| 0.779 | variable-matched scattered | 0.8002 | 0.3990 | 0.1049 | 0.3445 | 1.023 | +0.573 | 0.0944 |
+| 0.779 | structured group | 0.8002 | 0.3990 | 0.1049 | 0.3445 | 1.023 | +0.573 | 0.0944 |
 
-Provenance: git `bff052a6168d`, cohort `f59c44f07556b7a6`, split `21cbeab1b5bc308f`,
-calibration split `bf7584e60636875c`, config `2d22974f8daf179d`, seed 20260809.
+Structured and variable-matched masks and predictions are bit-identical at all
+three severities. The paired Review #3 contrasts are therefore exact:
 
-**Model frozen from M2, not re-searched:** XGBoost `max_depth=5, learning_rate=0.05,
-min_child_weight=10, n_estimators=200, subsample=0.8, colsample_bytree=0.8, reg_lambda=1.0`.
-`n_estimators` is fixed rather than early-stopped, because a stopping signal whose composition
-changes with the stress condition would make the model itself condition-dependent.
+| severity | structured - variable-matched NLL | structured - variable-matched Brier |
+|---:|---:|---:|
+| 0.284 | 0.0000 [0.0000, 0.0000] | 0.0000 [0.0000, 0.0000] |
+| 0.519 | 0.0000 [0.0000, 0.0000] | 0.0000 [0.0000, 0.0000] |
+| 0.779 | 0.0000 [0.0000, 0.0000] | 0.0000 [0.0000, 0.0000] |
 
-**Primary representation, declared in advance:** `values_mask` + XGBoost — chosen because it is
-the representation that *can see* the loss (counts fall to zero, ever-flags clear, recency hits its
-sentinel), because M4's disclosure benchmark needs it, and because M2 showed no performance cost.
+The historical amount-only contrasts reproduce exactly. At realized 0.519,
+structured minus count-random NLL is +0.0076 [+0.0028, +0.0122] and Brier is
++0.0021 [+0.0005, +0.0036]. At realized 0.779, NLL is +0.0100 [+0.0057,
++0.0145] and Brier is +0.0027 [+0.0012, +0.0042]. These differences combine
+analyte identity with whole-window group selection; they are not evidence for a
+coherence effect alone.
 
-## 2. Loss mechanisms
+## Variable-identity audit
 
-Loss is applied to the **cohort** — values and mask — before feature construction, so information
-genuinely disappears. Eligible information is the 23 laboratory variables in the co-measurement
-catalogue; vitals and ventilator settings are never removed.
+The count-random mask differs in per-variable counts for 7,816, 7,838, and 6,817
+patients at the three severities. Among patients with removed cells, median
+patient-level total-variation distance between removed-analyte distributions is
+0.714, 0.474, and 0.226. At the highest severity, structured loss removes 2,338
+fewer HCT, 1,847 fewer Platelets, and 1,732 fewer WBC cells than count-random,
+while removing 1,347 more pH, 1,298 more PaO2, and 1,293 more PaCO2 cells.
 
-- **`cell_random`** — individual observed laboratory cells removed uniformly at random.
-- **`group_structured`** — entire co-measurement groups removed (`BMP_like`, `CBC_like`,
-  `ABG_like`, `hepatic_like`, `Lactate`, `SaO2`, `Albumin`, `TroponinT`, `TroponinI`,
-  `Cholesterol`): every observed cell of that group, across the whole window.
+Descriptive clean-fold XGBoost gain ranks BUN, Bilirubin, Lactate, Platelets,
+PaO2, PaCO2, and pH among the most important eligible analytes. Importance is
+reported descriptively only and is not a causal decomposition.
 
-Temporal block loss was excluded, as declared, to keep severity comparable on a per-cell basis.
+## Risk underestimation and intercept convention
 
-**These are structured group-level information loss conditions over co-measurement groups. They
-are not verified clinical orders and are not "clinically realistic missingness".**
+Calibration diagnostics fit
+`logit(Y) = intercept + slope * logit(prediction)`. A positive intercept means
+the predicted log-odds require an upward shift when interpreted jointly with the
+slope. At highest structured/variable-matched loss, the intercept is +0.573,
+mean predicted mortality is 0.0944, observed prevalence is 0.1403, and nine of
+ten equal-mass reliability bins have observed mortality above mean prediction.
+These agree on systematic mortality-risk underestimation. Generic
+"overconfidence" is not used; entropy decline is not independent evidence.
 
-## 3. Realized severity
+## Calibration methods
 
-Groups are indivisible, so realized severity cannot equal the request. A first implementation
-removed groups until the target was reached, which turned a requested 25% into a realized 46%;
-it was replaced by a rule that accepts a group only when it lands *nearer* the target than
-stopping.
+At highest group loss, raw versus Platt results are:
 
-| requested | realized mean | realized median | cells removed | matched? |
-|---|---|---|---|---|
-| 0.25 | **0.284** | 0.273 | 86,192 | yes — identical in both conditions |
-| 0.50 | **0.519** | 0.511 | 157,625 | yes |
-| 0.75 | **0.779** | 0.763 | 231,414 | yes |
+| method | NLL | Brier | slope | intercept |
+|---|---:|---:|---:|---:|
+| raw | 0.3513 | 0.1061 | 0.952 | +0.570 |
+| Platt | 0.3445 | 0.1049 | 1.023 | +0.573 |
 
-Matching is **per patient**, and a test asserts it: `group.removed_cells == cell.removed_cells`
-elementwise. "Group loss is worse" therefore cannot be explained by group loss removing more.
-7,920 of 8,000 patients have any eligible laboratory cells.
+Platt improves NLL by -0.0068 [-0.0079, -0.0056] and Brier by -0.0012
+[-0.0014, -0.0010] at highest severity. It moves slope closer to one at each
+tested group-loss severity, but does not remove the risk-level intercept drift.
+This is an exploratory calibrator comparison, not a confirmatory treatment
+effect.
 
-## 4. Performance and calibration — primary (values_mask / XGBoost / Platt)
+Each isotonic fit uses 1,600 clean calibration patients and 224 deaths, yielding
+17-25 distinct fitted probability steps. No highest-severity raw test prediction
+falls outside clean isotonic input support, but 1,313 of 8,000 transformed
+predictions land on a learned zero-probability step and are numerically clipped.
+Under this clean-calibration/shifted-test protocol, isotonic has worse stress NLL
+(0.3912) and slope (0.489) than Platt. This does not support the general claim
+that isotonic calibration is harmful.
 
-| severity | condition | AUROC | AP | Brier | NLL | AURC | slope | intercept | mean p | entropy |
-|---|---|---|---|---|---|---|---|---|---|---|
-| 0.00 | none | 0.8270 | 0.4473 | 0.0968 | 0.3151 | 0.0354 | 0.988 | −0.010 | 0.1397 | 0.3129 |
-| 0.284 | cell_random | 0.8226 | 0.4376 | 0.0979 | 0.3183 | 0.0362 | 0.976 | −0.041 | 0.1411 | 0.3163 |
-| 0.284 | **group** | 0.8204 | 0.4339 | 0.0986 | 0.3212 | 0.0369 | 1.007 | **+0.204** | 0.1224 | 0.2944 |
-| 0.519 | cell_random | 0.8151 | 0.4273 | 0.0991 | 0.3231 | 0.0380 | 0.954 | −0.020 | 0.1358 | 0.3107 |
-| 0.519 | **group** | 0.8118 | 0.4142 | 0.1012 | 0.3308 | 0.0396 | 1.010 | **+0.360** | 0.1094 | 0.2792 |
-| 0.779 | cell_random | 0.8016 | 0.4018 | 0.1022 | 0.3345 | 0.0410 | 0.926 | +0.115 | 0.1184 | 0.2896 |
-| 0.779 | **group** | 0.8002 | 0.3990 | 0.1049 | 0.3445 | 0.0418 | 1.023 | **+0.573** | 0.0944 | 0.2596 |
+## Inference, determinism, and illustration
 
-**Reading this table.** Discrimination barely moves: AUROC falls 0.8270 → 0.8002 across a 78%
-loss of laboratory information, and group and cell loss are nearly indistinguishable on AUROC.
-The calibration intercept behaves completely differently: it is flat under random-cell loss
-(−0.010 → +0.115) and rises steeply under structured group loss (−0.010 → **+0.573**). Mean
-predicted risk falls from 0.1397 to 0.0944 while true prevalence is unchanged at 0.1403.
+The original predeclared group-minus-count-random analysis tests NLL, Brier, and
+AURC at three severities; NLL was named primary and Brier/AURC co-primary. No
+multiplicity correction was predeclared, so metric/severity findings are
+reported as a family and secondary calibrator/model/representation comparisons
+are exploratory. The Review #3 variable-matched comparisons are post-hoc
+falsification controls.
 
-A positive intercept with a slope near 1 means predictions need shifting **upward**: under
-structured loss the model systematically **understates** risk.
+Bootstrap resampling is by patient; paired methods share identical resampled
+indices and recompute the metric difference inside each replicate. Fold identity
+stays attached in the NPZ. Two independent reduced end-to-end runs produced 155
+bit-identical arrays (maximum absolute prediction difference 0.0), and every
+full-run loss mask is generated twice and asserted identical.
 
-## 5. Paired primary contrast — group minus matched cell
+The repaired illustrative case is record **142380**, a death. At requested 50%
+structured loss, predicted mortality falls from 0.2355 to 0.1579; absolute error
+worsens by 0.0775 versus a median eligible deterioration of 0.0778. It was chosen
+from 866 eligible deaths by the declared median-deterioration rule, with no 0.5
+classification threshold and no entropy criterion. It is an illustration, not
+evaluation evidence.
 
-Identical patients, identical realized cell counts, identical seeds. 2,000 patient-level
-bootstrap resamples. Positive = group loss is worse.
+## Corrected conclusion and M4 contract
 
-| calibrator | severity | NLL | Brier | AURC |
-|---|---|---|---|---|
-| Platt | 0.284 | +0.0029 [−0.0005, +0.0065] | +0.0007 [−0.0005, +0.0019] | +0.0006 [−0.0005, +0.0018] |
-| Platt | 0.519 | **+0.0076 [+0.0028, +0.0122]** | **+0.0021 [+0.0005, +0.0036]** | **+0.0016 [+0.0002, +0.0031]** |
-| Platt | 0.779 | **+0.0100 [+0.0057, +0.0145]** | **+0.0027 [+0.0012, +0.0042]** | +0.0008 [−0.0006, +0.0024] |
-| uncalibrated | 0.519 | **+0.0105 [+0.0054, +0.0155]** | **+0.0026 [+0.0008, +0.0042]** | **+0.0018 [+0.0003, +0.0033]** |
-| uncalibrated | 0.779 | **+0.0129 [+0.0083, +0.0177]** | **+0.0031 [+0.0016, +0.0048]** | +0.0009 [−0.0005, +0.0025] |
+**M3-B - FEATURE-IDENTITY EFFECT.** Whole-window removal of selected
+co-measurement-group variables produces substantial mortality-risk
+underestimation while discrimination degrades modestly. It is worse than equal
+amount random-cell loss, but the stronger control shows no separable
+co-occurrence-structure effect: analyte identity fully determines the implemented
+structured mask.
 
-Structured loss is significantly worse than matched random loss on **NLL and Brier at 50% and 75%
-severity**, for both uncalibrated and Platt-calibrated models. At 25% the difference is in the same
-direction but not distinguishable. **AURC separates only at 50%** — selective prediction is largely
-insensitive to the distinction, which is a real limitation of AURC as a stress readout here.
-
-## 6. Risk–coverage / AURC
-
-AURC degrades modestly and monotonically with severity (0.0354 → 0.0418 under group loss;
-0.0354 → 0.0410 under cell loss) and does **not** reliably distinguish the two conditions. The
-confidence *ordering* remains useful even as the probability *level* drifts: the model still knows
-which patients are higher risk, it just no longer knows how high.
-
-## 7. Does calibration mitigate it? Partly — and not the part that matters
-
-| calibrator | intercept at 0.779 group loss | slope | NLL |
-|---|---|---|---|
-| uncalibrated | +0.570 | 0.952 | 0.3513 |
-| **Platt (clean-fitted)** | **+0.573** | 1.023 | **0.3445** |
-| isotonic | −0.455 (sign flips, unstable across severities) | 0.489 | 0.3912 |
-
-Platt improves NLL and keeps the slope near 1, but leaves the intercept drift essentially
-untouched — it was fitted on clean data and cannot anticipate a shift that has not happened yet.
-**Isotonic is actively harmful under stress**: slope collapses to ~0.5 and NLL is worst at every
-severity, i.e. the more flexible calibrator is the less robust one.
-
-So calibration method matters (pre-declared Outcome B), but no clean-data calibrator prevents the
-risk-level drift caused by structured information loss.
-
-## 8. Secondary representations — the finding is not an artifact of one choice
-
-| run | intercept at baseline → 0.779 group loss | AUROC baseline → 0.779 group |
-|---|---|---|
-| **values_mask / XGBoost** (primary) | −0.010 → **+0.573** | 0.8270 → 0.8002 |
-| values_only / XGBoost | +0.010 → **+0.606** | 0.8229 → 0.7955 |
-| values_mask / logistic regression | −0.004 → **+0.590** | 0.8162 → 0.7726 |
-
-The drift appears in all three, at similar magnitude, so it is not specific to the mask block or to
-gradient boosting. Per the review's warning, these are **not** compared to attribute differences to
-calibration; they are a robustness check on the conclusion.
-
-## 9. Does confidence adapt? Direction, and an honest caveat
-
-Mean predictive entropy **falls** under structured loss (0.3129 → 0.2596), i.e. the model becomes
-nominally *more* decisive as it loses information and becomes less reliable.
-
-**Caveat that must not be dropped.** At a base rate of 14%, entropy is monotone increasing in `p`
-below 0.5, so an entropy decrease is a *mechanical consequence* of predicted risks falling toward
-zero. The entropy drop is therefore **not independent evidence** of increased confidence.
-
-The independent evidence is:
-1. probabilistic performance deteriorates (NLL +0.029, Brier +0.008 from baseline to 78% group
-   loss), and
-2. the calibration intercept moves to +0.573 while slope stays ~1 — a systematic, direction-specific
-   risk understatement, roughly **5× the drift** under matched random-cell loss.
-
-## 10. Demonstration patient (selection rule applied mechanically)
-
-136 outer-test patients flip from correct to incorrect under 50% group loss; 88 of those also show
-no entropy increase. Of those 88, the patient nearest the **median** deterioration was selected —
-median, not maximum, exactly as declared:
-
-| field | value |
-|---|---|
-| record id | **137856** |
-| true outcome | died |
-| p(death), no loss | **0.597** (correct at 0.5) |
-| p(death), 50% group loss | **0.375** (now wrong) |
-| predictive entropy | 0.674 → 0.662 (did not rise) |
-| deterioration | 0.222 (median of eligible: 0.226) |
-
-Stored as `results/m3/m3_demo_patient.json`. No UI built.
-
-## 11. Claim discipline
-
-**Supported by these metrics:**
-- Under structured group-level information loss, probabilistic reliability degrades significantly
-  more than under matched random-cell loss (NLL, Brier; 50% and 75% severity).
-- The model's risk estimates drift systematically downward, understating risk, while its ranking
-  ability is largely preserved.
-- Calibration fitted on clean data corrects slope but not this drift; isotonic makes it worse.
-
-**Not claimed:** that "the model doesn't know what it doesn't know" (entropy evidence is
-confounded, §9); that this is clinically realistic missingness; any causal or deployment claim.
-
-## 12. Decision gate
-
-**Verdict: pre-declared Outcome A, qualified by Outcome B.** Structured loss causes significantly
-greater probabilistic and calibration degradation than matched random loss, and confidence does not
-adapt in the protective direction — but the strongest evidence is the calibration-intercept drift,
-not entropy, and the effect is absent at the lowest severity.
-
-**Recommendation: GO to M4.**
-
-M4 becomes *more* important, not less. M3 shows that a fixed evaluation protocol already hides a
-large reliability failure behind a nearly-flat AUROC curve. If discrimination is this insensitive
-to information loss, then acquisition-policy rankings scored on discrimination may be similarly
-insensitive — or unstable for reasons unrelated to acquisition quality. M4 should therefore rank
-policies on **probabilistic** and **calibration** metrics, not AUROC alone.
-
-Carry into M4: the isolated three-way partition; the frozen model; matched-severity loss; and the
-finding that clean-data calibration does not survive structured loss.
-
-## 13. Limitations
-
-- One dataset, one cutoff, one split assignment, no external validation.
-- Synthetic deletion is **not** natural missingness and is not deployment shift.
-- The 25% severity contrast is not distinguishable; conclusions rest on 50% and 75%.
-- AURC barely separates the conditions — reported as a negative result on that metric.
-- Single model, no ensembles; entropy from one model is not decomposable.
-- Aggregate calibration slope/intercept are pooled over outer test folds; per-fold variability is
-  retained in the artifact but not summarised here.
-
-## 14. Artifacts
-
-```
-experiments/robustness/results/m3/
-  results.json          metrics, contrasts, severity report, provenance
-  predictions.npz       raw + calibrated predictions, labels, record ids
-  m3_demo_patient.json  selection rule, eligible counts, chosen case
-  figures/m3_degradation.png     headline: what degrades and what does not
-  figures/m3_calibrators.png     calibrator comparison under group loss
-  figures/m3_reliability.png     reliability at highest severity
-```
-
-```bash
-python experiments/robustness/m3_calibration_under_loss.py --n-boot 2000
-python experiments/robustness/m3_figures.py
-```
+M4 may proceed without implementing new event-loss experiments, but must inherit
+support blindness, patient-paired random baselines, clean calibration isolation,
+and probabilistic endpoints. Before results, it must declare NLL-vs-budget as
+primary, Brier-vs-budget as co-primary, calibration intercept/slope as direct
+secondary diagnostics, AUROC/AP as ranking diagnostics, and a single integration
+rule for AUBC. M4 must not reuse the whole-window M3 mask as evidence that
+coherent laboratory-event structure was tested.

@@ -58,8 +58,8 @@ those same historical ordering decisions.
 - **H2.** The *ranking* of acquisition policies by AUBC is not stable across the four cost regimes
   of [`BENCHMARK_SPEC.md`](BENCHMARK_SPEC.md) §6.
 - **H3.** Under support-blind replay, calibration (slope, intercept, reliability) degrades faster
-  than discrimination as budget shrinks — i.e. models become confidently wrong before they become
-  visibly inaccurate.
+  than discrimination as budget shrinks, producing systematic risk-level miscalibration before
+  ranking performance degrades substantially.
 
 All three are falsifiable in both directions. Null results are reportable and will be reported.
 

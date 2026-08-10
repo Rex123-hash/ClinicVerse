@@ -70,6 +70,10 @@ provides a stronger support-blind baseline fitted on training support only.
 
 ## 6. Uncertainty limitations
 
+- **M3 whole-window loss is not an event-structure experiment.** Its structured condition removes
+  every observed occurrence of selected analytes across the truncated window. Exact
+  per-patient/per-analyte matching is therefore mask-identical. The excess over equal-count random
+  cell loss combines analyte identity with amount and cannot identify co-occurrence coherence.
 - Conformal prediction gives **marginal** coverage guarantees. Coverage *conditional on
   missingness pattern* is known to degrade (Zaffran et al., ICML 2023) — precisely the regime
   this benchmark varies. We report pattern-stratified coverage, including where it fails.
