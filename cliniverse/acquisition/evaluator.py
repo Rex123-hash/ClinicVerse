@@ -5,15 +5,10 @@ module only decides *which* action to ask for and gathers the resulting visible
 state; it does not reimplement disclosure, costing, boundary enforcement or
 budget accounting.
 
-Two execution paths, identical in semantics:
+Execution path:
 
-``run_static``    for policies whose choice does not depend on the model
-                  (no-acquisition, random, fixed order, support oracle). Episodes
-                  run per patient through the engine.
-``run_adaptive``  for the surrogate expected-information-gain policies, which
-                  need a model prediction at every step. Patients advance in
-                  lockstep so candidate scoring can be batched; the engine calls
-                  are unchanged.
+``run_adaptive`` advances patients in lockstep so policy scoring can be batched;
+every policy uses this single path and every transition remains an engine call.
 
 The lockstep path exists purely for speed. A patient's action sequence does not
 depend on any other patient: scores are computed row-wise and each engine is
@@ -123,10 +118,12 @@ def run_adaptive(
     actions = engines[0].view().catalogue.panel_names
     trace: list[ActionRecord] = []
     build = build_features  # Callable[[Cohort], FloatArray]
+    policy.reset_batch(len(engines))
 
     while True:
         for step in range(MAX_REQUESTS_PER_EPOCH):
             legal = _affordable_mask(engines, actions)
+            legal = policy.constrain_legal(legal, actions)
             if not legal.any():
                 break
 

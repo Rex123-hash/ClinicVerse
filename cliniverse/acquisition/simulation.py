@@ -6,17 +6,21 @@ of the completion, not the completion itself.
 
 This module provides that model directly in feature space: acquiring a group is
 simulated as one additional observation, at the current boundary, for each member
-variable, taking a value from a training-fold quantile. Summary features are
-updated consistently:
+variable, taking a value from a training-fold quantile. The summaries that can
+be reconstructed from the current feature vector are updated as follows:
 
     n_obs   += 1              ever    := 1
     recency := 0              last    := q
     mean    := (mean*n + q)/(n+1)
     min     := min(min, q)    max     := max(max, q)
 
+The slope and global distinct-variable count cannot be reconstructed exactly
+from this compressed state and are left unchanged. This makes the completion a
+representation-incomplete heuristic rather than a simulated acquisition with
+fully compatible feature semantics.
+
 Working in feature space keeps the simulation cheap enough to batch across all
-patients and all candidate actions, which is what makes an expected-information-
-gain policy tractable here.
+patients and all candidate actions, which keeps the entropy heuristic tractable.
 
 **Every quantile comes from training folds only.** Nothing in this module reads a
 hidden value, so a policy built on it cannot leak one.

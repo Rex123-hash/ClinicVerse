@@ -8,9 +8,10 @@ Batching therefore speeds up scoring only; it never reimplements disclosure.
 
 **Leakage boundary.** Scores are computed from the policy-visible view and from
 statistics fitted on training folds. No policy sees hidden values, the hidden
-support, availability, or the label. `GreedyEIG` in particular integrates over a
-*predicted* distribution for the unknown value; it never evaluates the utility of
-the value that is actually hidden.
+support, availability, or the label. `GreedyEIG` in particular scores fixed
+training-quantile feature completions; it never evaluates the utility of the value
+that is actually hidden. The historical artifact key is retained, but this is a
+surrogate expected-entropy-reduction heuristic rather than mutual-information EIG.
 """
 
 from __future__ import annotations
@@ -54,6 +55,15 @@ class BatchPolicy(abc.ABC):
 
     def config(self) -> dict[str, object]:
         return {"name": self.name}
+
+    def reset_batch(self, n_patients: int) -> None:
+        """Reset optional per-patient policy state for one evaluation run."""
+        del n_patients
+
+    def constrain_legal(self, legal: BoolArray, actions: tuple[str, ...]) -> BoolArray:
+        """Optionally narrow the evaluator-provided legal-action mask."""
+        del actions
+        return legal
 
 
 @dataclasses.dataclass
@@ -135,6 +145,38 @@ class FixedOrderBatch(BatchPolicy):
 
     order: tuple[str, ...] = ()
     name: str = "fixed_domain_order"
+    _positions: npt.NDArray[np.int64] | None = dataclasses.field(
+        default=None, init=False, repr=False
+    )
+
+    def reset_batch(self, n_patients: int) -> None:
+        self._positions = np.zeros(n_patients, dtype=np.int64)
+
+    def constrain_legal(self, legal: BoolArray, actions: tuple[str, ...]) -> BoolArray:
+        """Return each patient's next legal action in the declared sequence.
+
+        The earlier batched implementation merely assigned a static priority to
+        every action. Under support-blind replay that repeatedly selected the
+        first affordable group, so it was not the predeclared fixed *order* and
+        did not match :class:`twinbench.episode.FixedOrder`. Advancing a separate
+        cursor per patient preserves the declared sequence while still letting
+        the disclosure engine decide availability and affordability.
+        """
+        if self._positions is None or len(self._positions) != legal.shape[0]:
+            raise ConfigError("FixedOrderBatch used before reset_batch()")
+        action_index = {action: i for i, action in enumerate(actions)}
+        constrained = np.zeros_like(legal)
+        for patient in range(legal.shape[0]):
+            position = int(self._positions[patient])
+            while position < len(self.order):
+                candidate = self.order[position]
+                position += 1
+                column = action_index.get(candidate)
+                if column is not None and legal[patient, column]:
+                    constrained[patient, column] = True
+                    break
+            self._positions[patient] = position
+        return constrained
 
     def score_batch(
         self, features: FloatArray, actions: tuple[str, ...], step: int
@@ -150,17 +192,19 @@ class FixedOrderBatch(BatchPolicy):
 
 @dataclasses.dataclass
 class GreedyEIGBatch(BatchPolicy):
-    """Myopic expected information gain about the outcome.
+    """Myopic surrogate expected-entropy-reduction heuristic.
 
-    For each action the policy integrates over a predictive distribution for the
-    unknown hidden value, using a fixed three-point quadrature at the training
+    For each action the policy averages over fixed feature completions for the
+    unknown hidden value, using three points at the training
     25th/50th/75th percentiles of each member variable with equal weights:
 
-        EIG(a) = H(p_now) - mean_k H(p_k)
+        score(a) = H(p_now) - mean_k H(p_k)
 
     where ``p_k`` is the model's outcome probability under the k-th imputed
-    completion. Quantiles come from training folds only, and the hidden value is
-    never consulted — the choice is made before any disclosure.
+    completion. The equal-weight quantiles are not a coherent posterior predictive
+    distribution and ``p_now`` need not equal their mean, so the score is not true
+    EIG or mutual information. Quantiles come from training folds only, and the
+    hidden value is never consulted — the choice is made before any disclosure.
 
     ``per_cost`` divides the score by the action's cost. That variant is the
     closest justified analogue to a cost-sensitive greedy comparator; it is **not**

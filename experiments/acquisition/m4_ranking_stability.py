@@ -359,6 +359,11 @@ def run_condition(
                         "policy": policy_name,
                         "fold": fm.fold,
                         "budget_fraction": beta,
+                        "n_patients": len(engines),
+                        "total_realized_cost": float(spent.sum()),
+                        "total_disclosed_cells": int(disclosed.sum()),
+                        "total_requests": int(requests.sum()),
+                        "total_failed_requests": int(failed.sum()),
                         "mean_realized_cost": float(spent.mean()),
                         "mean_disclosed_cells": float(disclosed.mean()),
                         "mean_requests": float(requests.mean()),
@@ -368,8 +373,15 @@ def run_condition(
                 )
                 if trace:
                     traces.extend(
-                        {**r.as_row(), "policy": policy_name, "fold": fm.fold}
-                        for r in trace[:200]
+                        {
+                            **r.as_row(),
+                            "record_id": int(sub.record_ids[r.patient_index]),
+                            "policy": policy_name,
+                            "fold": fm.fold,
+                            "budget_fraction": beta,
+                        }
+                        for r in trace
+                        if r.patient_index < 2
                     )
         del sub
     return predictions, spend_rows, traces
@@ -411,18 +423,37 @@ def paired_integrated_bootstrap(
     """
     rng = np.random.default_rng(seed)
     n = len(y)
-    point = integrate([negative_log_likelihood(y, b[k]) for k in BUDGET_FRACTIONS]) - (
-        integrate([negative_log_likelihood(y, a[k]) for k in BUDGET_FRACTIONS])
-    )
+
+    # NLL is a patient mean and trapezoidal integration is linear. Therefore
+    # integrating each patient's eight point-losses once and averaging those
+    # integrated losses on a resample is algebraically identical to rebuilding
+    # eight mean-NLL points and integrating the curve inside every replicate.
+    # This removes ~100,000 repeated sklearn metric calls without changing a
+    # patient index, seed, budget weight, or bootstrap definition.
+    weights = np.zeros(len(BUDGET_FRACTIONS), dtype=np.float64)
+    for i, (left, right) in enumerate(itertools.pairwise(BUDGET_FRACTIONS)):
+        half_width = (right - left) / 2.0
+        weights[i] += half_width
+        weights[i + 1] += half_width
+
+    def patient_integrated_loss(predictions: dict[float, np.ndarray]) -> np.ndarray:
+        out = np.zeros(n, dtype=np.float64)
+        for weight, beta in zip(weights, BUDGET_FRACTIONS, strict=True):
+            probability = np.clip(predictions[beta], 1e-15, 1.0 - 1e-15)
+            point_loss = -(y * np.log(probability) + (1.0 - y) * np.log1p(-probability))
+            out += weight * point_loss
+        return out / (BUDGET_FRACTIONS[-1] - BUDGET_FRACTIONS[0])
+
+    loss_a = patient_integrated_loss(a)
+    loss_b = patient_integrated_loss(b)
+    patient_differences = loss_b - loss_a
+    point = float(patient_differences.mean())
     diffs: list[float] = []
     for _ in range(n_boot):
         idx = rng.integers(0, n, n)
-        yb = y[idx]
-        if len(np.unique(yb)) < 2:
+        if len(np.unique(y[idx])) < 2:
             continue
-        ca = integrate([negative_log_likelihood(yb, a[k][idx]) for k in BUDGET_FRACTIONS])
-        cb = integrate([negative_log_likelihood(yb, b[k][idx]) for k in BUDGET_FRACTIONS])
-        diffs.append(cb - ca)
+        diffs.append(float(patient_differences[idx].mean()))
     lo, hi = (float(v) for v in np.percentile(diffs, [2.5, 97.5]))
     return {
         "difference": point,
@@ -431,6 +462,27 @@ def paired_integrated_bootstrap(
         "n_boot": len(diffs),
         "excludes_zero": bool(lo > 0.0 or hi < 0.0),
     }
+
+
+def classify_reversal_support(
+    support: dict[str, dict[str, float | bool]],
+) -> tuple[str, bool, bool]:
+    """Classify two-condition evidence without overstating a one-sided result.
+
+    The design's binding rule flagged evidence when either condition excluded
+    zero. Review #4 retains that flag for transparency, but reserves "supported
+    reversal" for the case in which both relevant paired comparisons resolve.
+    """
+    excludes = [bool(interval["excludes_zero"]) for interval in support.values()]
+    one_condition_evidence = any(excludes)
+    resolved_in_both = all(excludes)
+    if resolved_in_both:
+        classification = "SUPPORTED REVERSAL"
+    elif one_condition_evidence:
+        classification = "ONE-CONDITION EVIDENCE / REVERSAL UNRESOLVED"
+    else:
+        classification = "UNRESOLVED / EFFECTIVELY TIED"
+    return classification, one_condition_evidence, resolved_in_both
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -487,7 +539,10 @@ def main(argv: list[str] | None = None) -> int:
             "rows": rows,
             "integrated_aunllc": integrated,
             "spend": spend,
-            "trace_sample": traces[:500],
+            # Complete action histories for two deterministic patients per fold
+            # and policy, rather than a prefix that contained only step-zero
+            # records from the first policy.
+            "trace_sample": traces,
             "seconds": round(time.perf_counter() - t0, 1),
         }
         np.savez_compressed(
@@ -556,6 +611,7 @@ def main(argv: list[str] | None = None) -> int:
             "subsample_hash": stable_hash(subsample.tolist()),
             "results": grid_results,
         }
+        payload["conditions"] = [result["condition"] for result in grid_results]
         payload["stability"] = _stability(grid_results, y_sub, grid_preds, args)
         np.savez_compressed(
             args.out / "grid_predictions.npz",
@@ -630,7 +686,9 @@ def _stability(
                 n_boot=args.n_boot,
                 seed=args.seed,
             )
-        supported = any(s["excludes_zero"] for s in support.values())
+        classification, one_condition_evidence, resolved_in_both = classify_reversal_support(
+            support
+        )
         changes.append(
             {
                 "a": a,
@@ -638,9 +696,12 @@ def _stability(
                 "winner_a": wa,
                 "winner_b": wb,
                 "paired_delta_aunllc": support,
-                "classification": "SUPPORTED REVERSAL"
-                if supported
-                else "UNRESOLVED / EFFECTIVELY TIED",
+                # Preserve the binding predeclared at-least-one-condition flag,
+                # but do not mislabel a reversal as statistically supported when
+                # the competing-policy CI still includes zero in one condition.
+                "predeclared_one_condition_evidence": one_condition_evidence,
+                "resolved_in_both_conditions": resolved_in_both,
+                "classification": classification,
             }
         )
     return {
@@ -652,6 +713,9 @@ def _stability(
         "winner_changes": changes,
         "n_supported_reversals": sum(
             1 for c in changes if c["classification"] == "SUPPORTED REVERSAL"
+        ),
+        "n_predeclared_one_condition_evidence": sum(
+            1 for c in changes if c["predeclared_one_condition_evidence"]
         ),
     }
 

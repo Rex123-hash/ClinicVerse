@@ -1,7 +1,7 @@
 # Cliniverse — Status
 
-**Updated:** 2026-08-10
-**Current milestone:** M3 repaired and classified M3-B; paused at the M4 decision gate.
+**Updated:** 2026-08-11
+**Current milestone:** M4 repaired, accepted, and classified M4-C; M5 not started.
 
 ## Where we are
 
@@ -15,7 +15,7 @@
 | M1 TwinBench v0 | **Done + repaired** | Adversarial audit in `docs/ADVERSARIAL_REVIEW_1.md` |
 | M2 Baselines | **Done + repaired** | E-004; `docs/M2_MILESTONE_REPORT.md`, audit in `docs/ADVERSARIAL_REVIEW_2.md` |
 | M3 Calibration robustness | **Done + repaired** | E-005; `docs/M3_MILESTONE_REPORT.md`, `docs/ADVERSARIAL_REVIEW_3.md`. M3-B |
-| M4 Acquisition ranking stability | **Done** | `docs/M4_MILESTONE_REPORT.md`. Verdict **M4-B**, recommendation MODIFY |
+| M4 Acquisition ranking stability | **Done + repaired** | `docs/M4_MILESTONE_REPORT.md`, `docs/ADVERSARIAL_REVIEW_4.md`. Verdict **M4-C**, ACCEPT |
 | M5 Ablations/robustness/OOD | Not started | |
 | M6 API + minimal UI | Not started | |
 | M7 Final + review response | Not started | |
@@ -96,16 +96,15 @@ identified coherence effect. **M3-B.** Platt improves proper scores/slope but no
 
 ## Key M4 result
 
-Under the fair support-blind protocol, acquisition-policy ordering is **broadly stable** to cost
-regime and disclosure rate (mean Kendall tau-b **+0.743**, min +0.467; `fixed_domain_order` wins 7
-of 8 conditions; only **1 of 7** within-protocol winner changes is statistically supported, and it
-is marginal). Rankings scatter only once the diagnostic availability oracle is introduced (27 of 34
-supported reversals are across-protocol). Classification **M4-B**, not M4-A.
+Review #4 repaired a result-invalidating batched fixed-order bug and reran M4. Under the fair
+support-blind protocol, `fixed_domain_order` now wins **8/8** conditions (mean Kendall tau-b
+**+0.776**, min +0.600), with **zero fair winner changes and zero supported fair reversals**.
+Classification **M4-C**, not M4-A/B.
 
-Honest negative result: the surrogate expected-information-gain policy **loses to trivial
-baselines**, disclosing 2.4 cells at a 95% failed-request rate versus 11.6 cells at 76% for the
-training-frequency random baseline. Knowing what would be informative is worth less than knowing
-what is usually available.
+In the primary condition, the surrogate expected-entropy-reduction heuristic discloses 2.428 new
+cells at a 94.59% zero-new-cell request rate versus 11.556 cells at 75.99% for the training-frequency
+random baseline. This is benchmark-specific descriptive evidence, not a general availability-versus-
+information claim.
 
 ## Superseded M3 gate note
 

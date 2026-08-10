@@ -14,6 +14,7 @@ import numpy as np
 import pytest
 
 from cliniverse.acquisition.catalogue import Panel, PanelCatalogue
+from cliniverse.acquisition.policies import RandomUniformBatch
 from cliniverse.data.cohort import Cohort
 from cliniverse.exceptions import BudgetError, ConfigError
 from twinbench.disclosure import DisclosureEngine, PolicyView, Protocol
@@ -188,6 +189,37 @@ class TestIndistinguishability:
             np.nan_to_num(v2.disclosed_values, nan=-1.0),
         )
         assert v1.requestable == v2.requestable
+
+    def test_support_blind_action_unchanged_when_hidden_support_changes(self) -> None:
+        """Identical visible states and RNG states must yield the same next action."""
+        values = np.ones((4, 4), dtype=np.float32)
+        rich = make_cohort(np.ones((4, 4)), values)
+        sparse_mask = np.ones((4, 4))
+        sparse_mask[0, 2] = 0
+        sparse = make_cohort(sparse_mask, values)
+        hidden_rich = np.zeros((4, 4), dtype=bool)
+        hidden_rich[0, 2] = True
+        hidden_sparse = np.zeros((4, 4), dtype=bool)
+
+        views = (
+            engine(rich, hidden_rich).view(),
+            engine(sparse, hidden_sparse).view(),
+        )
+        features = [
+            np.concatenate(
+                (
+                    np.nan_to_num(view.disclosed_values, nan=0.0).ravel(),
+                    view.disclosed_mask.astype(np.float64).ravel(),
+                )
+            )[None, :]
+            for view in views
+        ]
+        policies = (RandomUniformBatch(seed=17), RandomUniformBatch(seed=17))
+        choices = [
+            int(policy.score_batch(feature, view.requestable, step=0).argmax(axis=1)[0])
+            for policy, feature, view in zip(policies, features, views, strict=True)
+        ]
+        assert choices[0] == choices[1]
 
     def test_support_aware_deliberately_leaks_availability(self) -> None:
         """The support-aware protocol is *meant* to leak; that is what it models."""

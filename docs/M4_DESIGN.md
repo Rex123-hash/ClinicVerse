@@ -8,6 +8,13 @@ and the M4 contract in `ADVERSARIAL_REVIEW_3.md`.
 Nothing below — policies, budget grid, cost regimes, primary metric, ranking statistic, bootstrap
 protocol, success/null definitions — may be revised after inspecting comparative results.
 
+> **Review #4 audit note (2026-08-11).** This remains the historical predeclaration. The
+> artifact key `greedy_eig` is retained, but the implemented score is described after audit as a
+> **surrogate expected-entropy-reduction heuristic**, not true EIG. The original batched
+> `fixed_domain_order` implementation incorrectly reapplied its first priority instead of advancing
+> through this document's declared sequence; Review #4 repaired that implementation defect and
+> reran M4 without changing the sequence or any scientific choice below.
+
 ---
 
 ## 1. Central question
@@ -205,6 +212,11 @@ A rank reversal is only reported as *supported* when **both** hold:
 
 Otherwise the reversal is reported as **statistically unresolved**, in those words. A reversal
 arising from effectively tied policies swapping by numerical noise will be stated as such.
+
+> **Review #4 terminology correction.** The binding at-least-one-condition flag is retained in the
+> artifact as `predeclared_one_condition_evidence`. It is not, by itself, called a statistically
+> supported *reversal* when the other relevant paired interval includes zero. The stricter
+> `SUPPORTED REVERSAL` label requires both condition-specific paired intervals to exclude zero.
 
 ## 12. Statistics
 

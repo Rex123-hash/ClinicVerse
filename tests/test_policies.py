@@ -195,6 +195,32 @@ class TestReferencePolicies:
         assert np.all(scores[:, ACTIONS.index("beta")] > scores[:, ACTIONS.index("alpha")])
         assert np.all(scores[:, ACTIONS.index("gamma")] < scores[:, ACTIONS.index("alpha")])
 
+    def test_fixed_order_advances_once_per_patient(self) -> None:
+        policy = FixedOrderBatch(order=("beta", "alpha", "gamma"))
+        policy.reset_batch(2)
+        legal = np.ones((2, len(ACTIONS)), dtype=bool)
+
+        first = policy.constrain_legal(legal, ACTIONS)
+        second = policy.constrain_legal(legal, ACTIONS)
+        third = policy.constrain_legal(legal, ACTIONS)
+        exhausted = policy.constrain_legal(legal, ACTIONS)
+
+        assert np.all(first[:, ACTIONS.index("beta")])
+        assert np.all(second[:, ACTIONS.index("alpha")])
+        assert np.all(third[:, ACTIONS.index("gamma")])
+        assert not exhausted.any()
+
+    def test_fixed_order_skips_unavailable_or_unaffordable_action(self) -> None:
+        policy = FixedOrderBatch(order=("beta", "alpha", "gamma"))
+        policy.reset_batch(2)
+        legal = np.array([[True, False, True], [False, True, True]], dtype=bool)
+
+        chosen = policy.constrain_legal(legal, ACTIONS)
+
+        assert chosen[0, ACTIONS.index("alpha")]
+        assert chosen[1, ACTIONS.index("beta")]
+        assert chosen.sum() == 2
+
     def test_train_frequency_fits_from_training_mask_only(self) -> None:
         m = np.zeros((5, 4, 2), dtype=bool)
         m[:, :, 0] = True  # variable 0 measured everywhere
