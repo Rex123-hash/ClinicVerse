@@ -318,6 +318,130 @@ def paired_bootstrap_difference(
     )
 
 
+@dataclasses.dataclass(frozen=True, slots=True)
+class PairedMeanDifference:
+    """The mean of an already-paired per-patient difference, with an interval.
+
+    Kept distinct from :class:`PairedDifference` so that carrying a bootstrap
+    p-value and a configurable interval level here cannot change the schema of
+    the artifacts earlier milestones already emitted.
+    """
+
+    metric: str
+    name_a: str
+    name_b: str
+    difference: float
+    low: float
+    high: float
+    n_boot: int
+    excludes_zero: bool
+    p_value: float
+    percentiles: tuple[float, float]
+
+    def as_dict(self) -> dict[str, object]:
+        return {
+            "metric": self.metric,
+            "name_a": self.name_a,
+            "name_b": self.name_b,
+            "difference": self.difference,
+            "ci_low": self.low,
+            "ci_high": self.high,
+            "n_boot": self.n_boot,
+            "excludes_zero": self.excludes_zero,
+            "p_value": self.p_value,
+            "percentiles": list(self.percentiles),
+        }
+
+    def __str__(self) -> str:
+        verdict = "excludes 0" if self.excludes_zero else "includes 0"
+        return (
+            f"{self.metric}: {self.name_b} - {self.name_a} = "
+            f"{self.difference:+.5f} [{self.low:+.5f}, {self.high:+.5f}] ({verdict})"
+        )
+
+
+def per_patient_log_loss(y: FloatArray, p: FloatArray) -> FloatArray:
+    """Log loss for each patient. Its mean is :func:`negative_log_likelihood`."""
+    y, p = _validate(y, p)
+    q = np.clip(p, _EPS, 1 - _EPS)
+    return np.asarray(-(y * np.log(q) + (1.0 - y) * np.log1p(-q)), dtype=np.float64)
+
+
+def per_patient_squared_error(y: FloatArray, p: FloatArray) -> FloatArray:
+    """Squared error for each patient. Its mean is :func:`brier_score`."""
+    y, p = _validate(y, p)
+    return np.asarray((p - y) ** 2, dtype=np.float64)
+
+
+def paired_mean_difference_bootstrap(
+    y: FloatArray,
+    per_patient_difference: FloatArray,
+    *,
+    metric_name: str,
+    name_a: str,
+    name_b: str,
+    n_boot: int = 2000,
+    seed: int = 20260809,
+    percentiles: tuple[float, float] = (2.5, 97.5),
+) -> PairedMeanDifference:
+    """Bootstrap the mean of a per-patient difference that is already paired.
+
+    For metrics that are patient means — log loss and squared error —
+    differencing per patient and averaging on a resample is algebraically
+    identical to re-scoring both arms inside every replicate, and
+    ``tests/test_failure_search.py`` pins that equivalence against the general
+    :func:`paired_bootstrap_difference` path. It is used where the comparison arm
+    is an average over several control draws and so has no single prediction
+    vector to re-score.
+
+    Resamples come from the same :func:`_patient_resamples` draw as every other
+    paired comparison in the project, and single-class resamples are skipped on
+    the same rule, so intervals stay comparable across milestones.
+    """
+    y = np.asarray(y, dtype=np.float64).ravel()
+    difference = np.asarray(per_patient_difference, dtype=np.float64).ravel()
+    if y.shape != difference.shape:
+        raise ConfigError(
+            f"labels {y.shape} and differences {difference.shape} differ in shape"
+        )
+    if y.size == 0:
+        raise ConfigError("cannot bootstrap an empty comparison")
+    if not np.isfinite(difference).all():
+        raise ConfigError("per-patient differences contain non-finite values")
+    low_q, high_q = percentiles
+    if not 0.0 <= low_q < high_q <= 100.0:
+        raise ConfigError(f"percentiles must be ascending within [0, 100], got {percentiles}")
+
+    point = float(difference.mean())
+    draws = _patient_resamples(y.size, n_boot, seed)
+    replicates: list[float] = []
+    for idx in draws:
+        if len(np.unique(y[idx])) < 2:
+            continue
+        replicates.append(float(difference[idx].mean()))
+    if not replicates:
+        raise ConfigError("every bootstrap resample was single-class")
+
+    values = np.asarray(replicates, dtype=np.float64)
+    low, high = (float(v) for v in np.percentile(values, [low_q, high_q]))
+    # Two-sided bootstrap p-value: twice the smaller tail mass at zero. Carried
+    # so the secondary tests can enter a Holm family alongside the permutation
+    # test, which is defined on p-values rather than on intervals.
+    tail = min(float(np.mean(values <= 0.0)), float(np.mean(values >= 0.0)))
+    return PairedMeanDifference(
+        metric=metric_name,
+        name_a=name_a,
+        name_b=name_b,
+        difference=point,
+        low=low,
+        high=high,
+        n_boot=len(replicates),
+        excludes_zero=bool(low > 0.0 or high < 0.0),
+        p_value=float(min(1.0, 2.0 * tail)),
+        percentiles=(float(low_q), float(high_q)),
+    )
+
+
 METRIC_FUNCTIONS: dict[str, MetricFn] = {
     "auroc": auroc,
     "auprc": auprc,
