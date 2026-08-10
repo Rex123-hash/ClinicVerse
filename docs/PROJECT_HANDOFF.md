@@ -1,8 +1,15 @@
 # Cliniverse — Project Handoff
 
 **Written for a fresh assistant with zero conversation history.**
-**Date:** 2026-08-11 · **HEAD at handoff:** `ebb814ad0af1f1b5791b2c31373228dc3ddea686`
+**Date:** 2026-08-11 · **HEAD at handoff:** `848c9030aa3553d7ec977ec2f7cdde3bc7955b39`
 **Status:** M0–M4 complete. **M5 NOT STARTED and must be reconsidered before implementation.**
+
+> **Update 2026-08-11 (post adversarial repair #4).** This document was first written at `ebb814a`, when M4
+> was classified M4-B. Repair #4 then found a result-invalidating bug in the batched
+> `fixed_domain_order` policy and reran M4. **M4 is now M4-C — largely stable / null.** Every M4
+> number below is the repaired one. If you find an M4-B claim anywhere in this repository, it is
+> stale: `docs/ADVERSARIAL_REVIEW_4.md` and `experiments/acquisition/results/m4/results.json` are the
+> live truth.
 
 ---
 
@@ -160,7 +167,7 @@ DESCRIPTIVE ONLY** (this was an M2 finding). M3/M4 use the isolated design above
 | **M1** | TwinBench: disclosure engine, seeded masking, case manifests, episode runner. Hardened by adversarial repair #1. |
 | **M2** | Representation ablation (mask vs values vs both). Corrected by adversarial repair #2 after a real nested-preprocessing defect. |
 | **M3** | Calibration robustness under structured information loss. Reclassified **M3-B** by adversarial repair #3. |
-| **M4** | Acquisition-policy ranking stability. Classified **M4-B**. |
+| **M4** | Acquisition-policy ranking stability. Repaired by adversarial repair #4. Classified **M4-C**. |
 
 ### Verified commit SHAs
 
@@ -180,7 +187,9 @@ DESCRIPTIVE ONLY** (this was an M2 finding). M3/M4 use the isolated design above
 | `9357303` | M4 policy layer + leakage test |
 | `e2c905c` | M4 evaluator (2 real bugs fixed) |
 | `3528223` | degenerate-booster guard |
-| **`ebb814a`** | **M4 complete — HEAD at handoff** |
+| `ebb814a` | M4 complete as M4-B — **superseded** |
+| `abaeb44` | this handoff, first written at the M4-B state |
+| **`848c903`** | **adversarial repair #4: fixed-order bug fixed, M4 rerun, M4-C — HEAD at handoff** |
 
 ---
 
@@ -226,57 +235,73 @@ is **analyte identity**, not a separable coherence effect.
 proper scores and slope but does **not** remove intercept drift. Isotonic was worse **under this
 protocol only**. Demo record **142380**.
 
-### M4 — acquisition-policy ranking stability (**M4-B**)
+### M4 — acquisition-policy ranking stability (**M4-C**, repaired)
 
 Primary condition (n = 8,000, support_blind / shared_plus_marginal / mask 0.6), **AUNLLC lower better**:
 
 | rank | policy | AUNLLC |
 |---|---|---|
-| 1 | fixed_domain_order | 0.32071 |
-| 2 | random_train_frequency | 0.32095 |
-| 3 | random_uniform_all | 0.32366 |
-| 4 | greedy_eig | 0.32659 |
-| 5 | greedy_eig_per_cost | 0.32671 |
-| 6 | no_acquisition | 0.32696 |
+| 1 | fixed_domain_order | **0.319414** |
+| 2 | random_train_frequency | 0.320947 |
+| 3 | random_uniform_all | 0.323660 |
+| 4 | greedy_eig | 0.326586 |
+| 5 | greedy_eig_per_cost | 0.326713 |
+| 6 | no_acquisition | 0.326957 |
+
+Paired `fixed_domain_order − random_train_frequency` = **−0.001533**, patient-level 1,000-replicate
+percentile 95% CI **[−0.002814, −0.000251]**. The top two are statistically resolved.
 
 Ranking stability (16 conditions, n = 2,000 fixed paired subsample):
 
 | pair set | mean Kendall τ-b | min | supported reversals |
 |---|---|---|---|
-| **within support_blind (fair)** | **+0.743** | +0.467 | **1 of 7** |
-| within support_aware (oracle) | +0.524 | +0.067 | 6 of 23 |
-| across protocols | +0.512 | −0.067 | 27 of 41 |
+| **within support_blind (fair)** | **+0.776** | **+0.600** | **0 of 0 winner changes** |
+| all 120 condition pairs (incl. oracle) | +0.557 | −0.200 | 0 |
+
+`fixed_domain_order` wins **8 of 8** fair support-blind conditions. There are **zero** descriptive
+fair-protocol winner changes across the 28 fair pairs, therefore zero supported fair reversals.
+Repair #4 also tightened the label: `SUPPORTED REVERSAL` now requires **both** condition-specific
+paired intervals to exclude zero, not just one. The predeclared one-condition flag is retained in the
+artifact as `predeclared_one_condition_evidence` (25 across all pairs) for transparency only.
 
 ---
 
-## 8. M4-B classification, and why M4-A is NOT supported
+## 8. M4-C classification, and why M4-A and M4-B are NOT supported
 
-**M4-B — MODERATE ASSUMPTION SENSITIVITY.**
+**M4-C — LARGELY STABLE / NULL.**
 
-M4-A (strong ranking instability) would require statistically supported winner changes across
-*legitimate* benchmark assumptions. It is **not supported** because:
+Repair #4 found that `FixedOrderBatch.score_batch()` ignored step and history and returned the same
+static priority at every step. Under support-blind replay `fixed_domain_order` therefore repeatedly
+re-bought its first affordable group instead of advancing through the predeclared sequence,
+contradicting the tested `twinbench.episode.FixedOrder` and producing non-monotone budget curves.
+The repair added per-patient cursors. **No policy, order, mask rate, cost regime, budget, endpoint,
+seed, sample, model or bootstrap choice changed** — but because the defect changed the primary
+policy and the grid rankings, the entire run was necessarily repeated.
 
-1. Within the fair `support_blind` protocol, ordering is **stable**: mean τ-b **+0.743**,
-   `fixed_domain_order` wins **7 of 8** conditions.
-2. Only **1 of 7** within-protocol winner changes is statistically supported, and it is marginal —
-   one of its two paired intervals *includes zero* (`ordinal_tier|0.3` → `per_analyte|0.6`,
-   in A +0.00030 [−0.00173, +0.00242]; in B −0.00264 [−0.00516, −0.00016]).
-3. That single reversal changes **both** cost regime and disclosure rate simultaneously, so it
-   isolates neither axis.
-4. **27 of the 34 supported reversals are across-protocol** — they compare the fair protocol against
-   a **diagnostic availability oracle that is explicitly never deployable**. Instability that only
-   appears when a policy is handed an oracle is not evidence that benchmark design changes real
-   scientific conclusions.
+M4-A (strong ranking instability) and M4-B (moderate assumption sensitivity) are both **not
+supported** after the repair:
+
+1. Within the fair `support_blind` protocol, ordering is **stable**: mean τ-b **+0.776**, min
+   **+0.600**, `fixed_domain_order` wins **8 of 8** conditions.
+2. There are **zero** fair-protocol winner changes across all 28 fair condition pairs, so there is
+   nothing left for M4-B to rest on. The single marginal reversal that carried M4-B was eliminated
+   twice over: by the bug fix, and by the stricter both-intervals reversal definition.
+3. Every remaining descriptive winner change involves the **`support_aware` availability oracle**,
+   which is explicitly never deployable. Instability that only appears when a policy is handed an
+   oracle is not evidence that benchmark design changes real scientific conclusions.
+4. Across all 120 condition pairs, `n_supported_reversals` is **0**.
 
 ### Exact M4 headline (use this wording)
 
 > Under support-blind retrospective disclosure replay on PhysioNet 2012, acquisition-policy ordering
-> is largely stable to cost-regime and disclosure-rate assumptions (mean Kendall τ-b +0.743 within
-> the fair protocol, one marginal supported winner change out of 28 pairs), but becomes unstable
-> when policies are scored against a historical-availability oracle (27 supported winner changes
-> across protocols). A surrogate expected-information-gain policy is beaten by a training-frequency
-> random baseline and by a fixed domain-motivated ordering, because it spends 95% of its requests on
-> information that is not available to disclose.
+> is stable to cost-regime and disclosure-rate assumptions: a fixed domain-motivated sequence ranks
+> first in all eight predeclared fair conditions, mean Kendall τ-b +0.776, with no fair winner
+> changes and no supported reversals. In the primary condition a surrogate expected-entropy-reduction
+> heuristic has a much higher zero-new-cell request rate (94.59%) than a training-frequency random
+> baseline (75.99%), disclosing 2.428 versus 11.556 new cells per patient.
+
+That second sentence is **benchmark-specific and descriptive**. It does not establish that
+availability is generally more valuable than information utility, and must never be written that way.
 
 ---
 
@@ -284,22 +309,30 @@ M4-A (strong ranking instability) would require statistically supported winner c
 
 At β = 1.0 in the primary condition:
 
-| policy | mean cells disclosed | failed-request rate | mean requests |
-|---|---|---|---|
-| **greedy_eig (surrogate)** | **2.4** | **0.95** | 9.5 |
-| greedy_eig_per_cost | 2.3 | 0.95 | 9.5 |
-| **random_train_frequency** | **11.6** | **0.76** | 8.3 |
-| random_uniform_all | 8.8 | 0.80 | 9.7 |
-| fixed_domain_order | 5.1 | 0.91 | 7.0 |
+| policy | mean cells disclosed | failed-request rate | mean requests | spend |
+|---|---|---|---|---|
+| **greedy_eig (surrogate)** | **2.428** | **94.59%** | 9.482 | 11.899 |
+| greedy_eig_per_cost | 2.338 | 94.66% | 9.530 | 11.900 |
+| **random_train_frequency** | **11.556** | **75.99%** | 8.348 | 11.898 |
+| random_uniform_all | 8.783 | 80.21% | 9.662 | 11.839 |
+| fixed_domain_order | 13.946 | 69.87% | 10.000 | 12.300 |
+
+The `fixed_domain_order` row is the **repaired** one. Before repair #4 that policy re-bought its
+first affordable group and appeared to disclose only ~5.1 cells at a 0.91 failure rate; corrected, it
+discloses the most information of any policy, which is consistent with it also winning the ranking.
+
+A failure is one paid action returning exactly **zero newly disclosed cells**. The denominator is
+requests, not patients. A partially successful group counts as successful.
 
 The surrogate EIG scores a group by how much its *simulated* completion would move the prediction,
 which systematically favours rarely-measured, high-leverage analytes — exactly the ones least
 likely to have hidden data available. Under support-blind replay it therefore burns most of its
 budget on empty requests.
 
-**Knowing what would be informative is worth less than knowing what is usually available.**
+**In this benchmark condition, knowing what would be informative bought less disclosure than knowing
+what is usually available.** State it as a benchmark observation, never as a general law.
 
-Note: failure rates are 76–95% for *every* policy. Acquisition headroom is genuinely small (at mask
+Note: failure rates are 70–95% for *every* policy. Acquisition headroom is genuinely small (at mask
 0.6 the `group_hours` mechanism leaves only ~12% of cells hidden by the final boundary). This was
 retained as a result and **deliberately not engineered away**.
 
@@ -321,6 +354,9 @@ retained as a result and **deliberately not engineered away**.
 | M3-A: "structure of loss causes excess degradation beyond amount" | **SUPERSEDED by M3-B.** Variable-matched control is mask-identical; ΔNLL exactly 0.0000. |
 | "Calibration is perfect" (mask-only slope 1.000) | **SUPERSEDED.** Descriptive same-label regression only; fold slopes range 0.884–1.168. |
 | M4-A strong ranking instability | **NOT SUPPORTED.** See §8. |
+| M4-B moderate assumption sensitivity | **SUPERSEDED by M4-C** after repair #4. Zero fair winner changes remain. |
+| Pre-repair M4 figures: fixed-order AUNLLC 0.32071, fair τ-b +0.743, 7/8 wins, 1 of 7 supported reversals | **SUPERSEDED.** Repaired: 0.319414, +0.776, 8/8, 0. Produced by the `FixedOrderBatch` static-priority bug. |
+| Pre-repair `fixed_domain_order` spend figures (5.1 cells, 0.91 failure) | **SUPERSEDED.** Repaired: 13.946 cells, 69.87% failure. |
 | E-003's "10.89 vs 0.62 / ~17× random collapse" | **SUPERSEDED.** Correct repaired figures: support-oracle random 11.33; support-blind uniform-all 4.58; support-blind training-frequency 7.32. |
 
 ---
@@ -403,18 +439,28 @@ independently recomputable from raw predictions; superseded claims retracted in 
 quietly dropped.
 
 Weakness: the three completed results are a **dominance result** (M2: values dominate), a
-**calibration-drift result** (M3-B), and a **stability result** (M4-B). None is a single striking
-failure a judge grasps in 20 seconds. The most novel finding is the EIG availability failure (§9),
-but it is a single-dataset negative result.
+**calibration-drift result** (M3-B), and a **null stability result** (M4-C). None is a single
+striking failure a judge grasps in 20 seconds. The most novel finding is the EIG availability
+failure (§9), but it is a single-dataset negative result.
 
 **BEST OVERALL KILLER RESULT: NO.**
 
 ---
 
-## 15. M5 — NOT STARTED. Candidate directions only.
+## 15. M5 — direction selected. See `docs/M5_DESIGN.md`.
 
-**None of the following is implemented. All require literature review and feasibility assessment
-before any commitment. Do not treat these as planned features.**
+> **Update 2026-08-11.** The literature review and feasibility assessment called for below were
+> carried out, and **CANDIDATE DIRECTION A was selected and approved**. It is predeclared in
+> `docs/M5_DESIGN.md` as **M5-A — Discrimination-Silent Reliability Failure Search**. Directions B
+> and C were considered and **not** selected: B's motivating problem (the 94.59% failed-request rate)
+> is an artifact of retrospective replay rather than of deployment, and its winning fix is already
+> implemented as the `random_train_frequency` baseline; C is well covered by existing selective-
+> prediction and conformal-under-missingness work, and M4 shows the recovery arm has little headroom.
+> Useful parts of C survive inside M5-A's recovery arm. The candidate text below is retained
+> unedited as the historical statement of the options.
+
+**None of the following was implemented at the time of writing. All required literature review and
+feasibility assessment before any commitment. Do not treat these as planned features.**
 
 ### CANDIDATE DIRECTION A — Automated adversarial reliability/failure search
 Search over information-loss configurations for settings that **maximise probability/calibration
