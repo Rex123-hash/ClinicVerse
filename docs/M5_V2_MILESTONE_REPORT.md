@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-11
 **Design:** predeclared in [`M5_V2_DESIGN.md`](M5_V2_DESIGN.md) at commit `5562120`, before any v2 code ran
-**Implementation:** `1de9feb` · **Artifact provenance:** `git_sha=1de9feb`, `git_dirty=false`
+**Implementation:** `1de9feb`, repaired at `91262fd` · **Artifact provenance:** `git_sha=91262fd`, `git_dirty=false`
 **Verdict:** **v2-STABLE — all four gates pass**
 **Status:** A+B development phase complete. **Set C not loaded.** No confirmatory claim is made here.
 
@@ -19,7 +19,7 @@ M5-v1 is untouched and remains **M5-C**.
 | **G1 — null-control sanity** | **PASS** | frozen pattern is in the target region; **zero** null-control patterns selected in 20 resplits |
 | **G2 — majority stability** | **PASS (at the minimum)** | `Pi = 0.55`, exactly **11/20**, threshold 11 |
 | **G3 — discrimination-silent** | **PASS** | reference-run AUROC drop **+0.01572** ≤ delta 0.02 |
-| **G4 — detectability** | **PASS** | MDE **+0.00804** ≤ out-of-selection effect **+0.01212** |
+| **G4 — detectability** | **PASS** | MDE **+0.00804** ≤ out-of-selection development estimate **+0.01201** |
 
 All 141 candidates enumerated, 20 resplits, R = 5 amount-matched controls, n = 8,000 sets a+b.
 
@@ -48,23 +48,25 @@ selection-frequency table:
 Every selection in every resplit contained `BUN`. The instability is entirely about *which
 companions* join it, not about the core.
 
-## 3. The winner's curse was largely removed — the methodological headline
+## 3. Apparent shrinkage under the stability-aware procedure
 
 | | M5-v1 | M5-v2 |
 |---|---:|---:|
 | selection rule | maximise pooled discovery excess | 1-SE parsimony on per-fold means |
-| shrinkage from selection to honest estimate | **58%** | **12.1%** |
+| apparent shrinkage | **58%** | **12.9%** |
 | naive estimate | +0.01385 | +0.01379 |
-| honest estimate | +0.00587 (confirmation) | +0.01212 (out-of-selection) |
+| held-out estimate | +0.00587 (confirmation) | +0.01201 (out-of-selection procedure) |
 
-v1's rank-1 pick lost 58% of its apparent effect when moved to unseen patients. v2's frozen pattern
-loses **12.1%** under nested out-of-selection re-selection. The stability-aware rule did the job it
-was designed for.
+The two columns are not like-for-like estimands: v1 evaluates one discovery winner on a separate
+development partition, whereas v2 repeatedly re-selects a pattern on four folds and evaluates the
+selected procedure on the fifth. Apparent shrinkage was substantially smaller under the v2
+stability-aware development procedure than under v1's naive selection procedure; the percentages
+must not be interpreted as an exact quantitative reduction in selection bias.
 
-Supporting evidence: across all 100 (resplit, held-out fold) pairs, the out-of-selection excess was
-**positive in 100/100**, mean +0.01212, range +0.00025 to +0.02360. The patterns chosen during
-nested re-selection were `BUN+Glucose+Na` 34/100, `BUN+Glucose` 26/100, `BUN` 10/100, `BUN+Mg` 5/100,
-`BUN+Glucose+Mg` 5/100 — **all containing `BUN`**.
+Across all 100 (resplit, held-out fold) pairs, the out-of-selection excess was positive in **99/100**,
+mean +0.01201, range -0.00244 to +0.02379. The most common nested selections were
+`BUN+Glucose+Na` 32/100, `BUN+Glucose` 24/100, `BUN` 11/100 and `BUN+Mg` 6/100. Every selected
+pattern contained `BUN`; exact companion membership remained variable.
 
 ## 4. What the frozen pattern does
 
@@ -87,7 +89,7 @@ Against a development prevalence of 14.03%, mean predicted risk falls to 10.7%. 
 mortality risk.** This is the M3-B signature reproduced from **three analytes and roughly six cells
 per patient**, rather than from a seven-analyte panel.
 
-## 5. `BUN` carries the effect; `Glucose` and `Na` amplify it superadditively
+## 5. `BUN` carries most of the development signal
 
 Single-analyte development excesses on the reference run:
 
@@ -106,17 +108,17 @@ Single-analyte development excesses on the reference run:
 alone are indistinguishable from the null controls (−0.00026 and −0.00011). Yet together with `BUN`
 they reach +0.01379, against an additive prediction of +0.00984.
 
-**That is a superadditive interaction, and it is qualitatively different from the M5-v1 pathology.**
-In v1 the appended analytes (`TroponinI`, `Cholesterol`) were near-empty — severities 0.002 and
-0.003 — and contributed nothing. Here `Glucose` and `Na` are routinely measured (severity 0.057 and
-0.059 each) and materially change the outcome. The parsimony rule kept them because they earned
-their place, and rejected `HCO3`, `Mg`, `Creatinine` and `K`, which did not.
+This arithmetic does not establish a statistical interaction or a valid additive decomposition,
+because candidate and control losses share fitted models, patients and amount-matched random draws.
+The supported statement is narrower: **Glucose and Na provide additional development-stage damage
+when combined with BUN despite weak singleton excesses.** In v1 the appended analytes
+(`TroponinI`, `Cholesterol`) were near-empty; here `Glucose` and `Na` are routinely measured
+(severity 0.057 and 0.059 each). Exact three-analyte membership remains provisional at 11/20.
 
-Descriptively, the three-analyte core also does **more** damage than the full seven-analyte panel did
-in v1 (+0.01212 out-of-selection here versus +0.00713 confirmation there). Withholding fewer, better
-chosen analytes hurts probability reliability more than withholding the whole panel. Both figures are
-development or single-holdout estimates on different patient sets and are **not** a like-for-like
-comparison.
+Descriptively, the v2 procedure estimate is numerically larger than the full seven-analyte panel's v1
+confirmation estimate (+0.01201 versus +0.00713). These are different estimands on different
+development partitions and do not support the claim that withholding fewer analytes is intrinsically
+more damaging.
 
 ## 6. The null-control sanity gate did real work
 
@@ -133,15 +135,15 @@ frozen pattern will replicate on unseen data.
 **`M5_V2_DESIGN.md` §7 predicted G4 was "more likely to fail than to pass."** It passed. The
 prediction assumed the minimal core would carry an effect similar to full `BMP_like` (about +0.007),
 which would have sat below the MDE. It did not: the sharper pattern concentrates more damage
-(+0.01212), which is precisely the escape route the design named but declined to bank on. The
+(+0.01201), which is precisely the escape route the design named but declined to bank on. The
 variance prediction was accurate — design estimated `sigma_Delta ≈ 0.21`, measured **0.2046**, giving
 MDE **+0.00804** against a predicted ≈0.008.
 
-**The AUROC constraint did not bite in v2.** All **141/141** candidates were eligible at delta = 0.02
-(maximum drop +0.0182, median +0.0029). In v1 roughly half the space was excluded. G3 passed, but
-within this smaller, hypothesis-driven space the constraint excluded nothing and therefore did less
-work than it did in v1. G3 should be read as a property the frozen pattern happens to satisfy, not as
-a filter that shaped the selection.
+On the **reference resplit only**, all **141/141** candidates were eligible at delta = 0.02 (maximum
+drop +0.0182, median +0.0029). Across all 20 resplits, eligibility ranged from 121 to 141 candidates,
+and the constraint changed the top-level choice in 2 resplits compared with unrestricted selection.
+It therefore did bite during v2, although the frozen pattern and its net 11/20 count were unchanged.
+G3 is both a property of the frozen reference result and an active predeclared search constraint.
 
 ## 8. Limitations
 
@@ -161,8 +163,8 @@ a filter that shaped the selection.
 - **The finding is not biologically surprising.** That withholding blood urea nitrogen degrades
   mortality-risk calibration will not astonish a clinician. The contribution is the **procedure** —
   stability-aware, parsimony-constrained, amount-matched, out-of-selection-calibrated — which found
-  it automatically, separated it from null controls, and quantified its own selection bias at 12%
-  before any holdout was spent.
+  it automatically, separated it from null controls, and produced an out-of-selection development
+  estimate before the final holdout test.
 - No causal, deployment-utility, clinical-validation or clinician-intent claim.
 
 ## 9. Reproduce
@@ -174,8 +176,9 @@ python experiments/robustness/m5_v2_stability_search.py
 Artifacts in `experiments/robustness/results/m5v2/`: `results.json` (full reference-run table for all
 141 candidates, the per-resplit selections, the selection-frequency table, all 100 out-of-selection
 components, detectability and the gate verdicts), `frozen_pattern.json`, and `m5v2_tables.npz` (the
-full 141 x 20 x 5 delta table, candidate and clean AUROC, and the reference-run per-patient
-differences for the frozen pattern).
+full 141 x 20 x 5 delta table, top-level and nested AUROC tables, candidate identities, fold
+assignments, reference-run predictions for all candidates, and reference-run per-patient differences
+for the frozen pattern).
 
 ## 10. Decision and what is not done
 

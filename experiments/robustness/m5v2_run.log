@@ -1,26 +1,26 @@
-﻿2026-08-11T07:17:05.711754Z [info     ] parsing set                    n_records=4000 set=a
-2026-08-11T07:17:12.103969Z [info     ] parsing set                    n_records=4000 set=b
-2026-08-11T07:17:19.460515Z [info     ] cohort loaded                  degenerate_records=9 grid_occupancy=0.2027660472972973 missing_fraction=0.7972339527027027 n_hours=48 n_patients=8000 n_variables=37 observed_cells=2880900 sets=('a', 'b')
-2026-08-11T07:17:19.495773Z [info     ] cohort                         n=8000 prevalence=0.14025
-2026-08-11T07:20:08.544128Z [info     ] resplits fitted                n=20 seconds=169.1
-2026-08-11T07:20:09.682296Z [info     ] clean reference                reference_auroc=0.827 reference_nll=0.3151
-2026-08-11T07:20:09.682296Z [info     ] candidates                     n=141
-2026-08-11T07:21:43.494441Z [info     ] scoring progress               done=10 eta_seconds=1229.0 seconds=93.8 total=141
-2026-08-11T07:23:25.175640Z [info     ] scoring progress               done=20 eta_seconds=1182.8 seconds=195.5 total=141
-2026-08-11T07:24:49.679459Z [info     ] scoring progress               done=30 eta_seconds=1036.0 seconds=280.0 total=141
-2026-08-11T07:25:53.621668Z [info     ] scoring progress               done=40 eta_seconds=868.5 seconds=343.9 total=141
-2026-08-11T07:26:57.332923Z [info     ] scoring progress               done=50 eta_seconds=741.9 seconds=407.7 total=141
-2026-08-11T07:28:01.157342Z [info     ] scoring progress               done=60 eta_seconds=636.5 seconds=471.5 total=141
-2026-08-11T07:29:05.072294Z [info     ] scoring progress               done=70 eta_seconds=543.0 seconds=535.4 total=141
-2026-08-11T07:30:09.355156Z [info     ] scoring progress               done=80 eta_seconds=457.3 seconds=599.7 total=141
-2026-08-11T07:31:19.173156Z [info     ] scoring progress               done=90 eta_seconds=379.4 seconds=669.5 total=141
-2026-08-11T07:35:55.590623Z [info     ] scoring progress               done=100 eta_seconds=387.8 seconds=945.9 total=141
-2026-08-11T07:37:18.137903Z [info     ] scoring progress               done=110 eta_seconds=289.8 seconds=1028.5 total=141
-2026-08-11T07:38:39.779002Z [info     ] scoring progress               done=120 eta_seconds=194.3 seconds=1110.1 total=141
-2026-08-11T07:40:11.860712Z [info     ] scoring progress               done=130 eta_seconds=101.7 seconds=1202.2 total=141
-2026-08-11T07:41:40.411461Z [info     ] scoring progress               done=140 eta_seconds=9.2 seconds=1290.7 total=141
-2026-08-11T07:41:49.370838Z [info     ] scoring progress               done=141 eta_seconds=0.0 seconds=1299.7 total=141
-2026-08-11T07:41:49.442923Z [info     ] frozen pattern                 pattern=['BUN', 'Glucose', 'Na'] pi=0.55
+2026-08-11T08:06:02.956831Z [info     ] parsing set                    n_records=4000 set=a
+2026-08-11T08:06:07.320930Z [info     ] parsing set                    n_records=4000 set=b
+2026-08-11T08:06:11.715221Z [info     ] cohort loaded                  degenerate_records=9 grid_occupancy=0.2027660472972973 missing_fraction=0.7972339527027027 n_hours=48 n_patients=8000 n_variables=37 observed_cells=2880900 sets=('a', 'b')
+2026-08-11T08:06:11.742464Z [info     ] cohort                         n=8000 prevalence=0.14025
+2026-08-11T08:07:34.181562Z [info     ] resplits fitted                n=20 seconds=82.4
+2026-08-11T08:07:34.996293Z [info     ] clean reference                reference_auroc=0.827 reference_nll=0.3151
+2026-08-11T08:07:34.996293Z [info     ] candidates                     n=141
+2026-08-11T08:08:40.768309Z [info     ] scoring progress               done=10 eta_seconds=859.2 seconds=65.6 total=141
+2026-08-11T08:09:46.478246Z [info     ] scoring progress               done=20 eta_seconds=794.4 seconds=131.3 total=141
+2026-08-11T08:10:53.330929Z [info     ] scoring progress               done=30 eta_seconds=733.2 seconds=198.2 total=141
+2026-08-11T08:11:59.184547Z [info     ] scoring progress               done=40 eta_seconds=666.6 seconds=264.0 total=141
+2026-08-11T08:13:05.335076Z [info     ] scoring progress               done=50 eta_seconds=600.9 seconds=330.2 total=141
+2026-08-11T08:14:11.127594Z [info     ] scoring progress               done=60 eta_seconds=534.5 seconds=395.9 total=141
+2026-08-11T08:15:17.919008Z [info     ] scoring progress               done=70 eta_seconds=469.3 seconds=462.7 total=141
+2026-08-11T08:16:24.122713Z [info     ] scoring progress               done=80 eta_seconds=403.3 seconds=528.9 total=141
+2026-08-11T08:17:30.336162Z [info     ] scoring progress               done=90 eta_seconds=337.3 seconds=595.2 total=141
+2026-08-11T08:18:36.502995Z [info     ] scoring progress               done=100 eta_seconds=271.1 seconds=661.3 total=141
+2026-08-11T08:19:43.256776Z [info     ] scoring progress               done=110 eta_seconds=205.2 seconds=728.1 total=141
+2026-08-11T08:21:01.765757Z [info     ] scoring progress               done=120 eta_seconds=141.2 seconds=806.6 total=141
+2026-08-11T08:22:08.186086Z [info     ] scoring progress               done=130 eta_seconds=73.9 seconds=873.0 total=141
+2026-08-11T08:23:12.525354Z [info     ] scoring progress               done=140 eta_seconds=6.7 seconds=937.3 total=141
+2026-08-11T08:23:19.045201Z [info     ] scoring progress               done=141 eta_seconds=0.0 seconds=943.9 total=141
+2026-08-11T08:23:19.092435Z [info     ] frozen pattern                 pattern=['BUN', 'Glucose', 'Na'] pi=0.55
 
 ================================================================================================
 M5-v2 — STABILITY-AWARE ADVERSARIAL FAILURE SEARCH (A+B DEVELOPMENT ONLY)
@@ -31,22 +31,23 @@ frozen pattern: BUN+Glucose+Na  [target]
 SELECTION FREQUENCY (top 8):
   pi=0.55  BUN+Glucose+Na                               [target]
   pi=0.20  BUN+Glucose                                  [target]
-  pi=0.05  BUN+Glucose+Mg                               [target]
-  pi=0.05  BUN+Glucose+HCO3                             [target]
   pi=0.05  BUN                                          [target]
+  pi=0.05  BUN+Glucose+HCO3                             [target]
+  pi=0.05  BUN+Glucose+Mg                               [target]
   pi=0.05  BUN+Glucose+HCO3+Mg                          [target]
   pi=0.05  BUN+Glucose+HCO3+Na                          [target]
+  pi=0.00  Creatinine                                   [target]
 
 DEVELOPMENT ESTIMATES (not confirmatory, no intervals):
   naive mean excess NLL          +0.01379
-  out-of-selection excess NLL    +0.01212
-  shrinkage                      12.1%
+  out-of-selection excess NLL    +0.01201
+  shrinkage                      12.9%
   reference-run AUROC drop       +0.01572
 
 SET-C DETECTABILITY (set-c NOT loaded):
   sigma_delta (reference run)    0.20462
   MDE at n=4000, 1-sided 5%, 80% +0.00804
-  out-of-selection effect        +0.01212
+  out-of-selection effect        +0.01201
 
 GATES:
   G1 null-control sanity : PASS
@@ -57,4 +58,4 @@ GATES:
 VERDICT: v2-STABLE
 set-c: LOCKED — not loaded, not scored, not referenced by any statistic here
 
-wrote <local scratch path redacted>/m5v2_run/results.json
+wrote <local scratch path redacted>/results/results.json

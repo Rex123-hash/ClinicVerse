@@ -134,13 +134,15 @@ every resplit contained `BUN`.
 
 On the reference run, withholding it moves AUROC only 0.8270 -> 0.8113 while the calibration
 intercept moves -0.010 -> **+0.488** and mean predicted risk falls 0.1397 -> **0.1067** against 14.03%
-prevalence, from about six removed cells per patient. `BUN` alone gives 74% of the effect;
-`Glucose` and `Na` are individually null yet superadditive with it.
+prevalence, from about six removed cells per patient. `BUN` alone accounts for most of the
+development excess; `Glucose` and `Na` add development-stage damage in combination despite weak
+singleton excesses. This arithmetic does not establish an interaction.
 
-Methodologically the point of v2: selection shrinkage fell from **58%** in v1 to **12.1%**. All 100
-out-of-selection estimates were positive. Detectability projects MDE +0.00804 against an
-out-of-selection effect of +0.01212, so the design's predeclared expectation that G4 would likely
-fail was **wrong**, and the report says so.
+After repairing held-out-fold leakage in nested AUROC eligibility, apparent shrinkage is **12.9%**
+under v2 versus 58% under v1's non-comparable naive procedure. **99/100** out-of-selection estimates
+were positive. Detectability projects MDE +0.00804 against an out-of-selection development estimate
+of +0.01201, so G4 still passes. The exact percentages are not a like-for-like estimate of bias
+reduction.
 
 ## Superseded M3 gate note
 

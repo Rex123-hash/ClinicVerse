@@ -26,7 +26,7 @@
   "detectability": {
     "alpha_one_sided": 0.05,
     "minimum_detectable_effect": 0.00804441345228621,
-    "out_of_selection_delta": 0.012120478724049692,
+    "out_of_selection_delta": 0.012013168205102115,
     "passes": true,
     "power": 0.8,
     "set_c_n": 4000,
@@ -34,11 +34,33 @@
   },
   "development_estimates": {
     "naive_mean_delta": 0.01378706584739147,
-    "out_of_selection_delta": 0.012120478724049692,
+    "out_of_selection_delta": 0.012013168205102115,
     "reference_auroc_drop": 0.015721352380863585,
-    "shrinkage_fraction": 0.12088047897857102,
+    "shrinkage_fraction": 0.12866389860791005,
     "sigma_delta_reference_run": 0.20461633739548665
   },
+  "eligibility_count_by_resplit": [
+    141,
+    138,
+    140,
+    141,
+    141,
+    141,
+    141,
+    140,
+    141,
+    141,
+    141,
+    137,
+    138,
+    141,
+    130,
+    141,
+    140,
+    121,
+    141,
+    140
+  ],
   "frozen_pattern": [
     "BUN",
     "Glucose",
@@ -64,7 +86,7 @@
       "passes": true
     },
     "G4_detectability": {
-      "delta_oos": 0.012120478724049692,
+      "delta_oos": 0.012013168205102115,
       "mde": 0.00804441345228621,
       "passes": true
     }
@@ -129,22 +151,22 @@
       ]
     },
     {
-      "delta_on_held_out_fold": 0.012609830485143171,
+      "delta_on_held_out_fold": 0.012933399787672495,
       "held_out_fold": 1,
       "resplit": 1,
       "selected": [
         "BUN",
+        "Creatinine",
         "Glucose",
         "Na"
       ]
     },
     {
-      "delta_on_held_out_fold": 0.012330406225400839,
+      "delta_on_held_out_fold": 0.010183262576525617,
       "held_out_fold": 2,
       "resplit": 1,
       "selected": [
-        "BUN",
-        "Glucose"
+        "BUN"
       ]
     },
     {
@@ -225,13 +247,12 @@
       ]
     },
     {
-      "delta_on_held_out_fold": 0.016339952524333748,
+      "delta_on_held_out_fold": 0.011781057110815996,
       "held_out_fold": 1,
       "resplit": 3,
       "selected": [
         "BUN",
-        "Glucose",
-        "Na"
+        "Glucose"
       ]
     },
     {
@@ -486,11 +507,12 @@
       ]
     },
     {
-      "delta_on_held_out_fold": 0.0010092779416468669,
+      "delta_on_held_out_fold": -0.002439086624919069,
       "held_out_fold": 3,
       "resplit": 8,
       "selected": [
-        "BUN"
+        "BUN",
+        "Creatinine"
       ]
     },
     {
@@ -598,42 +620,39 @@
       ]
     },
     {
-      "delta_on_held_out_fold": 0.009109314731087568,
+      "delta_on_held_out_fold": 0.009407486215611023,
       "held_out_fold": 0,
       "resplit": 11,
       "selected": [
-        "BUN",
-        "Glucose",
-        "Na"
+        "BUN"
       ]
     },
     {
-      "delta_on_held_out_fold": 0.012403128424251593,
+      "delta_on_held_out_fold": 0.0115794112481139,
       "held_out_fold": 1,
       "resplit": 11,
       "selected": [
         "BUN",
         "Glucose",
-        "Na"
-      ]
-    },
-    {
-      "delta_on_held_out_fold": 0.010866429461782234,
-      "held_out_fold": 2,
-      "resplit": 11,
-      "selected": [
-        "BUN",
         "Mg",
         "Na"
       ]
     },
     {
-      "delta_on_held_out_fold": 0.020939182064710345,
+      "delta_on_held_out_fold": 0.008459960578252589,
+      "held_out_fold": 2,
+      "resplit": 11,
+      "selected": [
+        "BUN",
+        "Mg"
+      ]
+    },
+    {
+      "delta_on_held_out_fold": 0.017566060566392528,
       "held_out_fold": 3,
       "resplit": 11,
       "selected": [
         "BUN",
-        "Glucose",
         "Mg",
         "Na"
       ]
@@ -667,12 +686,13 @@
       ]
     },
     {
-      "delta_on_held_out_fold": 0.003964921178285456,
+      "delta_on_held_out_fold": 0.004864893209963185,
       "held_out_fold": 2,
       "resplit": 12,
       "selected": [
         "BUN",
-        "Glucose"
+        "Glucose",
+        "Na"
       ]
     },
     {
@@ -863,13 +883,12 @@
       ]
     },
     {
-      "delta_on_held_out_fold": 0.010637857591795434,
+      "delta_on_held_out_fold": 0.009277916619960622,
       "held_out_fold": 3,
       "resplit": 16,
       "selected": [
         "BUN",
-        "Glucose",
-        "Mg"
+        "Glucose"
       ]
     },
     {
@@ -883,12 +902,13 @@
       ]
     },
     {
-      "delta_on_held_out_fold": 0.01038289140396609,
+      "delta_on_held_out_fold": 0.009607229479394836,
       "held_out_fold": 0,
       "resplit": 17,
       "selected": [
         "BUN",
-        "Glucose"
+        "Glucose",
+        "Na"
       ]
     },
     {
@@ -902,8 +922,17 @@
       ]
     },
     {
-      "delta_on_held_out_fold": 0.013181644422109855,
+      "delta_on_held_out_fold": 0.01433497289593515,
       "held_out_fold": 2,
+      "resplit": 17,
+      "selected": [
+        "BUN",
+        "Glucose"
+      ]
+    },
+    {
+      "delta_on_held_out_fold": 0.023789761660853052,
+      "held_out_fold": 3,
       "resplit": 17,
       "selected": [
         "BUN",
@@ -912,21 +941,12 @@
       ]
     },
     {
-      "delta_on_held_out_fold": 0.018105015882345997,
-      "held_out_fold": 3,
-      "resplit": 17,
-      "selected": [
-        "BUN",
-        "Glucose"
-      ]
-    },
-    {
-      "delta_on_held_out_fold": 0.0065483176535036484,
+      "delta_on_held_out_fold": 0.005186389056485172,
       "held_out_fold": 4,
       "resplit": 17,
       "selected": [
         "BUN",
-        "Glucose"
+        "Creatinine"
       ]
     },
     {
@@ -941,11 +961,12 @@
       ]
     },
     {
-      "delta_on_held_out_fold": 0.01433257300600805,
+      "delta_on_held_out_fold": 0.015422700042449935,
       "held_out_fold": 1,
       "resplit": 18,
       "selected": [
         "BUN",
+        "Glucose",
         "HCO3",
         "Mg",
         "Na"
@@ -973,13 +994,12 @@
       ]
     },
     {
-      "delta_on_held_out_fold": 0.013931390076056793,
+      "delta_on_held_out_fold": 0.014005666754162925,
       "held_out_fold": 4,
       "resplit": 18,
       "selected": [
         "BUN",
         "HCO3",
-        "Mg",
         "Na"
       ]
     },
@@ -1041,6 +1061,28 @@
     ],
     "reference_resplit": 0,
     "reference_seed": 20260809,
+    "resplit_seeds": [
+      20260809,
+      20260810,
+      20260811,
+      20260812,
+      20260813,
+      20260814,
+      20260815,
+      20260816,
+      20260817,
+      20260818,
+      20260819,
+      20260820,
+      20260821,
+      20260822,
+      20260823,
+      20260824,
+      20260825,
+      20260826,
+      20260827,
+      20260828
+    ],
     "selection_rule": "1-SE parsimony on mean fold excess NLL",
     "set_c_n": 4000,
     "target_group": "BMP_like"
@@ -1053,7 +1095,7 @@
       "c"
     ],
     "git_dirty": false,
-    "git_sha": "1de9feb9d832257abe9e40732ab31e3682d12c1c",
+    "git_sha": "91262fd5c53c56665a042d11225abdc7b5c85777",
     "n_patients": 8000,
     "package_versions": {
       "numpy": "2.5.2",
@@ -1075,6 +1117,7 @@
       "brier": 0.09953434642227786,
       "calibration_intercept": 0.26832323056901397,
       "calibration_slope": 1.0327810913040627,
+      "candidate_index": 0,
       "fold_dispersion": 0.001287450812908499,
       "mean_delta": 0.01020798038657416,
       "mean_predicted_risk": 0.1201886901954633,
@@ -1093,6 +1136,7 @@
       "brier": 0.09739460078348201,
       "calibration_intercept": -0.10349224014659202,
       "calibration_slope": 0.9550724119591947,
+      "candidate_index": 1,
       "fold_dispersion": 0.0005069470864672295,
       "mean_delta": 0.0016822511653650275,
       "mean_predicted_risk": 0.1445142915546295,
@@ -1111,6 +1155,7 @@
       "brier": 0.09685741217463027,
       "calibration_intercept": 0.11421291499741877,
       "calibration_slope": 1.0052155251277488,
+      "candidate_index": 2,
       "fold_dispersion": 0.0010546656007618792,
       "mean_delta": -0.000260981145951354,
       "mean_predicted_risk": 0.13033473768212248,
@@ -1129,6 +1174,7 @@
       "brier": 0.09678132159129388,
       "calibration_intercept": 0.02249736396012057,
       "calibration_slope": 0.997707104963365,
+      "candidate_index": 3,
       "fold_dispersion": 0.0006167357648084408,
       "mean_delta": -0.00016319597837982343,
       "mean_predicted_risk": 0.13781818308600619,
@@ -1147,6 +1193,7 @@
       "brier": 0.09692915382791457,
       "calibration_intercept": -0.06384631842310316,
       "calibration_slope": 0.9882453826179687,
+      "candidate_index": 4,
       "fold_dispersion": 0.0002009183299217142,
       "mean_delta": 0.0006808798338910698,
       "mean_predicted_risk": 0.14491585748545485,
@@ -1165,6 +1212,7 @@
       "brier": 0.09671326486891886,
       "calibration_intercept": 0.04015106358507521,
       "calibration_slope": 0.9905995758182561,
+      "candidate_index": 5,
       "fold_dispersion": 0.0006193133108238081,
       "mean_delta": -0.0005194849121683274,
       "mean_predicted_risk": 0.13520720200229971,
@@ -1183,6 +1231,7 @@
       "brier": 0.09679976584905034,
       "calibration_intercept": 0.050201775364247934,
       "calibration_slope": 0.9968420653513702,
+      "candidate_index": 6,
       "fold_dispersion": 0.0005967560687488388,
       "mean_delta": -0.00010918793540735327,
       "mean_predicted_risk": 0.13512134387105393,
@@ -1201,6 +1250,7 @@
       "brier": 0.099458084069988,
       "calibration_intercept": 0.25182890761724347,
       "calibration_slope": 1.027917934691707,
+      "candidate_index": 7,
       "fold_dispersion": 0.0013863850157095762,
       "mean_delta": 0.009885888507263095,
       "mean_predicted_risk": 0.12094186469598234,
@@ -1220,6 +1270,7 @@
       "brier": 0.10032295797758033,
       "calibration_intercept": 0.41702594843006496,
       "calibration_slope": 1.0568777628680008,
+      "candidate_index": 8,
       "fold_dispersion": 0.002662928344002736,
       "mean_delta": 0.012245997350356959,
       "mean_predicted_risk": 0.11117194850537547,
@@ -1239,6 +1290,7 @@
       "brier": 0.09988007879758715,
       "calibration_intercept": 0.31288929588786213,
       "calibration_slope": 1.0422475240815643,
+      "candidate_index": 9,
       "fold_dispersion": 0.0018782420109195433,
       "mean_delta": 0.01070797890595417,
       "mean_predicted_risk": 0.11765664929888527,
@@ -1258,6 +1310,7 @@
       "brier": 0.09921011552814718,
       "calibration_intercept": 0.23863589189402132,
       "calibration_slope": 1.0442629564032482,
+      "candidate_index": 10,
       "fold_dispersion": 0.0010626769442289132,
       "mean_delta": 0.00895933068298858,
       "mean_predicted_risk": 0.12426260041441348,
@@ -1277,6 +1330,7 @@
       "brier": 0.09986139793376457,
       "calibration_intercept": 0.30743573719176004,
       "calibration_slope": 1.0281696605818524,
+      "candidate_index": 11,
       "fold_dispersion": 0.0015303542615466349,
       "mean_delta": 0.011646470669212546,
       "mean_predicted_risk": 0.11627940067870476,
@@ -1296,6 +1350,7 @@
       "brier": 0.09993723393889384,
       "calibration_intercept": 0.33303098992523916,
       "calibration_slope": 1.0406239231118244,
+      "candidate_index": 12,
       "fold_dispersion": 0.001760460023504485,
       "mean_delta": 0.011235399404109723,
       "mean_predicted_risk": 0.11582148645159838,
@@ -1315,6 +1370,7 @@
       "brier": 0.09725824410569989,
       "calibration_intercept": 0.023746924232034818,
       "calibration_slope": 0.9741974833932924,
+      "candidate_index": 13,
       "fold_dispersion": 0.0010044480071624965,
       "mean_delta": 0.0008298528861927966,
       "mean_predicted_risk": 0.13461193494413368,
@@ -1334,6 +1390,7 @@
       "brier": 0.09745476949456804,
       "calibration_intercept": -0.07743379922561985,
       "calibration_slope": 0.9617340495521877,
+      "candidate_index": 14,
       "fold_dispersion": 0.0008337584770937813,
       "mean_delta": 0.0007886888412454269,
       "mean_predicted_risk": 0.1427902972982779,
@@ -1353,6 +1410,7 @@
       "brier": 0.09765071412827514,
       "calibration_intercept": -0.15581070603895478,
       "calibration_slope": 0.9557268068667563,
+      "candidate_index": 15,
       "fold_dispersion": 0.0007109020952727201,
       "mean_delta": 0.0009913947034305478,
       "mean_predicted_risk": 0.14994197097209447,
@@ -1372,6 +1430,7 @@
       "brier": 0.09732343758424844,
       "calibration_intercept": -0.05732971734303461,
       "calibration_slope": 0.9557286794222178,
+      "candidate_index": 16,
       "fold_dispersion": 0.0008071416423272247,
       "mean_delta": 0.0004203686004515624,
       "mean_predicted_risk": 0.13998587437558127,
@@ -1391,6 +1450,7 @@
       "brier": 0.09732734955064887,
       "calibration_intercept": -0.044881368519633924,
       "calibration_slope": 0.9636732604761673,
+      "candidate_index": 17,
       "fold_dispersion": 0.0010189928907553757,
       "mean_delta": 0.001065973065084471,
       "mean_predicted_risk": 0.1398164778190046,
@@ -1410,6 +1470,7 @@
       "brier": 0.09696535759853095,
       "calibration_intercept": 0.1516073364411812,
       "calibration_slope": 1.015594942004129,
+      "candidate_index": 18,
       "fold_dispersion": 0.0013042811823222858,
       "mean_delta": -0.0005918487412953042,
       "mean_predicted_risk": 0.12831444734953343,
@@ -1429,6 +1490,7 @@
       "brier": 0.09686308247587297,
       "calibration_intercept": 0.07289773617548745,
       "calibration_slope": 1.006638011113317,
+      "candidate_index": 19,
       "fold_dispersion": 0.0013957958614683789,
       "mean_delta": -0.0012784017802723484,
       "mean_predicted_risk": 0.13429362354238455,
@@ -1448,6 +1510,7 @@
       "brier": 0.09700160013866124,
       "calibration_intercept": 0.16734594614279924,
       "calibration_slope": 1.007621783061639,
+      "candidate_index": 20,
       "fold_dispersion": 0.0007645867024741094,
       "mean_delta": 0.00047182056393406895,
       "mean_predicted_risk": 0.12592243403259915,
@@ -1467,6 +1530,7 @@
       "brier": 0.09705568714871558,
       "calibration_intercept": 0.17858956814152258,
       "calibration_slope": 1.0136652866257934,
+      "candidate_index": 21,
       "fold_dispersion": 0.0012601904954216377,
       "mean_delta": 0.0005354408709781157,
       "mean_predicted_risk": 0.12572423044323247,
@@ -1486,6 +1550,7 @@
       "brier": 0.09693659091725638,
       "calibration_intercept": -0.03318756580726996,
       "calibration_slope": 0.9975725076774664,
+      "candidate_index": 22,
       "fold_dispersion": 0.0004770128155756789,
       "mean_delta": -0.0003854195525581837,
       "mean_predicted_risk": 0.14313886794515054,
@@ -1505,6 +1570,7 @@
       "brier": 0.09679698436345806,
       "calibration_intercept": 0.07645610291272097,
       "calibration_slope": 0.9986902933564953,
+      "candidate_index": 23,
       "fold_dispersion": 0.0005981548569293361,
       "mean_delta": -0.00041375527399341294,
       "mean_predicted_risk": 0.13290703807718446,
@@ -1524,6 +1590,7 @@
       "brier": 0.09687458433222684,
       "calibration_intercept": 0.08544407561597298,
       "calibration_slope": 1.0067446645482208,
+      "candidate_index": 24,
       "fold_dispersion": 0.0009287480419231364,
       "mean_delta": -0.00026444026395296225,
       "mean_predicted_risk": 0.13312573646784984,
@@ -1543,6 +1610,7 @@
       "brier": 0.0968008228806921,
       "calibration_intercept": -0.010355108414550316,
       "calibration_slope": 0.9911216681762101,
+      "candidate_index": 25,
       "fold_dispersion": 0.0008494666436998636,
       "mean_delta": -0.0007938678496246576,
       "mean_predicted_risk": 0.1400816989981328,
@@ -1562,6 +1630,7 @@
       "brier": 0.09686357265090229,
       "calibration_intercept": -0.0005833668013058412,
       "calibration_slope": 0.9967543898283909,
+      "candidate_index": 26,
       "fold_dispersion": 0.0003514670724782943,
       "mean_delta": -0.000988903986047126,
       "mean_predicted_risk": 0.1398782378073793,
@@ -1581,6 +1650,7 @@
       "brier": 0.09685052307100463,
       "calibration_intercept": 0.10066047108488652,
       "calibration_slope": 0.9985792554380982,
+      "candidate_index": 27,
       "fold_dispersion": 0.0006116532913906687,
       "mean_delta": -0.0007862299821460821,
       "mean_predicted_risk": 0.13071248673899608,
@@ -1600,6 +1670,7 @@
       "brier": 0.10025791867395928,
       "calibration_intercept": 0.4068723307070734,
       "calibration_slope": 1.054412870516548,
+      "candidate_index": 28,
       "fold_dispersion": 0.0025688550250344564,
       "mean_delta": 0.011569333460511885,
       "mean_predicted_risk": 0.11164007778107343,
@@ -1620,6 +1691,7 @@
       "brier": 0.09981947358397239,
       "calibration_intercept": 0.2955471998551484,
       "calibration_slope": 1.0374585311533324,
+      "candidate_index": 29,
       "fold_dispersion": 0.001975585403401141,
       "mean_delta": 0.010622807213857877,
       "mean_predicted_risk": 0.11845930126519151,
@@ -1640,6 +1712,7 @@
       "brier": 0.09908421713835347,
       "calibration_intercept": 0.22195800010456973,
       "calibration_slope": 1.0410404805302305,
+      "candidate_index": 30,
       "fold_dispersion": 0.001441701896727051,
       "mean_delta": 0.007340535040091914,
       "mean_predicted_risk": 0.12528335553354264,
@@ -1660,6 +1733,7 @@
       "brier": 0.0997737173485951,
       "calibration_intercept": 0.2870567608286575,
       "calibration_slope": 1.0219045050334574,
+      "candidate_index": 31,
       "fold_dispersion": 0.001949692082567773,
       "mean_delta": 0.010513477763305799,
       "mean_predicted_risk": 0.11714534834311005,
@@ -1680,6 +1754,7 @@
       "brier": 0.09984816396882559,
       "calibration_intercept": 0.3155144982097907,
       "calibration_slope": 1.0354201376701573,
+      "candidate_index": 32,
       "fold_dispersion": 0.002032287798954621,
       "mean_delta": 0.01075484784392183,
       "mean_predicted_risk": 0.11657169319475451,
@@ -1700,6 +1775,7 @@
       "brier": 0.1007431479248323,
       "calibration_intercept": 0.46494603783923744,
       "calibration_slope": 1.0668699036261426,
+      "candidate_index": 33,
       "fold_dispersion": 0.002582817376513452,
       "mean_delta": 0.013215995675649253,
       "mean_predicted_risk": 0.10868356505219455,
@@ -1720,6 +1796,7 @@
       "brier": 0.0999413305466174,
       "calibration_intercept": 0.40624734951080166,
       "calibration_slope": 1.0731502945077869,
+      "candidate_index": 34,
       "fold_dispersion": 0.002352911050201898,
       "mean_delta": 0.010452797980732679,
       "mean_predicted_risk": 0.11415074562066506,
@@ -1740,6 +1817,7 @@
       "brier": 0.10076472171594204,
       "calibration_intercept": 0.45470749894207874,
       "calibration_slope": 1.0510923751720638,
+      "candidate_index": 35,
       "fold_dispersion": 0.0021371043144436798,
       "mean_delta": 0.013141689153843797,
       "mean_predicted_risk": 0.10746839931626456,
@@ -1760,6 +1838,7 @@
       "brier": 0.10086021723341144,
       "calibration_intercept": 0.48824287479366985,
       "calibration_slope": 1.0649113856453047,
+      "candidate_index": 36,
       "fold_dispersion": 0.0027608468783864837,
       "mean_delta": 0.013790842796720756,
       "mean_predicted_risk": 0.10671530827109436,
@@ -1780,6 +1859,7 @@
       "brier": 0.09947870255860375,
       "calibration_intercept": 0.2833993968481176,
       "calibration_slope": 1.0551775144090882,
+      "candidate_index": 37,
       "fold_dispersion": 0.0018013049980762476,
       "mean_delta": 0.00863311976194583,
       "mean_predicted_risk": 0.12184543742865872,
@@ -1800,6 +1880,7 @@
       "brier": 0.10021365041907239,
       "calibration_intercept": 0.35286975974124424,
       "calibration_slope": 1.0354397174757337,
+      "candidate_index": 38,
       "fold_dispersion": 0.0018186593015486535,
       "mean_delta": 0.012095553282264724,
       "mean_predicted_risk": 0.1134519924866487,
@@ -1820,6 +1901,7 @@
       "brier": 0.10033469391138877,
       "calibration_intercept": 0.3748004766392659,
       "calibration_slope": 1.0480752029519043,
+      "candidate_index": 39,
       "fold_dispersion": 0.002707715564668869,
       "mean_delta": 0.01228039850689706,
       "mean_predicted_risk": 0.11334554134687375,
@@ -1840,6 +1922,7 @@
       "brier": 0.0994944033569628,
       "calibration_intercept": 0.27888354905022344,
       "calibration_slope": 1.038753051029293,
+      "candidate_index": 40,
       "fold_dispersion": 0.0012532942044257566,
       "mean_delta": 0.009674967112162113,
       "mean_predicted_risk": 0.12008899685662794,
@@ -1860,6 +1943,7 @@
       "brier": 0.0995667334227607,
       "calibration_intercept": 0.3041425382312037,
       "calibration_slope": 1.0503052451559325,
+      "candidate_index": 41,
       "fold_dispersion": 0.001966970754491755,
       "mean_delta": 0.008265019822664059,
       "mean_predicted_risk": 0.11950617648440882,
@@ -1880,6 +1964,7 @@
       "brier": 0.10026288383745961,
       "calibration_intercept": 0.36954699552696046,
       "calibration_slope": 1.0348385600223253,
+      "candidate_index": 42,
       "fold_dispersion": 0.0021961247714434367,
       "mean_delta": 0.012248341969080617,
       "mean_predicted_risk": 0.11207842906754516,
@@ -1900,6 +1985,7 @@
       "brier": 0.09737917722132135,
       "calibration_intercept": 0.053886193449095024,
       "calibration_slope": 0.9818163471421578,
+      "candidate_index": 43,
       "fold_dispersion": 0.0012363968571081246,
       "mean_delta": 0.0005601669397323173,
       "mean_predicted_risk": 0.13276769909262856,
@@ -1920,6 +2006,7 @@
       "brier": 0.09732433997984423,
       "calibration_intercept": -0.01800176134882317,
       "calibration_slope": 0.9759900834059025,
+      "candidate_index": 44,
       "fold_dispersion": 0.0014454971499723566,
       "mean_delta": 0.00038407552387344316,
       "mean_predicted_risk": 0.13882792513838974,
@@ -1940,6 +2027,7 @@
       "brier": 0.09738464939711125,
       "calibration_intercept": 0.07040695505860022,
       "calibration_slope": 0.9742172604295548,
+      "candidate_index": 45,
       "fold_dispersion": 0.0009894579609539813,
       "mean_delta": 0.00048690968777800935,
       "mean_predicted_risk": 0.13025417165785239,
@@ -1960,6 +2048,7 @@
       "brier": 0.09734791467715806,
       "calibration_intercept": 0.08568796746251932,
       "calibration_slope": 0.982669835177165,
+      "candidate_index": 46,
       "fold_dispersion": 0.0015481119451754063,
       "mean_delta": 0.0004535216158775143,
       "mean_predicted_risk": 0.12996149555171885,
@@ -1980,6 +2069,7 @@
       "brier": 0.0976906322521891,
       "calibration_intercept": -0.13277198839271234,
       "calibration_slope": 0.9621340649342359,
+      "candidate_index": 47,
       "fold_dispersion": 0.0009910189561024255,
       "mean_delta": 0.0019525355988070808,
       "mean_predicted_risk": 0.14843514907379143,
@@ -2000,6 +2090,7 @@
       "brier": 0.09741436141280127,
       "calibration_intercept": -0.02871151033072862,
       "calibration_slope": 0.9612942198651251,
+      "candidate_index": 48,
       "fold_dispersion": 0.0006195636255466222,
       "mean_delta": 0.0006958265091889087,
       "mean_predicted_risk": 0.13790142162801103,
@@ -2020,6 +2111,7 @@
       "brier": 0.09742264625375041,
       "calibration_intercept": -0.016806013507356596,
       "calibration_slope": 0.9707267060777889,
+      "candidate_index": 49,
       "fold_dispersion": 0.0011074799829615017,
       "mean_delta": 0.0005366770512056343,
       "mean_predicted_risk": 0.1380097154484495,
@@ -2040,6 +2132,7 @@
       "brier": 0.09745618199862184,
       "calibration_intercept": -0.10642704112525046,
       "calibration_slope": 0.9573833123889848,
+      "candidate_index": 50,
       "fold_dispersion": 0.0008366181421123269,
       "mean_delta": 0.0006381386502584771,
       "mean_predicted_risk": 0.14510786621784325,
@@ -2060,6 +2153,7 @@
       "brier": 0.09745130230122019,
       "calibration_intercept": -0.09461732015700869,
       "calibration_slope": 0.9643526099687251,
+      "candidate_index": 51,
       "fold_dispersion": 0.0008931357188999635,
       "mean_delta": 0.00027708616393521627,
       "mean_predicted_risk": 0.14482814405742295,
@@ -2080,6 +2174,7 @@
       "brier": 0.09733555710331517,
       "calibration_intercept": 8.937288935288138e-05,
       "calibration_slope": 0.963476238647321,
+      "candidate_index": 52,
       "fold_dispersion": 0.0008335199720640533,
       "mean_delta": 0.0005240389408792527,
       "mean_predicted_risk": 0.13544409498917356,
@@ -2100,6 +2195,7 @@
       "brier": 0.09692072658353393,
       "calibration_intercept": 0.1075165067573036,
       "calibration_slope": 1.0169385822149282,
+      "candidate_index": 53,
       "fold_dispersion": 0.001476570627796018,
       "mean_delta": -0.0006448597908187606,
       "mean_predicted_risk": 0.13245290676586188,
@@ -2120,6 +2216,7 @@
       "brier": 0.09714423310285936,
       "calibration_intercept": 0.20680003859568086,
       "calibration_slope": 1.0164087060968545,
+      "candidate_index": 54,
       "fold_dispersion": 0.0011007851423640801,
       "mean_delta": 0.00029357484439028806,
       "mean_predicted_risk": 0.12360395302089228,
@@ -2140,6 +2237,7 @@
       "brier": 0.09719965771018045,
       "calibration_intercept": 0.21799900292015648,
       "calibration_slope": 1.024378383477533,
+      "candidate_index": 55,
       "fold_dispersion": 0.0016655283190016841,
       "mean_delta": -0.00016559715037950395,
       "mean_predicted_risk": 0.12367078900650458,
@@ -2160,6 +2258,7 @@
       "brier": 0.09692971421920445,
       "calibration_intercept": 0.12679211885478944,
       "calibration_slope": 1.0097570682947652,
+      "candidate_index": 56,
       "fold_dispersion": 0.000992441061823158,
       "mean_delta": -0.00035487826716526754,
       "mean_predicted_risk": 0.12978442812093663,
@@ -2180,6 +2279,7 @@
       "brier": 0.09696062502626798,
       "calibration_intercept": 0.14247787955972926,
       "calibration_slope": 1.0161073690921638,
+      "candidate_index": 57,
       "fold_dispersion": 0.0011134402264372598,
       "mean_delta": -0.0008740152884281077,
       "mean_predicted_risk": 0.12921551174143348,
@@ -2200,6 +2300,7 @@
       "brier": 0.09727163118621732,
       "calibration_intercept": 0.2301716161585963,
       "calibration_slope": 1.0150761461884834,
+      "candidate_index": 58,
       "fold_dispersion": 0.0012802435363133008,
       "mean_delta": 2.2001921311278968e-05,
       "mean_predicted_risk": 0.12147140676449772,
@@ -2220,6 +2321,7 @@
       "brier": 0.09683326570817104,
       "calibration_intercept": 0.02252925429795875,
       "calibration_slope": 0.9987933186457532,
+      "candidate_index": 59,
       "fold_dispersion": 0.0009268136016730318,
       "mean_delta": -0.00183036253126747,
       "mean_predicted_risk": 0.13795196213706457,
@@ -2240,6 +2342,7 @@
       "brier": 0.09688531706469472,
       "calibration_intercept": 0.032035959230301746,
       "calibration_slope": 1.0065744496527465,
+      "candidate_index": 60,
       "fold_dispersion": 0.0007064442283462038,
       "mean_delta": -0.0013531717434488502,
       "mean_predicted_risk": 0.13806377435360326,
@@ -2260,6 +2363,7 @@
       "brier": 0.09694867363293959,
       "calibration_intercept": 0.1390856031138107,
       "calibration_slope": 1.0074361131503642,
+      "candidate_index": 61,
       "fold_dispersion": 0.0011316523059961374,
       "mean_delta": -0.0005360453787955619,
       "mean_predicted_risk": 0.1283920435978643,
@@ -2280,6 +2384,7 @@
       "brier": 0.09683307824297674,
       "calibration_intercept": 0.051895830207340995,
       "calibration_slope": 0.9983911304583719,
+      "candidate_index": 62,
       "fold_dispersion": 0.0009959842603741928,
       "mean_delta": -0.0013092811116494532,
       "mean_predicted_risk": 0.13516967623148257,
@@ -2300,6 +2405,7 @@
       "brier": 0.10072482087191005,
       "calibration_intercept": 0.45396944830556873,
       "calibration_slope": 1.0641275566836443,
+      "candidate_index": 63,
       "fold_dispersion": 0.002970115630744857,
       "mean_delta": 0.012445616830592778,
       "mean_predicted_risk": 0.10915021649423079,
@@ -2321,6 +2427,7 @@
       "brier": 0.09984805487781051,
       "calibration_intercept": 0.3950785750662085,
       "calibration_slope": 1.0716455585684201,
+      "candidate_index": 64,
       "fold_dispersion": 0.0022446921787241613,
       "mean_delta": 0.008490199301792135,
       "mean_predicted_risk": 0.11483647599469782,
@@ -2342,6 +2449,7 @@
       "brier": 0.10072811984184304,
       "calibration_intercept": 0.4395002762532454,
       "calibration_slope": 1.0464206390869526,
+      "candidate_index": 65,
       "fold_dispersion": 0.002325230321500157,
       "mean_delta": 0.01208991477172841,
       "mean_predicted_risk": 0.10802249416768366,
@@ -2363,6 +2471,7 @@
       "brier": 0.10080714726796355,
       "calibration_intercept": 0.4768963213072945,
       "calibration_slope": 1.0619735800350767,
+      "candidate_index": 66,
       "fold_dispersion": 0.003228599144364796,
       "mean_delta": 0.012937291901299042,
       "mean_predicted_risk": 0.10717813042472774,
@@ -2384,6 +2493,7 @@
       "brier": 0.09936422454596072,
       "calibration_intercept": 0.26732920817835487,
       "calibration_slope": 1.0527480595398653,
+      "candidate_index": 67,
       "fold_dispersion": 0.0017433552576233257,
       "mean_delta": 0.007726737857745522,
       "mean_predicted_risk": 0.12288291812131823,
@@ -2405,6 +2515,7 @@
       "brier": 0.10018060457103624,
       "calibration_intercept": 0.3319298116335969,
       "calibration_slope": 1.029065288421733,
+      "candidate_index": 68,
       "fold_dispersion": 0.002085835870483432,
       "mean_delta": 0.011361588660225335,
       "mean_predicted_risk": 0.11430145315168157,
@@ -2426,6 +2537,7 @@
       "brier": 0.1002920557040791,
       "calibration_intercept": 0.3566923467743596,
       "calibration_slope": 1.0427136362246285,
+      "candidate_index": 69,
       "fold_dispersion": 0.0028315794607102073,
       "mean_delta": 0.01151509815170038,
       "mean_predicted_risk": 0.11408228151596438,
@@ -2447,6 +2559,7 @@
       "brier": 0.09937848719817376,
       "calibration_intercept": 0.2606505455206475,
       "calibration_slope": 1.0350061185365604,
+      "candidate_index": 70,
       "fold_dispersion": 0.00101687470035456,
       "mean_delta": 0.008844125589420795,
       "mean_predicted_risk": 0.12112463237667603,
@@ -2468,6 +2581,7 @@
       "brier": 0.09943876321678718,
       "calibration_intercept": 0.2886239891322029,
       "calibration_slope": 1.047699555749417,
+      "candidate_index": 71,
       "fold_dispersion": 0.0016993297335125752,
       "mean_delta": 0.007782903641489962,
       "mean_predicted_risk": 0.12044829303677386,
@@ -2489,6 +2603,7 @@
       "brier": 0.10020344288328735,
       "calibration_intercept": 0.34804689931955735,
       "calibration_slope": 1.0278553531617611,
+      "candidate_index": 72,
       "fold_dispersion": 0.0026516287177446897,
       "mean_delta": 0.011506109739274897,
       "mean_predicted_risk": 0.11287925928909681,
@@ -2510,6 +2625,7 @@
       "brier": 0.100315335489614,
       "calibration_intercept": 0.45452331594548645,
       "calibration_slope": 1.0841438649173274,
+      "candidate_index": 73,
       "fold_dispersion": 0.002939810917178935,
       "mean_delta": 0.010962626847110087,
       "mean_predicted_risk": 0.1117292812024591,
@@ -2531,6 +2647,7 @@
       "brier": 0.10123060590550363,
       "calibration_intercept": 0.5052077658330901,
       "calibration_slope": 1.059674416071235,
+      "candidate_index": 74,
       "fold_dispersion": 0.0024629484114135954,
       "mean_delta": 0.015003140925359862,
       "mean_predicted_risk": 0.10466894838797763,
@@ -2552,6 +2669,7 @@
       "brier": 0.10136198283126557,
       "calibration_intercept": 0.5347848658344486,
       "calibration_slope": 1.073540908812033,
+      "candidate_index": 75,
       "fold_dispersion": 0.0033645088728822196,
       "mean_delta": 0.014799417398879078,
       "mean_predicted_risk": 0.10426095861822633,
@@ -2573,6 +2691,7 @@
       "brier": 0.1003998881741204,
       "calibration_intercept": 0.44262908707181575,
       "calibration_slope": 1.0654935464847595,
+      "candidate_index": 76,
       "fold_dispersion": 0.0020175446419973893,
       "mean_delta": 0.011098685879503443,
       "mean_predicted_risk": 0.1102826059454615,
@@ -2594,6 +2713,7 @@
       "brier": 0.10049497640305503,
       "calibration_intercept": 0.48289058680307245,
       "calibration_slope": 1.0807609271812553,
+      "candidate_index": 77,
       "fold_dispersion": 0.0023849449128879392,
       "mean_delta": 0.011594655189807051,
       "mean_predicted_risk": 0.10917863102501424,
@@ -2615,6 +2735,7 @@
       "brier": 0.10134502070473753,
       "calibration_intercept": 0.5258345539313163,
       "calibration_slope": 1.0590687533101226,
+      "candidate_index": 78,
       "fold_dispersion": 0.0026827823340630458,
       "mean_delta": 0.01464365694600495,
       "mean_predicted_risk": 0.10312175380834367,
@@ -2636,6 +2757,7 @@
       "brier": 0.09980844957924424,
       "calibration_intercept": 0.3274340909294943,
       "calibration_slope": 1.0486065112644993,
+      "candidate_index": 79,
       "fold_dispersion": 0.0018327900300277168,
       "mean_delta": 0.010281872168610345,
       "mean_predicted_risk": 0.11729748751502854,
@@ -2657,6 +2779,7 @@
       "brier": 0.09990752219077781,
       "calibration_intercept": 0.3498631756308951,
       "calibration_slope": 1.0609781865711834,
+      "candidate_index": 80,
       "fold_dispersion": 0.00235413635610696,
       "mean_delta": 0.009484876866365625,
       "mean_predicted_risk": 0.11709067459195681,
@@ -2678,6 +2801,7 @@
       "brier": 0.10070285443684036,
       "calibration_intercept": 0.41646442232783343,
       "calibration_slope": 1.042230899933032,
+      "candidate_index": 81,
       "fold_dispersion": 0.0026434363661107722,
       "mean_delta": 0.01236481886512645,
       "mean_predicted_risk": 0.10925248426833688,
@@ -2699,6 +2823,7 @@
       "brier": 0.09990575267645607,
       "calibration_intercept": 0.3467898432712731,
       "calibration_slope": 1.0459440686324943,
+      "candidate_index": 82,
       "fold_dispersion": 0.0015282448533502373,
       "mean_delta": 0.008828305847190314,
       "mean_predicted_risk": 0.11540757682259556,
@@ -2720,6 +2845,7 @@
       "brier": 0.0974174432998777,
       "calibration_intercept": 0.009410227998395564,
       "calibration_slope": 0.9834526397504393,
+      "candidate_index": 83,
       "fold_dispersion": 0.0017540671198548559,
       "mean_delta": -0.0001630120789076795,
       "mean_predicted_risk": 0.13716159299265518,
@@ -2741,6 +2867,7 @@
       "brier": 0.09755912789236272,
       "calibration_intercept": 0.10308101742277419,
       "calibration_slope": 0.9804413062742968,
+      "candidate_index": 84,
       "fold_dispersion": 0.0014827777225814504,
       "mean_delta": 0.00043043595971393566,
       "mean_predicted_risk": 0.12805332771498337,
@@ -2762,6 +2889,7 @@
       "brier": 0.09752785950273711,
       "calibration_intercept": 0.11793732319428105,
       "calibration_slope": 0.9904441539187073,
+      "candidate_index": 85,
       "fold_dispersion": 0.0015898726748651022,
       "mean_delta": 0.0002958110200516389,
       "mean_predicted_risk": 0.12801923324590445,
@@ -2783,6 +2911,7 @@
       "brier": 0.09738269808608387,
       "calibration_intercept": 0.030618637566405576,
       "calibration_slope": 0.9767897920559772,
+      "candidate_index": 86,
       "fold_dispersion": 0.0012955795941366097,
       "mean_delta": -0.00012547279398208113,
       "mean_predicted_risk": 0.13429421890788523,
@@ -2804,6 +2933,7 @@
       "brier": 0.0973255888039372,
       "calibration_intercept": 0.04965652848792803,
       "calibration_slope": 0.9855952834052193,
+      "candidate_index": 87,
       "fold_dispersion": 0.00171495139957127,
       "mean_delta": 1.7980798938336055e-05,
       "mean_predicted_risk": 0.13364144438232256,
@@ -2825,6 +2955,7 @@
       "brier": 0.09757572565294077,
       "calibration_intercept": 0.13114464397327233,
       "calibration_slope": 0.981699377405429,
+      "candidate_index": 88,
       "fold_dispersion": 0.0012507874354871463,
       "mean_delta": 0.00029858334517631786,
       "mean_predicted_risk": 0.12571784154123306,
@@ -2846,6 +2977,7 @@
       "brier": 0.09754421522692269,
       "calibration_intercept": -0.08100836293829707,
       "calibration_slope": 0.9620923808759453,
+      "candidate_index": 89,
       "fold_dispersion": 0.0009350379761302551,
       "mean_delta": 0.00011081403275788591,
       "mean_predicted_risk": 0.1431871607447777,
@@ -2867,6 +2999,7 @@
       "brier": 0.09752822365076849,
       "calibration_intercept": -0.06940921178513339,
       "calibration_slope": 0.9710528753978033,
+      "candidate_index": 90,
       "fold_dispersion": 0.0010870670901149933,
       "mean_delta": 0.00014318050162678912,
       "mean_predicted_risk": 0.1432074201703691,
@@ -2888,6 +3021,7 @@
       "brier": 0.09748528725066251,
       "calibration_intercept": 0.03097047321475399,
       "calibration_slope": 0.9692119019004953,
+      "candidate_index": 91,
       "fold_dispersion": 0.0014216479859068334,
       "mean_delta": 7.127802427452554e-05,
       "mean_predicted_risk": 0.13325196549428198,
@@ -2909,6 +3043,7 @@
       "brier": 0.09739390247144657,
       "calibration_intercept": -0.046616201128122065,
       "calibration_slope": 0.9646885642483221,
+      "candidate_index": 92,
       "fold_dispersion": 0.0010084987212637488,
       "mean_delta": 0.0004926581809204217,
       "mean_predicted_risk": 0.14007588958422695,
@@ -2930,6 +3065,7 @@
       "brier": 0.09705493726660626,
       "calibration_intercept": 0.16396120388328173,
       "calibration_slope": 1.0183936232058342,
+      "candidate_index": 93,
       "fold_dispersion": 0.0011627413968061634,
       "mean_delta": -0.0006306035046515744,
       "mean_predicted_risk": 0.12757782421873615,
@@ -2951,6 +3087,7 @@
       "brier": 0.09707968865082793,
       "calibration_intercept": 0.1798021382603629,
       "calibration_slope": 1.0268995970533832,
+      "candidate_index": 94,
       "fold_dispersion": 0.0020593014531485,
       "mean_delta": -0.0014192253092288017,
       "mean_predicted_risk": 0.1272951796541272,
@@ -2972,6 +3109,7 @@
       "brier": 0.09747544947597607,
       "calibration_intercept": 0.27219883313434157,
       "calibration_slope": 1.0241670792709436,
+      "candidate_index": 95,
       "fold_dispersion": 0.0014937581863242496,
       "mean_delta": 0.00017709115261162054,
       "mean_predicted_risk": 0.11908647399474255,
@@ -2993,6 +3131,7 @@
       "brier": 0.09716864289730807,
       "calibration_intercept": 0.19493600632319305,
       "calibration_slope": 1.0171728732476328,
+      "candidate_index": 96,
       "fold_dispersion": 0.0011351296925426455,
       "mean_delta": -0.0013213930117524642,
       "mean_predicted_risk": 0.12475407592910247,
@@ -3014,6 +3153,7 @@
       "brier": 0.09691821993998083,
       "calibration_intercept": 0.08702128730308399,
       "calibration_slope": 1.0066818597169853,
+      "candidate_index": 97,
       "fold_dispersion": 0.0010068381017103232,
       "mean_delta": -0.0021252687556057416,
       "mean_predicted_risk": 0.13296563912068013,
@@ -3035,6 +3175,7 @@
       "brier": 0.1002567813309714,
       "calibration_intercept": 0.4467291582778031,
       "calibration_slope": 1.0844138979288906,
+      "candidate_index": 98,
       "fold_dispersion": 0.0029734805010204575,
       "mean_delta": 0.010217059970475008,
       "mean_predicted_risk": 0.11234966984178558,
@@ -3057,6 +3198,7 @@
       "brier": 0.1012489066428946,
       "calibration_intercept": 0.492009988099764,
       "calibration_slope": 1.0558461661860787,
+      "candidate_index": 99,
       "fold_dispersion": 0.002689891684712371,
       "mean_delta": 0.013921289463236128,
       "mean_predicted_risk": 0.1051427730795021,
@@ -3079,6 +3221,7 @@
       "brier": 0.1013651697076473,
       "calibration_intercept": 0.5256083381482126,
       "calibration_slope": 1.07146609518177,
+      "candidate_index": 100,
       "fold_dispersion": 0.003720145167559436,
       "mean_delta": 0.013742066326519206,
       "mean_predicted_risk": 0.1046413889493474,
@@ -3101,6 +3244,7 @@
       "brier": 0.10034160661763425,
       "calibration_intercept": 0.43037007132222876,
       "calibration_slope": 1.063317018112206,
+      "candidate_index": 101,
       "fold_dispersion": 0.002346429675007842,
       "mean_delta": 0.008665196956133839,
       "mean_predicted_risk": 0.11094713148583875,
@@ -3123,6 +3267,7 @@
       "brier": 0.10041165146150077,
       "calibration_intercept": 0.4751221616113008,
       "calibration_slope": 1.080790625431832,
+      "candidate_index": 102,
       "fold_dispersion": 0.002694041196809715,
       "mean_delta": 0.009651315804065605,
       "mean_predicted_risk": 0.1097587456416399,
@@ -3145,6 +3290,7 @@
       "brier": 0.10132586028792386,
       "calibration_intercept": 0.5136031723047771,
       "calibration_slope": 1.055847012859808,
+      "candidate_index": 103,
       "fold_dispersion": 0.0030938968541026324,
       "mean_delta": 0.013742746653985439,
       "mean_predicted_risk": 0.10360024250020772,
@@ -3167,6 +3313,7 @@
       "brier": 0.09972748832965113,
       "calibration_intercept": 0.309681328000424,
       "calibration_slope": 1.0451350631229601,
+      "candidate_index": 104,
       "fold_dispersion": 0.0015451334964645775,
       "mean_delta": 0.007791908032728645,
       "mean_predicted_risk": 0.11830229886246894,
@@ -3189,6 +3336,7 @@
       "brier": 0.09981581334347076,
       "calibration_intercept": 0.33516855857934286,
       "calibration_slope": 1.0587836317387356,
+      "candidate_index": 105,
       "fold_dispersion": 0.001907025328321657,
       "mean_delta": 0.008463764677328707,
       "mean_predicted_risk": 0.11799279702889087,
@@ -3211,6 +3359,7 @@
       "brier": 0.10069359332807523,
       "calibration_intercept": 0.3959812389743515,
       "calibration_slope": 1.0358169294516812,
+      "candidate_index": 106,
       "fold_dispersion": 0.002710645998339879,
       "mean_delta": 0.010929163878888466,
       "mean_predicted_risk": 0.10999979005438998,
@@ -3233,6 +3382,7 @@
       "brier": 0.09981162192517568,
       "calibration_intercept": 0.32869271868611477,
       "calibration_slope": 1.0417335095038358,
+      "candidate_index": 107,
       "fold_dispersion": 0.0017045260768301781,
       "mean_delta": 0.007808273138070282,
       "mean_predicted_risk": 0.11632835384713718,
@@ -3255,6 +3405,7 @@
       "brier": 0.1008375811966892,
       "calibration_intercept": 0.497139832665288,
       "calibration_slope": 1.0764959944000903,
+      "candidate_index": 108,
       "fold_dispersion": 0.00220353808999048,
       "mean_delta": 0.012246447430387867,
       "mean_predicted_risk": 0.10746094083127332,
@@ -3277,6 +3428,7 @@
       "brier": 0.10096313746606507,
       "calibration_intercept": 0.5350196552791934,
       "calibration_slope": 1.0927335145685608,
+      "candidate_index": 109,
       "fold_dispersion": 0.003179582679718225,
       "mean_delta": 0.012417269242248941,
       "mean_predicted_risk": 0.10671772609827199,
@@ -3299,6 +3451,7 @@
       "brier": 0.10189119503532426,
       "calibration_intercept": 0.5786563069328676,
       "calibration_slope": 1.0678379419035493,
+      "candidate_index": 110,
       "fold_dispersion": 0.003073062816727519,
       "mean_delta": 0.0154820689816347,
       "mean_predicted_risk": 0.10029600612042097,
@@ -3321,6 +3474,7 @@
       "brier": 0.10102941993055009,
       "calibration_intercept": 0.5229915288324505,
       "calibration_slope": 1.0742348805483355,
+      "candidate_index": 111,
       "fold_dispersion": 0.0018688262638557186,
       "mean_delta": 0.012037080634949533,
       "mean_predicted_risk": 0.10530032351221946,
@@ -3343,6 +3497,7 @@
       "brier": 0.10030224747558686,
       "calibration_intercept": 0.3950006602085731,
       "calibration_slope": 1.0545287872466556,
+      "candidate_index": 112,
       "fold_dispersion": 0.0016564558686808983,
       "mean_delta": 0.010891695447486568,
       "mean_predicted_risk": 0.11258552805339712,
@@ -3365,6 +3520,7 @@
       "brier": 0.09753910149847254,
       "calibration_intercept": 0.061310305487539254,
       "calibration_slope": 0.982895635025208,
+      "candidate_index": 113,
       "fold_dispersion": 0.0015781926852489396,
       "mean_delta": -0.0012407551355878954,
       "mean_predicted_risk": 0.13220673095387672,
@@ -3387,6 +3543,7 @@
       "brier": 0.09746826197686756,
       "calibration_intercept": 0.08052081974339267,
       "calibration_slope": 0.9935465011858174,
+      "candidate_index": 114,
       "fold_dispersion": 0.0018651908896475586,
       "mean_delta": -0.0016090095111648169,
       "mean_predicted_risk": 0.13183410438308402,
@@ -3409,6 +3566,7 @@
       "brier": 0.09780257401324788,
       "calibration_intercept": 0.16710515865470935,
       "calibration_slope": 0.9885328176492342,
+      "candidate_index": 115,
       "fold_dispersion": 0.0017732401732359418,
       "mean_delta": -0.0006497227461192501,
       "mean_predicted_risk": 0.12339595155825166,
@@ -3431,6 +3589,7 @@
       "brier": 0.0975258964054815,
       "calibration_intercept": 0.09745407758806415,
       "calibration_slope": 0.9845042444391204,
+      "candidate_index": 116,
       "fold_dispersion": 0.0015106754362947709,
       "mean_delta": -0.001424032528913864,
       "mean_predicted_risk": 0.1291183862967103,
@@ -3453,6 +3612,7 @@
       "brier": 0.09750919424561612,
       "calibration_intercept": -0.017298810183553386,
       "calibration_slope": 0.9704938827962744,
+      "candidate_index": 117,
       "fold_dispersion": 0.0010961930683349452,
       "mean_delta": -0.0010714373786145297,
       "mean_predicted_risk": 0.13801805443321027,
@@ -3475,6 +3635,7 @@
       "brier": 0.09734329360583027,
       "calibration_intercept": 0.2360042674388044,
       "calibration_slope": 1.026747635573163,
+      "candidate_index": 118,
       "fold_dispersion": 0.0011491080393057301,
       "mean_delta": -0.0014483387964664932,
       "mean_predicted_risk": 0.12243835234990416,
@@ -3497,6 +3658,7 @@
       "brier": 0.10081649444347261,
       "calibration_intercept": 0.4842471595449541,
       "calibration_slope": 1.074358682575889,
+      "candidate_index": 119,
       "fold_dispersion": 0.0022902177165711685,
       "mean_delta": 0.01021581437058881,
       "mean_predicted_risk": 0.10814365020466939,
@@ -3520,6 +3682,7 @@
       "brier": 0.10091113952701153,
       "calibration_intercept": 0.5264922195894403,
       "calibration_slope": 1.0926356239393034,
+      "candidate_index": 120,
       "fold_dispersion": 0.00316358369962829,
       "mean_delta": 0.010197784020709408,
       "mean_predicted_risk": 0.10731135353674419,
@@ -3543,6 +3706,7 @@
       "brier": 0.10193738691763894,
       "calibration_intercept": 0.5626003202457504,
       "calibration_slope": 1.0627025436887325,
+      "candidate_index": 121,
       "fold_dispersion": 0.0035438258042832147,
       "mean_delta": 0.014898999727357476,
       "mean_predicted_risk": 0.10076079809907278,
@@ -3566,6 +3730,7 @@
       "brier": 0.10099054196163723,
       "calibration_intercept": 0.5089327724830913,
       "calibration_slope": 1.0713024925275427,
+      "candidate_index": 122,
       "fold_dispersion": 0.002574800572790069,
       "mean_delta": 0.010592613652114133,
       "mean_predicted_risk": 0.10595525712992634,
@@ -3589,6 +3754,7 @@
       "brier": 0.1002453758618283,
       "calibration_intercept": 0.3759025016159916,
       "calibration_slope": 1.0502971687831126,
+      "candidate_index": 123,
       "fold_dispersion": 0.0021449782983520766,
       "mean_delta": 0.009219321895759901,
       "mean_predicted_risk": 0.1135396279843988,
@@ -3612,6 +3778,7 @@
       "brier": 0.1015510384444161,
       "calibration_intercept": 0.5770605436913843,
       "calibration_slope": 1.0843109084081424,
+      "candidate_index": 124,
       "fold_dispersion": 0.002725231376441394,
       "mean_delta": 0.013017381980547119,
       "mean_predicted_risk": 0.10252791084352696,
@@ -3635,6 +3802,7 @@
       "brier": 0.09773449339613392,
       "calibration_intercept": 0.1305646962619976,
       "calibration_slope": 0.9909638440280796,
+      "candidate_index": 125,
       "fold_dispersion": 0.0019619971614994315,
       "mean_delta": -0.0010035032305593036,
       "mean_predicted_risk": 0.12694152792570193,
@@ -3658,6 +3826,7 @@
       "brier": 0.10151582986507816,
       "calibration_intercept": 0.5670630766149387,
       "calibration_slope": 1.083538587483346,
+      "candidate_index": 126,
       "fold_dispersion": 0.002386295338266096,
       "mean_delta": 0.011678089974609932,
       "mean_predicted_risk": 0.10313069911157603,
@@ -3682,6 +3851,7 @@
       "brier": 0.09639502492536826,
       "calibration_intercept": 0.016054520116928303,
       "calibration_slope": 1.003417297297523,
+      "candidate_index": 127,
       "fold_dispersion": 0.000442787548958216,
       "mean_delta": -0.0011330157887750676,
       "mean_predicted_risk": 0.1391648374400628,
@@ -3700,6 +3870,7 @@
       "brier": 0.09726195029279947,
       "calibration_intercept": 0.019252787447982922,
       "calibration_slope": 0.9935092038810911,
+      "candidate_index": 128,
       "fold_dispersion": 0.0008682313318198584,
       "mean_delta": 0.00039887904998064277,
       "mean_predicted_risk": 0.13758109648953104,
@@ -3718,6 +3889,7 @@
       "brier": 0.09686150635838293,
       "calibration_intercept": 0.050767866064181946,
       "calibration_slope": 0.9911769004998655,
+      "candidate_index": 129,
       "fold_dispersion": 0.0002568165402688873,
       "mean_delta": 0.00015198398909432428,
       "mean_predicted_risk": 0.1343142829610397,
@@ -3736,6 +3908,7 @@
       "brier": 0.09697122622448287,
       "calibration_intercept": 0.04651485049139287,
       "calibration_slope": 1.007057626458166,
+      "candidate_index": 130,
       "fold_dispersion": 0.0008167280483466394,
       "mean_delta": -0.0007049640150671884,
       "mean_predicted_risk": 0.13676929910946123,
@@ -3755,6 +3928,7 @@
       "brier": 0.09649953006887657,
       "calibration_intercept": 0.07595043349920833,
       "calibration_slope": 1.0054096356806834,
+      "candidate_index": 131,
       "fold_dispersion": 0.00034506919160337204,
       "mean_delta": -0.0017626007116715657,
       "mean_predicted_risk": 0.13386453184647845,
@@ -3774,6 +3948,7 @@
       "brier": 0.09755421561989794,
       "calibration_intercept": 0.06337902203963201,
       "calibration_slope": 0.9903487044108992,
+      "candidate_index": 132,
       "fold_dispersion": 0.0011020145058462983,
       "mean_delta": 0.0011726702298994654,
       "mean_predicted_risk": 0.1330065671250971,
@@ -3793,6 +3968,7 @@
       "brier": 0.09721167473399729,
       "calibration_intercept": 0.08944244943548105,
       "calibration_slope": 1.0038437201151393,
+      "candidate_index": 133,
       "fold_dispersion": 0.0011523706467730772,
       "mean_delta": 7.294487846064464e-06,
       "mean_predicted_risk": 0.13236508924165843,
@@ -3813,6 +3989,7 @@
       "brier": 0.09694875649234658,
       "calibration_intercept": 0.04372021859440128,
       "calibration_slope": 0.9974387827232678,
+      "candidate_index": 134,
       "fold_dispersion": 0.0004026977537420139,
       "mean_delta": 0.0004583009057011495,
       "mean_predicted_risk": 0.13579677641142984,
@@ -3831,6 +4008,7 @@
       "brier": 0.09704515899770823,
       "calibration_intercept": -0.022627950641598383,
       "calibration_slope": 0.9773597421534642,
+      "candidate_index": 135,
       "fold_dispersion": 0.0009745327029633573,
       "mean_delta": 1.0742793552692263e-05,
       "mean_predicted_risk": 0.13946629916667194,
@@ -3849,6 +4027,7 @@
       "brier": 0.0967401693388767,
       "calibration_intercept": 0.005132079420315959,
       "calibration_slope": 0.9887856480159077,
+      "candidate_index": 136,
       "fold_dispersion": 0.0005536634188388095,
       "mean_delta": 0.00014140048246044496,
       "mean_predicted_risk": 0.13830698609743258,
@@ -3867,6 +4046,7 @@
       "brier": 0.09728641481135414,
       "calibration_intercept": 0.029123206141184476,
       "calibration_slope": 0.9857537697270028,
+      "candidate_index": 137,
       "fold_dispersion": 0.0010439641583129325,
       "mean_delta": 0.0010074431581648864,
       "mean_predicted_risk": 0.13555139904957558,
@@ -3886,6 +4066,7 @@
       "brier": 0.09697363276783995,
       "calibration_intercept": 0.05937146084680461,
       "calibration_slope": 0.9982714653797784,
+      "candidate_index": 138,
       "fold_dispersion": 0.000775620391971829,
       "mean_delta": -0.0005308867995090123,
       "mean_predicted_risk": 0.1344247845523357,
@@ -3905,6 +4086,7 @@
       "brier": 0.09701148090700602,
       "calibration_intercept": -0.008039154464394663,
       "calibration_slope": 0.9775545365373892,
+      "candidate_index": 139,
       "fold_dispersion": 0.0012945139484574345,
       "mean_delta": -0.0007963217660140514,
       "mean_predicted_risk": 0.13807043855980547,
@@ -3924,6 +4106,7 @@
       "brier": 0.0972737392917422,
       "calibration_intercept": 0.042918617147188705,
       "calibration_slope": 0.9859354664517869,
+      "candidate_index": 140,
       "fold_dispersion": 0.001560355496364834,
       "mean_delta": 8.060640080971709e-05,
       "mean_predicted_risk": 0.13432072787512533,
@@ -4058,9 +4241,7 @@
     },
     {
       "pattern": [
-        "BUN",
-        "Glucose",
-        "Mg"
+        "BUN"
       ],
       "pi": 0.05,
       "region": "target"
@@ -4076,7 +4257,9 @@
     },
     {
       "pattern": [
-        "BUN"
+        "BUN",
+        "Glucose",
+        "Mg"
       ],
       "pi": 0.05,
       "region": "target"
@@ -4099,6 +4282,1262 @@
         "Na"
       ],
       "pi": 0.05,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "HCO3"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "HCT"
+      ],
+      "pi": 0.0,
+      "region": "null_control"
+    },
+    {
+      "pattern": [
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "PaCO2"
+      ],
+      "pi": 0.0,
+      "region": "null_control"
+    },
+    {
+      "pattern": [
+        "PaO2"
+      ],
+      "pi": 0.0,
+      "region": "null_control"
+    },
+    {
+      "pattern": [
+        "Platelets"
+      ],
+      "pi": 0.0,
+      "region": "null_control"
+    },
+    {
+      "pattern": [
+        "WBC"
+      ],
+      "pi": 0.0,
+      "region": "null_control"
+    },
+    {
+      "pattern": [
+        "pH"
+      ],
+      "pi": 0.0,
+      "region": "null_control"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "HCO3"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "HCO3"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose",
+        "HCO3"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose",
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "HCO3",
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "HCO3",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "HCO3",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "HCT",
+        "Platelets"
+      ],
+      "pi": 0.0,
+      "region": "null_control"
+    },
+    {
+      "pattern": [
+        "HCT",
+        "WBC"
+      ],
+      "pi": 0.0,
+      "region": "null_control"
+    },
+    {
+      "pattern": [
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "PaCO2",
+        "PaO2"
+      ],
+      "pi": 0.0,
+      "region": "null_control"
+    },
+    {
+      "pattern": [
+        "PaCO2",
+        "pH"
+      ],
+      "pi": 0.0,
+      "region": "null_control"
+    },
+    {
+      "pattern": [
+        "PaO2",
+        "pH"
+      ],
+      "pi": 0.0,
+      "region": "null_control"
+    },
+    {
+      "pattern": [
+        "Platelets",
+        "WBC"
+      ],
+      "pi": 0.0,
+      "region": "null_control"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "HCO3"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Glucose",
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "HCO3",
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "HCO3",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "HCO3",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose",
+        "HCO3"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose",
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "HCO3",
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "HCO3",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "HCO3",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose",
+        "HCO3",
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose",
+        "HCO3",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose",
+        "HCO3",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose",
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose",
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "HCO3",
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "HCO3",
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "HCO3",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "HCT",
+        "Platelets",
+        "WBC"
+      ],
+      "pi": 0.0,
+      "region": "null_control"
+    },
+    {
+      "pattern": [
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "PaCO2",
+        "PaO2",
+        "pH"
+      ],
+      "pi": 0.0,
+      "region": "null_control"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose",
+        "HCO3"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose",
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "HCO3",
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "HCO3",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "HCO3",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Glucose",
+        "HCO3",
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Glucose",
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Glucose",
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Glucose",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "HCO3",
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "HCO3",
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "HCO3",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose",
+        "HCO3",
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose",
+        "HCO3",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose",
+        "HCO3",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose",
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose",
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "HCO3",
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "HCO3",
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "HCO3",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose",
+        "HCO3",
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose",
+        "HCO3",
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose",
+        "HCO3",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose",
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "HCO3",
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose",
+        "HCO3",
+        "K"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose",
+        "HCO3",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose",
+        "HCO3",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose",
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose",
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "HCO3",
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "HCO3",
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "HCO3",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Glucose",
+        "HCO3",
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Glucose",
+        "HCO3",
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Glucose",
+        "HCO3",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Glucose",
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "HCO3",
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose",
+        "HCO3",
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose",
+        "HCO3",
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose",
+        "HCO3",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose",
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "HCO3",
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Glucose",
+        "HCO3",
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose",
+        "HCO3",
+        "K",
+        "Mg"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose",
+        "HCO3",
+        "K",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose",
+        "HCO3",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose",
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "HCO3",
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Glucose",
+        "HCO3",
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "Creatinine",
+        "Glucose",
+        "HCO3",
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
+      "region": "target"
+    },
+    {
+      "pattern": [
+        "BUN",
+        "Creatinine",
+        "Glucose",
+        "HCO3",
+        "K",
+        "Mg",
+        "Na"
+      ],
+      "pi": 0.0,
       "region": "target"
     }
   ],

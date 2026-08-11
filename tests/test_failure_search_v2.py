@@ -306,6 +306,62 @@ class TestNestedAurocIsolation:
         with pytest.raises(ConfigError, match="duplicates"):
             pooled_auroc_on_folds(labels, predictions, fold_assignment, folds=(0, 0))
 
+    def test_pinned_repaired_nested_selection_counts(self) -> None:
+        artifact = Path("experiments/robustness/results/m5v2/m5v2_tables.npz")
+        with np.load(artifact, allow_pickle=False) as tables:
+            patterns = [tuple(name.split("+")) for name in tables["candidate_names"].tolist()]
+            deltas = tables["deltas"]
+            candidate_auroc = tables["nested_candidate_auroc"]
+            clean_auroc = tables["nested_clean_auroc"]
+
+        selections = []
+        held_out_excess = []
+        for resplit in range(20):
+            for held_out in range(5):
+                selection_folds = [fold for fold in range(5) if fold != held_out]
+                means = {
+                    pattern: float(deltas[index, resplit, selection_folds].mean())
+                    for index, pattern in enumerate(patterns)
+                }
+                dispersions = {
+                    pattern: fold_dispersion(deltas[index, resplit, selection_folds])
+                    for index, pattern in enumerate(patterns)
+                }
+                eligible = {
+                    pattern
+                    for index, pattern in enumerate(patterns)
+                    if clean_auroc[resplit, held_out]
+                    - candidate_auroc[index, resplit, held_out]
+                    <= 0.02
+                }
+                selected = select_one_se_parsimonious(means, dispersions, eligible)
+                selections.append(selected)
+                held_out_excess.append(deltas[patterns.index(selected), resplit, held_out])
+
+        assert Counter(selections) == Counter(
+            {
+                ("BUN", "Glucose", "Na"): 32,
+                ("BUN", "Glucose"): 24,
+                ("BUN",): 11,
+                ("BUN", "Mg"): 6,
+                ("BUN", "Glucose", "HCO3"): 4,
+                ("BUN", "Glucose", "Mg"): 4,
+                ("BUN", "Na"): 3,
+                ("BUN", "Glucose", "HCO3", "Mg"): 3,
+                ("BUN", "Glucose", "HCO3", "Na"): 3,
+                ("BUN", "Creatinine"): 2,
+                ("BUN", "Mg", "Na"): 2,
+                ("BUN", "Glucose", "HCO3", "Mg", "Na"): 2,
+                ("BUN", "HCO3", "Na"): 1,
+                ("BUN", "Creatinine", "Glucose", "Na"): 1,
+                ("BUN", "Glucose", "Mg", "Na"): 1,
+                ("BUN", "HCO3", "Mg", "Na"): 1,
+            }
+        )
+        assert all("BUN" in selection for selection in selections)
+        assert sum(excess > 0 for excess in held_out_excess) == 99
+        assert np.mean(held_out_excess) == pytest.approx(0.012013168205102115)
+
 
 class TestMinimumDetectableEffect:
     def test_matches_the_closed_form(self) -> None:
