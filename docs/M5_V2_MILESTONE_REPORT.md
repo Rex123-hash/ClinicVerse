@@ -191,3 +191,23 @@ could resolve it.
 - The final frozen model of `M5_V2_DESIGN.md` §8 has **not** been fitted.
 - **Set C has not been loaded, scored, or referenced by any statistic here, and remains locked.**
 - Unlocking set-c for the single frozen test of §9 requires separate explicit approval.
+
+## 11. Quality gate
+
+Recorded here after the the reviewer M5-v2 audit; the earlier revision of this report omitted the counts.
+
+| check | result |
+|---|---|
+| targeted M5-v2 tests (`tests/test_failure_search_v2.py`) | **37 passed** |
+| full suite (`pytest`) | **415 passed** |
+| `ruff check .` | clean |
+| `ruff format --check .` | clean |
+| mypy strict (`cliniverse twinbench`) | clean |
+| working tree at artifact generation | clean, `git_dirty=false`, source `91262fd` |
+
+### Audit repair recorded
+
+The nested four-fold selection previously allowed the held-out fold to influence AUROC eligibility.
+the reviewer repaired it at `91262fd`. The repair changed **16 of 100** nested choices. It did **not** change
+the frozen pattern (`BUN+Glucose+Na`), the selection frequency (11/20), or any gate verdict. The
+post-repair nested positivity is **99/100**, not the 100/100 stated in the pre-repair revision.
