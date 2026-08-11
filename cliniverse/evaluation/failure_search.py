@@ -51,6 +51,8 @@ FloatArray = npt.NDArray[np.float64]
 
 #: A configuration: a sorted tuple of catalogue group names to withhold.
 GroupSubset = tuple[str, ...]
+#: An M5-v2 pattern: a sorted tuple of individual analyte names to withhold.
+AnalyteSubset = tuple[str, ...]
 
 
 def enumerate_group_subsets(group_names: Sequence[str]) -> tuple[GroupSubset, ...]:
@@ -155,6 +157,140 @@ def apply_group_subset_loss(
         eligible_cells=cohort.m[:, :, columns].sum(axis=(1, 2)).astype(np.int64),
         removed_by_variable=removal.sum(axis=1).astype(np.int64),
     )
+
+
+def analyte_columns(
+    cohort: Cohort, analytes: AnalyteSubset, catalogue: PanelCatalogue
+) -> IntArray:
+    """Cohort column indices for named *analytes*, validated against the catalogue.
+
+    M5-v1 searched whole catalogue groups; M5-v2 searches analyte subsets inside a
+    group. Eligibility is unchanged: an analyte must be covered by the catalogue,
+    which is what keeps vitals and ventilator settings out of the search space.
+    """
+    if not analytes:
+        raise ConfigError("a pattern must name at least one analyte")
+    if len(set(analytes)) != len(analytes):
+        raise ConfigError(f"pattern repeats an analyte: {analytes}")
+    index = {name: i for i, name in enumerate(cohort.variable_names)}
+    covered = set(catalogue.covered_variables)
+    unknown = sorted(set(analytes) - covered)
+    if unknown:
+        raise ConfigError(f"pattern names analytes not covered by the catalogue: {unknown}")
+    absent = sorted(set(analytes) - set(index))
+    if absent:
+        raise ConfigError(f"pattern names analytes absent from this cohort: {absent}")
+    return np.array(sorted(index[name] for name in analytes), dtype=np.int64)
+
+
+def apply_analyte_subset_loss(
+    cohort: Cohort, analytes: AnalyteSubset, catalogue: PanelCatalogue
+) -> SubsetLoss:
+    """Withhold every observed cell of the named analytes across the whole window.
+
+    Identical semantics to :func:`apply_group_subset_loss`, addressed by analyte
+    rather than by group. Deterministic: no RNG, no severity target. Loss is
+    applied to the cohort before feature construction, so a withheld cell is
+    indistinguishable from one that was never measured.
+    """
+    columns = analyte_columns(cohort, analytes, catalogue)
+    removal: BoolArray = np.zeros_like(cohort.m)
+    removal[:, :, columns] = True
+    removal &= cohort.m
+
+    eligible, _ = eligible_columns(cohort, catalogue)
+    x = cohort.x.copy()
+    m = cohort.m.copy()
+    x[removal] = np.nan
+    m[removal] = False
+
+    return SubsetLoss(
+        cohort=dataclasses.replace(cohort, x=x, m=m),
+        subset=tuple(analytes),
+        removed_cells=removal.sum(axis=(1, 2)).astype(np.int64),
+        eligible_cells=cohort.m[:, :, eligible].sum(axis=(1, 2)).astype(np.int64),
+        removed_by_variable=removal.sum(axis=1).astype(np.int64),
+    )
+
+
+def fold_dispersion(fold_estimates: FloatArray) -> float:
+    """Spread of a candidate's per-fold estimates within one resplit.
+
+    **This is not a standard error and must never be reported as one.** The folds
+    partition the patients, but their models share heavily overlapping training
+    data, and across resplits the same 8,000 development patients are reused. The
+    quantity exists only to set the width of the 1-SE rule's tie band
+    (``M5_V2_DESIGN.md`` §2).
+    """
+    values = np.asarray(fold_estimates, dtype=np.float64).ravel()
+    if values.size < 2:
+        raise ConfigError("fold dispersion needs at least two folds")
+    return float(values.std(ddof=1) / np.sqrt(values.size))
+
+
+def select_one_se_parsimonious(
+    means: dict[AnalyteSubset, float],
+    dispersions: dict[AnalyteSubset, float],
+    eligible: set[AnalyteSubset],
+) -> AnalyteSubset:
+    """The 1-SE parsimony rule: sparsest candidate effectively tied with the best.
+
+    M5-v1 selected the argmax of a noisy score and paid a 58% shrinkage for it,
+    while the configurations that outranked plain ``BMP_like`` were that pattern
+    plus near-empty singletons that cannot add damage. This rule answers both:
+    take the tie band within one fold dispersion of the leader, then keep the
+    **fewest analytes**, so an analyte must earn its place rather than ride along.
+
+    Ties inside the band are broken by higher mean, then lexicographically, so the
+    selection is fully deterministic.
+    """
+    candidates = [c for c in means if c in eligible]
+    if not candidates:
+        raise ConfigError(
+            "no candidate satisfied the discrimination-silent constraint; the "
+            "search space cannot answer the predeclared question"
+        )
+    leader = max(candidates, key=lambda c: (means[c], -len(c)))
+    threshold = means[leader] - dispersions[leader]
+    band = [c for c in candidates if means[c] >= threshold]
+    return min(band, key=lambda c: (len(c), -means[c], c))
+
+
+def selection_frequency(
+    selections: Sequence[AnalyteSubset],
+) -> dict[AnalyteSubset, float]:
+    """How often each pattern was selected across the development resplits.
+
+    A count over resplits that reuse the same patients. It measures development
+    stability and is **not** an inferential quantity.
+    """
+    if not selections:
+        raise ConfigError("cannot compute selection frequency with no resplits")
+    counts: dict[AnalyteSubset, int] = {}
+    for choice in selections:
+        counts[choice] = counts.get(choice, 0) + 1
+    return {k: v / len(selections) for k, v in counts.items()}
+
+
+def minimum_detectable_effect(
+    sigma: float, n: int, *, alpha: float = 0.05, power: float = 0.80
+) -> float:
+    """Smallest one-sided effect detectable at ``n`` with the given alpha and power.
+
+    ``MDE = (z_{1-alpha} + z_{power}) * sigma / sqrt(n)``. Used to decide whether
+    the locked holdout can answer the question *before* it is spent, rather than
+    discovering afterwards that it could not.
+    """
+    if not np.isfinite(sigma) or sigma <= 0:
+        raise ConfigError(f"sigma must be finite and positive, got {sigma}")
+    if n <= 0:
+        raise ConfigError(f"n must be positive, got {n}")
+    if not 0.0 < alpha < 0.5 or not 0.5 < power < 1.0:
+        raise ConfigError(f"implausible alpha={alpha} or power={power}")
+    from scipy.stats import norm
+
+    z = float(norm.ppf(1.0 - alpha) + norm.ppf(power))
+    return float(z * sigma / np.sqrt(n))
 
 
 def control_seed(base_seed: int, subset: GroupSubset, repetition: int) -> int:
