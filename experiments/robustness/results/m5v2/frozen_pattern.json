@@ -1,0 +1,11 @@
+{
+  "frozen_pattern": [
+    "BUN",
+    "Glucose",
+    "Na"
+  ],
+  "region": "target",
+  "selected_on": "A+B development only; set-c never loaded",
+  "selection_frequency": 0.55,
+  "verdict": "v2-STABLE"
+}

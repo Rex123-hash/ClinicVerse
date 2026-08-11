@@ -1,7 +1,8 @@
 # Cliniverse — Status
 
 **Updated:** 2026-08-11
-**Current milestone:** M5 discovery + confirmation complete and classified M5-C; recovery arm pending.
+**Current milestone:** M5-v1 closed as M5-C; M5-v2 A+B development complete, verdict **v2-STABLE**.
+Set C locked; unlocking not authorised.
 
 ## Where we are
 
@@ -16,7 +17,8 @@
 | M2 Baselines | **Done + repaired** | E-004; `docs/M2_MILESTONE_REPORT.md`, audit in `docs/ADVERSARIAL_REVIEW_2.md` |
 | M3 Calibration robustness | **Done + repaired** | E-005; `docs/M3_MILESTONE_REPORT.md`, `docs/ADVERSARIAL_REVIEW_3.md`. M3-B |
 | M4 Acquisition ranking stability | **Done + repaired** | `docs/M4_MILESTONE_REPORT.md`, `docs/ADVERSARIAL_REVIEW_4.md`. Verdict **M4-C**, ACCEPT |
-| M5 Discrimination-silent failure search | **Discovery + confirmation done** | `docs/M5_DESIGN.md` (predeclared), `docs/M5_MILESTONE_REPORT.md`. Verdict **M5-C**: primary test T1 failed, transfer test T4 passed. Recovery arm not yet run |
+| M5-v1 Discrimination-silent failure search | **Closed** | `docs/M5_DESIGN.md` (predeclared), `docs/M5_MILESTONE_REPORT.md`. Verdict **M5-C**: primary test T1 failed, transfer test T4 passed. Recovery arm not run |
+| M5-v2 Stability-aware failure search | **A+B development done** | `docs/M5_V2_DESIGN.md` (predeclared), `docs/M5_V2_MILESTONE_REPORT.md`. Verdict **v2-STABLE**, all four gates pass. Frozen pattern `BUN+Glucose+Na` |
 | M6 API + minimal UI | Not started | |
 | M7 Final + review response | Not started | |
 
@@ -119,6 +121,26 @@ excess is +0.01005 for the 512 configurations containing `BMP_like` and -0.00007
 it, and `BMP_like` appears in 50 of the top 50. Withholding `BMP_like` alone moves AUROC only
 0.8179 -> 0.8078 while the calibration intercept moves -0.141 -> **+0.520** and mean predicted risk
 falls 0.1432 -> **0.0984** against ~14% prevalence. **M5-C.**
+
+## Key M5-v2 result
+
+Stability-aware search over 141 candidates (127 `BMP_like` analyte subsets plus 14 `CBC_like` /
+`ABG_like` null controls), 20 development resplits, 1-SE parsimony selection, R=5 amount-matched
+controls. Verdict **v2-STABLE**, all four gates pass.
+
+Frozen pattern **`BUN+Glucose+Na`**, selected in **11/20** resplits — exactly the majority threshold,
+so the gate passed by a single resplit and the exact membership is provisional. Every selection in
+every resplit contained `BUN`.
+
+On the reference run, withholding it moves AUROC only 0.8270 -> 0.8113 while the calibration
+intercept moves -0.010 -> **+0.488** and mean predicted risk falls 0.1397 -> **0.1067** against 14.03%
+prevalence, from about six removed cells per patient. `BUN` alone gives 74% of the effect;
+`Glucose` and `Na` are individually null yet superadditive with it.
+
+Methodologically the point of v2: selection shrinkage fell from **58%** in v1 to **12.1%**. All 100
+out-of-selection estimates were positive. Detectability projects MDE +0.00804 against an
+out-of-selection effect of +0.01212, so the design's predeclared expectation that G4 would likely
+fail was **wrong**, and the report says so.
 
 ## Superseded M3 gate note
 
