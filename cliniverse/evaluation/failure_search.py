@@ -44,6 +44,7 @@ from cliniverse.evaluation.information_loss import (
     apply_information_loss,
     eligible_columns,
 )
+from cliniverse.evaluation.metrics import auroc
 from cliniverse.exceptions import ConfigError
 
 IntArray = npt.NDArray[np.int64]
@@ -270,6 +271,36 @@ def selection_frequency(
     for choice in selections:
         counts[choice] = counts.get(choice, 0) + 1
     return {k: v / len(selections) for k, v in counts.items()}
+
+
+def pooled_auroc_on_folds(
+    labels: FloatArray,
+    predictions: FloatArray,
+    fold_assignment: IntArray,
+    folds: Sequence[int],
+) -> float:
+    """AUROC pooled over exactly the requested outer folds.
+
+    Nested M5-v2 selection must compute its discrimination eligibility on the
+    four selection folds only. Keeping the patient restriction in this helper
+    makes it testable that the held-out fold cannot influence eligibility.
+    """
+    y = np.asarray(labels, dtype=np.float64).ravel()
+    p = np.asarray(predictions, dtype=np.float64).ravel()
+    assignment = np.asarray(fold_assignment, dtype=np.int64).ravel()
+    if y.shape != p.shape or y.shape != assignment.shape:
+        raise ConfigError(
+            "labels, predictions and fold_assignment must have the same one-dimensional shape"
+        )
+    selected_folds = tuple(int(fold) for fold in folds)
+    if not selected_folds:
+        raise ConfigError("at least one fold is required for pooled AUROC")
+    if len(set(selected_folds)) != len(selected_folds):
+        raise ConfigError(f"fold selection contains duplicates: {selected_folds}")
+    keep = np.isin(assignment, selected_folds)
+    if not bool(keep.any()):
+        raise ConfigError(f"no patients belong to requested folds {selected_folds}")
+    return float(auroc(y[keep], p[keep]))
 
 
 def minimum_detectable_effect(

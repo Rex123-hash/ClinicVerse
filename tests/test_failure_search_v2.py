@@ -17,6 +17,9 @@ tested hardest:
 
 from __future__ import annotations
 
+from collections import Counter
+from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -30,6 +33,7 @@ from cliniverse.evaluation.failure_search import (
     fold_dispersion,
     matched_random_control,
     minimum_detectable_effect,
+    pooled_auroc_on_folds,
     select_one_se_parsimonious,
     selection_frequency,
 )
@@ -204,6 +208,49 @@ class TestOneSeParsimonyRule:
         with pytest.raises(ConfigError, match="discrimination-silent"):
             select_one_se_parsimonious(means, {("BMP",): 0.001}, set())
 
+    def test_pinned_m5v2_top_level_selection_counts(self) -> None:
+        artifact = Path("experiments/robustness/results/m5v2/m5v2_tables.npz")
+        with np.load(artifact, allow_pickle=False) as tables:
+            deltas = tables["deltas"]
+            candidate_auroc = tables["candidate_auroc"]
+            clean_auroc = tables["clean_auroc"]
+
+        patterns = [
+            *enumerate_group_subsets(
+                ("BUN", "Creatinine", "Glucose", "HCO3", "K", "Mg", "Na")
+            ),
+            *enumerate_group_subsets(("HCT", "Platelets", "WBC")),
+            *enumerate_group_subsets(("PaCO2", "PaO2", "pH")),
+        ]
+        selections = []
+        for resplit in range(20):
+            means = {
+                pattern: float(deltas[index, resplit].mean())
+                for index, pattern in enumerate(patterns)
+            }
+            dispersions = {
+                pattern: fold_dispersion(deltas[index, resplit])
+                for index, pattern in enumerate(patterns)
+            }
+            eligible = {
+                pattern
+                for index, pattern in enumerate(patterns)
+                if clean_auroc[resplit] - candidate_auroc[index, resplit] <= 0.02
+            }
+            selections.append(select_one_se_parsimonious(means, dispersions, eligible))
+
+        assert Counter(selections) == Counter(
+            {
+                ("BUN", "Glucose", "Na"): 11,
+                ("BUN", "Glucose"): 4,
+                ("BUN",): 1,
+                ("BUN", "Glucose", "HCO3"): 1,
+                ("BUN", "Glucose", "Mg"): 1,
+                ("BUN", "Glucose", "HCO3", "Mg"): 1,
+                ("BUN", "Glucose", "HCO3", "Na"): 1,
+            }
+        )
+
 
 class TestSelectionFrequency:
     def test_counts_and_normalises(self) -> None:
@@ -221,6 +268,43 @@ class TestSelectionFrequency:
     def test_empty_rejected(self) -> None:
         with pytest.raises(ConfigError, match="no resplits"):
             selection_frequency([])
+
+
+class TestNestedAurocIsolation:
+    def test_held_out_fold_cannot_change_selection_auroc(self) -> None:
+        labels = np.array([0, 1, 0, 1, 0, 1, 0, 1], dtype=np.float64)
+        predictions = np.array([0.1, 0.9, 0.2, 0.8, 0.3, 0.7, 0.4, 0.6])
+        fold_assignment = np.array([0, 0, 1, 1, 2, 2, 3, 3], dtype=np.int64)
+
+        baseline = pooled_auroc_on_folds(labels, predictions, fold_assignment, folds=(0, 1, 2))
+        altered = predictions.copy()
+        altered[fold_assignment == 3] = altered[fold_assignment == 3][::-1]
+
+        assert pooled_auroc_on_folds(
+            labels, altered, fold_assignment, folds=(0, 1, 2)
+        ) == pytest.approx(baseline)
+
+    def test_included_fold_does_change_selection_auroc(self) -> None:
+        labels = np.array([0, 1, 0, 1, 0, 1, 0, 1], dtype=np.float64)
+        predictions = np.array([0.1, 0.9, 0.2, 0.8, 0.3, 0.7, 0.4, 0.6])
+        fold_assignment = np.array([0, 0, 1, 1, 2, 2, 3, 3], dtype=np.int64)
+
+        baseline = pooled_auroc_on_folds(labels, predictions, fold_assignment, folds=(0, 1, 2))
+        altered = predictions.copy()
+        altered[fold_assignment == 2] = altered[fold_assignment == 2][::-1]
+
+        assert (
+            pooled_auroc_on_folds(labels, altered, fold_assignment, folds=(0, 1, 2)) < baseline
+        )
+
+    def test_rejects_duplicate_or_empty_fold_selection(self) -> None:
+        labels = np.array([0, 1], dtype=np.float64)
+        predictions = np.array([0.1, 0.9], dtype=np.float64)
+        fold_assignment = np.array([0, 0], dtype=np.int64)
+        with pytest.raises(ConfigError, match="at least one fold"):
+            pooled_auroc_on_folds(labels, predictions, fold_assignment, folds=())
+        with pytest.raises(ConfigError, match="duplicates"):
+            pooled_auroc_on_folds(labels, predictions, fold_assignment, folds=(0, 0))
 
 
 class TestMinimumDetectableEffect:

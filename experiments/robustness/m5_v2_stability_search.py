@@ -41,6 +41,7 @@ from cliniverse.evaluation.failure_search import (
     fold_dispersion,
     matched_random_control,
     minimum_detectable_effect,
+    pooled_auroc_on_folds,
     select_one_se_parsimonious,
     selection_frequency,
 )
@@ -209,6 +210,14 @@ def main(argv: list[str] | None = None) -> int:
     clean_features = build_representation(truncated, REPRESENTATION).x
     clean_predictions = [predict_all(clean_features, fm) for fm in resplits]
     clean_auroc = [float(auroc(y, p)) for p in clean_predictions]
+    fold_assignments: list[np.ndarray] = []
+    for fold_models in resplits:
+        assignment = np.full(cohort.n_patients, -1, dtype=np.int64)
+        for fm in fold_models:
+            assignment[fm.test_index] = fm.fold
+        if bool((assignment < 0).any()):
+            raise RuntimeError("some patient has no outer-fold assignment")
+        fold_assignments.append(assignment)
     log.info(
         "clean reference",
         reference_auroc=round(clean_auroc[REFERENCE_RESPLIT], 4),
@@ -227,7 +236,20 @@ def main(argv: list[str] | None = None) -> int:
     n_patients = cohort.n_patients
     deltas = np.zeros((len(candidates), args.repeats, args.folds), dtype=np.float64)
     cand_auroc = np.zeros((len(candidates), args.repeats), dtype=np.float64)
+    nested_clean_auroc = np.zeros((args.repeats, args.folds), dtype=np.float64)
+    nested_cand_auroc = np.zeros((len(candidates), args.repeats, args.folds), dtype=np.float64)
+    all_folds = tuple(range(args.folds))
+    for b in range(args.repeats):
+        for held_out in all_folds:
+            selection_folds = tuple(fold for fold in all_folds if fold != held_out)
+            nested_clean_auroc[b, held_out] = pooled_auroc_on_folds(
+                y,
+                clean_predictions[b],
+                fold_assignments[b],
+                selection_folds,
+            )
     reference_d: dict[AnalyteSubset, np.ndarray] = {}
+    reference_candidate_predictions = np.zeros((len(candidates), n_patients), dtype=np.float64)
     reference_rows: list[dict[str, Any]] = []
 
     t0 = time.perf_counter()
@@ -258,11 +280,21 @@ def main(argv: list[str] | None = None) -> int:
             for k, fm in enumerate(fold_models):
                 deltas[ci, b, k] = float(d[fm.test_index].mean())
             cand_auroc[ci, b] = float(auroc(y, p_subset))
+            for held_out in all_folds:
+                selection_folds = tuple(fold for fold in all_folds if fold != held_out)
+                nested_cand_auroc[ci, b, held_out] = pooled_auroc_on_folds(
+                    y,
+                    p_subset,
+                    fold_assignments[b],
+                    selection_folds,
+                )
 
             if b == REFERENCE_RESPLIT:
+                reference_candidate_predictions[ci] = p_subset
                 reference_d[pattern] = d
                 reference_rows.append(
                     {
+                        "candidate_index": ci,
                         "pattern": list(pattern),
                         "region": region,
                         "n_analytes": len(pattern),
@@ -292,7 +324,9 @@ def main(argv: list[str] | None = None) -> int:
     patterns = [pattern for pattern, _ in candidates]
     region_of = dict(candidates)
 
-    def select(resplit: int, folds: tuple[int, ...]) -> AnalyteSubset:
+    def select(
+        resplit: int, folds: tuple[int, ...], *, held_out_fold: int | None = None
+    ) -> AnalyteSubset:
         """Run the predeclared 1-SE parsimony rule over the named folds."""
         means = {
             patterns[ci]: float(deltas[ci, resplit, list(folds)].mean())
@@ -302,14 +336,23 @@ def main(argv: list[str] | None = None) -> int:
             patterns[ci]: fold_dispersion(deltas[ci, resplit, list(folds)])
             for ci in range(len(patterns))
         }
+        if held_out_fold is None:
+            clean_eligibility_auroc = clean_auroc[resplit]
+            candidate_eligibility_auroc = cand_auroc[:, resplit]
+        else:
+            if held_out_fold in folds or set(folds) != set(all_folds) - {held_out_fold}:
+                raise ConfigError(
+                    "nested selection folds must be exactly all folds except held_out_fold"
+                )
+            clean_eligibility_auroc = nested_clean_auroc[resplit, held_out_fold]
+            candidate_eligibility_auroc = nested_cand_auroc[:, resplit, held_out_fold]
         eligible = {
             patterns[ci]
             for ci in range(len(patterns))
-            if clean_auroc[resplit] - cand_auroc[ci, resplit] <= args.delta
+            if clean_eligibility_auroc - candidate_eligibility_auroc[ci] <= args.delta
         }
         return select_one_se_parsimonious(means, dispersions, eligible)
 
-    all_folds = tuple(range(args.folds))
     per_resplit = [select(b, all_folds) for b in range(args.repeats)]
     frequency = selection_frequency(per_resplit)
     frozen = min(frequency, key=lambda c: (-frequency[c], len(c), c))
@@ -323,7 +366,7 @@ def main(argv: list[str] | None = None) -> int:
     for b in range(args.repeats):
         for k in range(args.folds):
             others = tuple(f for f in all_folds if f != k)
-            chosen = select(b, others)
+            chosen = select(b, others, held_out_fold=k)
             oos_components.append(
                 {
                     "resplit": b,
@@ -371,6 +414,7 @@ def main(argv: list[str] | None = None) -> int:
             "target_group": TARGET_GROUP,
             "null_control_groups": list(NULL_CONTROL_GROUPS),
             "n_resplits": args.repeats,
+            "resplit_seeds": [args.seed + b for b in range(args.repeats)],
             "reference_resplit": REFERENCE_RESPLIT,
             "reference_seed": args.seed,
             "control_repeats": args.control_repeats,
@@ -390,11 +434,19 @@ def main(argv: list[str] | None = None) -> int:
         "selection_by_resplit": [list(c) for c in per_resplit],
         "selection_frequency": sorted(
             (
-                {"pattern": list(k), "pi": v, "region": region_of[k]}
-                for k, v in frequency.items()
+                {
+                    "pattern": list(pattern),
+                    "pi": frequency.get(pattern, 0.0),
+                    "region": region_of[pattern],
+                }
+                for pattern in patterns
             ),
-            key=lambda r: -float(r["pi"]),
+            key=lambda r: (-float(r["pi"]), len(r["pattern"]), r["pattern"]),
         ),
+        "eligibility_count_by_resplit": [
+            int(np.sum(clean_auroc[b] - cand_auroc[:, b] <= args.delta))
+            for b in range(args.repeats)
+        ],
         "frozen_pattern": list(frozen),
         "frozen_pattern_region": region_of[frozen],
         "development_estimates": {
@@ -457,11 +509,16 @@ def main(argv: list[str] | None = None) -> int:
         args.out / "m5v2_tables.npz",
         labels=y,
         record_ids=cohort.record_ids,
+        candidate_names=np.asarray(["+".join(pattern) for pattern in patterns], dtype=np.str_),
+        fold_assignments=np.stack(fold_assignments),
         deltas=deltas,
         candidate_auroc=cand_auroc,
         clean_auroc=np.asarray(clean_auroc),
+        nested_candidate_auroc=nested_cand_auroc,
+        nested_clean_auroc=nested_clean_auroc,
         reference_d_frozen=reference_d[frozen],
         reference_clean_predictions=clean_predictions[REFERENCE_RESPLIT],
+        reference_candidate_predictions=reference_candidate_predictions,
     )
     (args.out / "frozen_pattern.json").write_text(
         json.dumps(
