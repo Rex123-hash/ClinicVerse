@@ -2,11 +2,16 @@
 
 **Date:** 2026-08-11
 **Contract:** [`M5_V2_DESIGN.md`](M5_V2_DESIGN.md) §8, executed exactly as predeclared
-**Generated from:** `08f767a`, clean tree (`git_dirty=false`)
+**Original implementation:** `08f767a` · **final-freeze audit repair:** `01bc036`
+**Generated from:** `01bc036`, clean tree (`git_dirty=false`)
 **Stage:** model freeze only. **No evaluation was performed. Set C was not accessed.**
 
 This stage fits one final pipeline on A+B and freezes it, together with the set-c evaluation
 contract. It does not test anything, and it does not authorise testing anything.
+
+The final-freeze audit repair made the inherited control mechanism/pool explicit and corrected the
+historical-exposure wording. It did not alter the fitted model: all three fitted-object hashes are
+byte-for-byte unchanged from the original freeze.
 
 ---
 
@@ -67,7 +72,7 @@ Provenance and split fingerprints:
 
 | field | value |
 |---|---|
-| git SHA | `08f767a748381431f1824183a2dc3911bae408ac` |
+| git SHA | `01bc036145e22c1821de8aae8233c2bc4a75b7a0` |
 | git dirty | **false** |
 | source sets | `['a', 'b']` |
 | cohort fingerprint | `f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34` |
@@ -178,7 +183,18 @@ Artifacts in `experiments/robustness/results/m5v2_final_freeze/`: `final_freeze.
 contract, split provenance, hashes and the frozen set-c contract), `final_model.json`,
 `final_imputer.npz`, `final_calibrator.json`.
 
-## 8. What is not done
+## 8. Final freeze audit
+
+**Audit verdict: REPAIR.** The fitted pipeline is unchanged and remains reproducible byte-for-byte.
+The repair makes the inherited `CELL_RANDOM` mechanism, exact per-patient amount matching, full
+23-lab pool and exact fitted-object reuse explicit in the machine-readable contract. It also narrows
+the historical disclosure to what git history supports. Scientific effect: none on the frozen model,
+pattern, M5-v2 gates or planned statistic.
+
+Quality gates after repair: 21 final-freeze tests, 37 targeted M5-v2 tests and 436 full-suite tests;
+Ruff, Ruff format, normal strict mypy scope and `git diff --check` all pass.
+
+## 9. What is not done
 
 - **The set-c test has not been run.** Set C remains locked.
 - No M6 work has started.
