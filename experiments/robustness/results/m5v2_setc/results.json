@@ -1,0 +1,168 @@
+{
+  "alternative_analyses_run": {
+    "count": 0,
+    "note": "Exactly one pattern, one control configuration, one bootstrap and one decision were executed. No alternative pattern, R, control pool, delta, calibration or bootstrap was run."
+  },
+  "cohort": {
+    "n_deaths": 585,
+    "n_patients": 4000,
+    "prevalence": 0.14625,
+    "sets": [
+      "c"
+    ]
+  },
+  "confirmation": {
+    "passes": true,
+    "rule": "primary LB > 0 AND AUROC drop <= 0.02"
+  },
+  "design_document": "docs/M5_V2_DESIGN.md#9",
+  "discrimination_silent": {
+    "auroc_drop": 0.011460750084469118,
+    "clean_auroc": 0.8349944313048268,
+    "delta": 0.02,
+    "passes": true,
+    "withheld_auroc": 0.8235336812203576
+  },
+  "finished_at_utc": "2026-08-11T09:48:09.116782+00:00",
+  "freeze_source_git_sha": "01bc036145e22c1821de8aae8233c2bc4a75b7a0",
+  "frozen_artifact_hashes": {
+    "final_calibrator.json": "3d38a73417c2416ecd957a08ee1e79ad312a31d7753edf623dee6bec4ecc01f7",
+    "final_imputer.npz": "0e84c7bc647521ced39c906a205d8b178d6a49a0d5680fc2de24bee2239193d2",
+    "final_model.json": "669ef8d158e4cdace73fd7d34a4397dba1ee6e2a909a9dfd99b24e3f467954d1"
+  },
+  "frozen_contract_as_executed": {
+    "amount_matching": "For every patient and every control draw, match_counts is the frozen pattern's exact realised per-patient removed-cell count; abort on any mismatch.",
+    "bootstrap_seed": 20260809,
+    "bound": "one-sided 95% LOWER confidence bound = 5th percentile of replicate means",
+    "constraint": "AUROC(clean) - AUROC(pattern) <= 0.02 on set-c",
+    "control_condition": "LossCondition.CELL_RANDOM",
+    "control_repeats": 5,
+    "control_seed_semantics": "control_seed(20260809, ('BUN', 'Glucose', 'Na'), repetition) for repetition=0..4; no label or outcome input",
+    "direction_fixed_by": "M5-v1 development finding; the hypothesis is strictly Delta_C > 0",
+    "eligible_control_pool": [
+      "ALP",
+      "ALT",
+      "AST",
+      "Albumin",
+      "BUN",
+      "Bilirubin",
+      "Cholesterol",
+      "Creatinine",
+      "Glucose",
+      "HCO3",
+      "HCT",
+      "K",
+      "Lactate",
+      "Mg",
+      "Na",
+      "PaCO2",
+      "PaO2",
+      "Platelets",
+      "SaO2",
+      "TroponinI",
+      "TroponinT",
+      "WBC",
+      "pH"
+    ],
+    "eligible_control_pool_includes_withheld_analytes": true,
+    "eligible_control_pool_n": 23,
+    "eligible_control_pool_provenance": "all variables covered by configs/panels.yaml catalogue version 2.0; identical to the M5-v2 development control pool",
+    "fitted_objects": "use exactly the three artifact-hashed fitted objects in this freeze; no refitting or substitution",
+    "forbidden": [
+      "any search or enumeration",
+      "any tuning of model, calibrator, imputer or pattern",
+      "any alternative or substitute pattern",
+      "any second look, retest, or re-test under a different delta",
+      "any refitting of the calibrator under withholding"
+    ],
+    "frozen_control_seeds": [
+      963394647,
+      118547003,
+      817200064,
+      959170045,
+      1019676579
+    ],
+    "interval": "paired patient-level percentile bootstrap on {d_i}",
+    "monte_carlo_limitation": "The R=5 control draws are FIXED across all 10,000 bootstrap replicates. The interval propagates patient-sampling uncertainty but NOT control-draw Monte-Carlo uncertainty, and is mildly optimistic on that account. This sentence must be restated verbatim in any report of the set-c result.",
+    "n_bootstrap": 10000,
+    "n_expected": 4000,
+    "pattern": [
+      "BUN",
+      "Glucose",
+      "Na"
+    ],
+    "primary_decision_rule": "PASS if and only if LB > 0",
+    "single_class_resamples": "skipped, matching project convention",
+    "statistic": "d_i = per-patient log loss under the withheld pattern minus the mean per-patient log loss over the R=5 amount-matched random controls; Delta_C = mean_i d_i",
+    "status": "FROZEN \u2014 NOT EXECUTED. Requires separate explicit approval to run."
+  },
+  "historical_disclosure": "No Set-C patient-level information was retained or used for model fitting, model selection, failure-pattern selection, or any M5-v2 statistic after the aggregate audit.",
+  "monte_carlo_limitation": "The R=5 control draws are FIXED across all 10,000 bootstrap replicates. The interval propagates patient-sampling uncertainty but NOT control-draw Monte-Carlo uncertainty, and is mildly optimistic on that account. This sentence must be restated verbatim in any report of the set-c result.",
+  "predictions_file": {
+    "name": "setc_oneshot_predictions.npz",
+    "sha256": "b8ed025b4a3ed037a07e6351240aa84b5240d9432e84c0639529a21701e38783"
+  },
+  "primary": {
+    "bootstrap_seed": 20260809,
+    "decision_rule": "PASS if and only if LB > 0",
+    "delta_c": 0.01834684116757657,
+    "n_bootstrap": 10000,
+    "n_valid_resamples": 10000,
+    "one_sided_95_lower_bound": 0.01242107148989628,
+    "passes": true,
+    "pattern": [
+      "BUN",
+      "Glucose",
+      "Na"
+    ]
+  },
+  "provenance": {
+    "catalogue_version": "2.0",
+    "cohort_fingerprint": "d3287171b76c4803cc6af4acf17c3118578362267ad5b948e6a8a5e2c0ea496e",
+    "config_hash": "8fbcca088a65ea6462fe04ef42fc00fcf9d049747c2ed58b8a4b2c44e5cbdec8",
+    "evaluated_sets": [
+      "c"
+    ],
+    "git_dirty": true,
+    "git_sha": "e2120eb3785647b361db9e29038259c0fa5de968",
+    "n_patients": 4000,
+    "package_versions": {
+      "numpy": "2.5.2",
+      "scikit-learn": "1.9.0",
+      "xgboost": "3.4.0"
+    },
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python": "3.12.13",
+    "sets": [
+      "c"
+    ],
+    "split_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "record_ids_hash": "dc6b25c8ed062234e4952c6aca7c413eeaed444ae251f8f0aa798e19ac1b4218",
+  "schema": "cliniverse.m5v2.setc_oneshot/1",
+  "secondary_descriptive": {
+    "clean": {
+      "auprc": 0.4677221064272483,
+      "auroc": 0.8349944313048268,
+      "brier": 0.09889783332669949,
+      "calibration_intercept": 0.026293669509318704,
+      "calibration_slope": 0.9697041859737849,
+      "mean_predicted_risk": 0.13988988333046484,
+      "nll": 0.31862169554802133
+    },
+    "mean_realized_severity": 0.17507166482514103,
+    "mean_removed_cells_per_patient": 5.94225,
+    "note": "Descriptive only. Not part of the frozen decision rule.",
+    "withheld": {
+      "auprc": 0.4432686763521523,
+      "auroc": 0.8235336812203576,
+      "brier": 0.104689836494233,
+      "calibration_intercept": 0.6064147678647909,
+      "calibration_slope": 1.0719054946573567,
+      "mean_predicted_risk": 0.10369935441320172,
+      "nll": 0.3374612301180218
+    }
+  },
+  "stage": "ONE-SHOT SET-C CONFIRMATION \u2014 executed once, per the frozen contract",
+  "started_at_utc": "2026-08-11T09:45:20.895837+00:00"
+}

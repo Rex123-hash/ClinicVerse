@@ -1,8 +1,8 @@
 # Cliniverse — Status
 
 **Updated:** 2026-08-11
-**Current milestone:** M5-v1 closed as M5-C; M5-v2 A+B development complete, verdict **v2-STABLE**.
-Set C locked; unlocking not authorised.
+**Current milestone:** M5-v2 complete and **CONFIRMED on set-c**. Set C has been used once, as
+pre-registered, and is now spent.
 
 ## Where we are
 
@@ -19,7 +19,8 @@ Set C locked; unlocking not authorised.
 | M4 Acquisition ranking stability | **Done + repaired** | `docs/M4_MILESTONE_REPORT.md`, `docs/ADVERSARIAL_REVIEW_4.md`. Verdict **M4-C**, ACCEPT |
 | M5-v1 Discrimination-silent failure search | **Closed** | `docs/M5_DESIGN.md` (predeclared), `docs/M5_MILESTONE_REPORT.md`. Verdict **M5-C**: primary test T1 failed, transfer test T4 passed. Recovery arm not run |
 | M5-v2 Stability-aware failure search | **A+B development done** | `docs/M5_V2_DESIGN.md` (predeclared), `docs/M5_V2_MILESTONE_REPORT.md`. Verdict **v2-STABLE**, all four gates pass. Frozen pattern `BUN+Glucose+Na` |
-| M5-v2 Final model freeze | **Done** | `docs/M5_V2_FINAL_FREEZE.md`. Final pipeline fitted on A+B with 6,400/1,600 isolation; set-c contract frozen and **not executed**; set-c not accessed |
+| M5-v2 Final model freeze | **Done** | `docs/M5_V2_FINAL_FREEZE.md`. Final pipeline fitted on A+B with 6,400/1,600 isolation; set-c contract frozen |
+| M5-v2 One-shot set-c confirmation | **Done — CONFIRMED** | `docs/M5_V2_SETC_CONFIRMATION.md`. `Delta_C` +0.018347, one-sided 95% LB **+0.012421 > 0**; AUROC drop **+0.011461 <= 0.02**. Set C is now spent |
 | M6 API + minimal UI | Not started | |
 | M7 Final + review response | Not started | |
 
@@ -144,6 +145,22 @@ under v2 versus 58% under v1's non-comparable naive procedure. **99/100** out-of
 were positive. Detectability projects MDE +0.00804 against an out-of-selection development estimate
 of +0.01201, so G4 still passes. The exact percentages are not a like-for-like estimate of bias
 reduction.
+
+## Key M5-v2 set-c confirmation result
+
+The single pre-registered set-c test was executed once, per the frozen contract, and **passed both
+conditions**. Withholding `BUN+Glucose+Na` from the frozen model on 4,000 quarantined patients gives
+`Delta_C` **+0.018347** excess NLL over an amount-matched random control, one-sided 95% lower bound
+**+0.012421 > 0**, while AUROC moves only 0.834994 -> 0.823534 (**drop +0.011461 <= 0.02**).
+
+Descriptively, the calibration intercept moves +0.026 -> **+0.606** and mean predicted risk falls
+0.1399 -> **0.1037** against a set-c prevalence of 0.14625.
+
+The R=5 control draws are fixed across all 10,000 bootstrap replicates, so the interval propagates
+patient-sampling uncertainty but not control-draw Monte-Carlo uncertainty.
+
+**No Set-C patient-level information was retained or used for model fitting, model selection,
+failure-pattern selection, or any M5-v2 statistic after the aggregate audit.** Set C is now spent.
 
 ## Superseded M3 gate note
 
