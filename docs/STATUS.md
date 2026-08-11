@@ -19,6 +19,7 @@ Set C locked; unlocking not authorised.
 | M4 Acquisition ranking stability | **Done + repaired** | `docs/M4_MILESTONE_REPORT.md`, `docs/ADVERSARIAL_REVIEW_4.md`. Verdict **M4-C**, ACCEPT |
 | M5-v1 Discrimination-silent failure search | **Closed** | `docs/M5_DESIGN.md` (predeclared), `docs/M5_MILESTONE_REPORT.md`. Verdict **M5-C**: primary test T1 failed, transfer test T4 passed. Recovery arm not run |
 | M5-v2 Stability-aware failure search | **A+B development done** | `docs/M5_V2_DESIGN.md` (predeclared), `docs/M5_V2_MILESTONE_REPORT.md`. Verdict **v2-STABLE**, all four gates pass. Frozen pattern `BUN+Glucose+Na` |
+| M5-v2 Final model freeze | **Done** | `docs/M5_V2_FINAL_FREEZE.md`. Final pipeline fitted on A+B with 6,400/1,600 isolation; set-c contract frozen and **not executed**; set-c not accessed |
 | M6 API + minimal UI | Not started | |
 | M7 Final + review response | Not started | |
 

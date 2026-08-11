@@ -1,0 +1,7 @@
+{
+  "fitted": true,
+  "intercept": 0.07011626064263363,
+  "kind": "platt",
+  "n_calibration": 1600,
+  "slope": 0.9915814346171334
+}

@@ -1,0 +1,143 @@
+{
+  "artifact_hashes": {
+    "final_calibrator.json": "3d38a73417c2416ecd957a08ee1e79ad312a31d7753edf623dee6bec4ecc01f7",
+    "final_imputer.npz": "0e84c7bc647521ced39c906a205d8b178d6a49a0d5680fc2de24bee2239193d2",
+    "final_model.json": "669ef8d158e4cdace73fd7d34a4397dba1ee6e2a909a9dfd99b24e3f467954d1"
+  },
+  "calibrator": {
+    "fitted_on": "the 1,600 clean final-calibration rows only",
+    "intercept": 0.07011626064263363,
+    "kind": "platt",
+    "never_refitted_under_withholding": true,
+    "slope": 0.9915814346171334
+  },
+  "design_document": "docs/M5_V2_DESIGN.md#8",
+  "fitting_diagnostics_not_evaluation": {
+    "mean_calibrated_calibration_prediction": 0.13998709367151585,
+    "mean_raw_calibration_prediction": 0.13257001340389252,
+    "note": "In-sample for the calibrator by construction. Recorded to verify reproducibility of the freeze, NOT as evaluation evidence."
+  },
+  "frozen_pattern": [
+    "BUN",
+    "Glucose",
+    "Na"
+  ],
+  "frozen_pattern_columns": [
+    4,
+    11,
+    23
+  ],
+  "frozen_pattern_provenance": "M5-v2 A+B development, verdict v2-STABLE, selected in 11/20 resplits (exactly the majority threshold). Carried in as a constant; this stage performs no selection.",
+  "model": {
+    "estimator": "XGBClassifier",
+    "fitted_on": "the 6,400 clean final-training rows only",
+    "hyperparameters": {
+      "colsample_bytree": 0.8,
+      "eval_metric": "logloss",
+      "learning_rate": 0.05,
+      "max_depth": 5,
+      "min_child_weight": 10,
+      "n_estimators": 200,
+      "n_jobs": 4,
+      "reg_lambda": 1.0,
+      "subsample": 0.8,
+      "tree_method": "hist"
+    },
+    "n_features_used": 230,
+    "random_state": 20260809
+  },
+  "preprocessing": {
+    "cutoff_hours": 24,
+    "imputation_strategy": "median",
+    "imputer_fitted_on": "the 6,400 clean final-training rows only",
+    "imputer_seed": 20260809,
+    "n_features": 298,
+    "representation": "values_mask"
+  },
+  "provenance": {
+    "catalogue_version": "2.0",
+    "cohort_fingerprint": "f59c44f07556b7a606623b928df12770af795abccff4b5771d5fe26fa25a2e34",
+    "config_hash": "40e192fe9139cd04c0b6647e738c4d85ed4de5b29c27b2ee951e4ee90de18b55",
+    "excluded_sets": [
+      "c"
+    ],
+    "git_dirty": false,
+    "git_sha": "08f767a748381431f1824183a2dc3911bae408ac",
+    "n_patients": 8000,
+    "package_versions": {
+      "numpy": "2.5.2",
+      "scikit-learn": "1.9.0",
+      "xgboost": "3.4.0"
+    },
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python": "3.12.13",
+    "sets": [
+      "a",
+      "b"
+    ],
+    "split_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "schema": "cliniverse.m5v2.final_freeze/1",
+  "set_c_access": {
+    "allow_final_holdout_passed": false,
+    "loaded_during_freeze": false,
+    "realised_source_sets": [
+      "a",
+      "b"
+    ],
+    "scored_during_freeze": false
+  },
+  "set_c_evaluation_contract": {
+    "bootstrap_seed": 20260809,
+    "bound": "one-sided 95% LOWER confidence bound = 5th percentile of replicate means",
+    "constraint": "AUROC(clean) - AUROC(pattern) <= 0.02 on set-c",
+    "control_repeats": 5,
+    "direction_fixed_by": "M5-v1 development finding; the hypothesis is strictly Delta_C > 0",
+    "forbidden": [
+      "any search or enumeration",
+      "any tuning of model, calibrator, imputer or pattern",
+      "any alternative or substitute pattern",
+      "any second look, retest, or re-test under a different delta",
+      "any refitting of the calibrator under withholding"
+    ],
+    "frozen_control_seeds": [
+      963394647,
+      118547003,
+      817200064,
+      959170045,
+      1019676579
+    ],
+    "interval": "paired patient-level percentile bootstrap on {d_i}",
+    "monte_carlo_limitation": "The R=5 control draws are FIXED across all 10,000 bootstrap replicates. The interval propagates patient-sampling uncertainty but NOT control-draw Monte-Carlo uncertainty, and is mildly optimistic on that account. This sentence must be restated verbatim in any report of the set-c result.",
+    "n_bootstrap": 10000,
+    "n_expected": 4000,
+    "pattern": [
+      "BUN",
+      "Glucose",
+      "Na"
+    ],
+    "primary_decision_rule": "PASS if and only if LB > 0",
+    "single_class_resamples": "skipped, matching project convention",
+    "statistic": "d_i = per-patient log loss under the withheld pattern minus the mean per-patient log loss over the R=5 amount-matched random controls; Delta_C = mean_i d_i",
+    "status": "FROZEN \u2014 NOT EXECUTED. Requires separate explicit approval to run."
+  },
+  "split": {
+    "calibration_index_hash": "193a3e806e1b4a6d5ed3bf7c23a0fff0bd0b9c507dd4dfefd9c7936a9fb6311f",
+    "calibration_prevalence": 0.14,
+    "calibration_record_ids_hash": "3a7914d77f56c290fed61099f983fd376be512c6fa1c9dd29bf6db2bbb9969a5",
+    "disjoint": true,
+    "n_final_calibration": 1600,
+    "n_final_train": 6400,
+    "n_total": 8000,
+    "seed": 20260809,
+    "source_sets": [
+      "a",
+      "b"
+    ],
+    "stratified_by": "mortality",
+    "train_index_hash": "8feae9cee60a1c2d48557a24d44a8f98ad8107986eb36f63a2d1e90696541ca5",
+    "train_prevalence": 0.1403125,
+    "train_record_ids_hash": "e62187cbfd85ca8115b796d054165a38a91f66eb49d5385bb8c057dee5e5db41"
+  },
+  "stage": "FINAL MODEL FREEZE \u2014 no evaluation performed"
+}
