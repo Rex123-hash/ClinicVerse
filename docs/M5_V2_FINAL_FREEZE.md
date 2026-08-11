@@ -88,7 +88,8 @@ approval.**
 |---|---|
 | pattern | `BUN + Glucose + Na` — one pattern, no alternatives |
 | expected n | 4,000 |
-| controls | **R = 5** amount-matched random draws |
+| controls | **R = 5**, `LossCondition.CELL_RANDOM`, exact realised per-patient `match_counts` |
+| eligible control pool | all **23** catalogue-covered labs, including BUN, Glucose and Na; identical to M5-v2 development |
 | control seeds | **963394647, 118547003, 817200064, 959170045, 1019676579** |
 | statistic | `d_i` = per-patient log loss under withholding minus the mean per-patient log loss over the 5 controls; `Delta_C = mean_i d_i` |
 | interval | paired patient-level **percentile bootstrap** on `{d_i}` |
@@ -132,11 +133,14 @@ aggregate information was observed once, during dataset assessment, and is recor
 | `Outcomes-c.txt` size | 79,191 bytes | E-000 access table (HTTP HEAD) |
 | `set-c.tar.gz` size | 6,600,293 bytes | E-000 access table (HTTP HEAD) |
 
-**What was NOT observed.** No set-c per-patient data, record IDs, time series, per-variable coverage,
-missingness structure or feature statistics were ever read. The E-000 time-series structure and
-per-variable coverage tables are computed on **set-a only** (E-000 states this explicitly). No set-c
-quantity has ever entered a fitted object, a hyperparameter choice, a split, a threshold, a metric, or
-a pattern selection.
+**What git history actually supports.** The historical verification script used `pandas.read_csv` on
+all three outcomes files and summed `In-hospital_death`. It therefore necessarily materialised
+Set-C patient-level outcome rows transiently, even though its recorded output was aggregate. Git
+history cannot establish whether a person inspected individual rows or whether copies existed
+outside the repository. The E-000 time-series structure and per-variable coverage tables were
+computed on **set-a only**. No Set-C patient-level information was retained or used for model
+fitting, model selection, failure-pattern selection, or any M5-v2 statistic after the aggregate
+audit.
 
 **Current local cache state**, established from filesystem metadata without reading contents:
 
@@ -144,9 +148,11 @@ a pattern selection.
 - `data/raw/physionet2012/set-c/` — **absent**. The set-c record archive was never materialised, so
   the time-series data does not exist locally.
 
-The honest summary is therefore: **set-c aggregate outcome counts were read once during dataset
-assessment and its labels file is present on disk; its records have never been materialised, and
-nothing from set-c has ever influenced any modelling decision.**
+The honest summary is therefore: **the historical audit code read Set-C outcome rows to produce
+aggregate counts, but no Set-C patient-level information was retained or used for model fitting,
+model selection, failure-pattern selection, or any M5-v2 statistic after that audit.** The labels
+file is present locally; filesystem metadata indicates that the time-series record directory is
+absent.
 
 The lock is enforced in code, not by convention: `load_cohort()` defaults to sets a+b and raises
 `DataError` when set-c is requested without `allow_final_holdout=True`; `final_holdout()` requires a

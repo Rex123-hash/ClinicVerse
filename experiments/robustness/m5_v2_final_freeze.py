@@ -76,6 +76,15 @@ SET_C_CONTRACT: dict[str, Any] = {
     "pattern": list(FROZEN_PATTERN),
     "n_expected": 4000,
     "control_repeats": 5,
+    "control_condition": "LossCondition.CELL_RANDOM",
+    "amount_matching": (
+        "For every patient and every control draw, match_counts is the frozen pattern's "
+        "exact realised per-patient removed-cell count; abort on any mismatch."
+    ),
+    "control_seed_semantics": (
+        "control_seed(20260809, ('BUN', 'Glucose', 'Na'), repetition) for "
+        "repetition=0..4; no label or outcome input"
+    ),
     "statistic": (
         "d_i = per-patient log loss under the withheld pattern minus the mean "
         "per-patient log loss over the R=5 amount-matched random controls; "
@@ -120,6 +129,14 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     catalogue = load_panel_catalogue()
+    control_pool = sorted(catalogue.covered_variables)
+    if len(control_pool) != 23:
+        raise ConfigError(
+            "final contract requires the inherited 23-lab control pool, "
+            f"got {len(control_pool)}"
+        )
+    if not set(FROZEN_PATTERN).issubset(control_pool):
+        raise ConfigError("frozen pattern is not contained in the eligible control pool")
 
     # `load_cohort()` defaults to the development sets. `allow_final_holdout` is
     # never passed anywhere in this file, so set-c cannot be materialised here.
@@ -283,6 +300,17 @@ def main(argv: list[str] | None = None) -> int:
         "set_c_evaluation_contract": {
             **SET_C_CONTRACT,
             "frozen_control_seeds": frozen_control_seeds,
+            "eligible_control_pool": control_pool,
+            "eligible_control_pool_n": len(control_pool),
+            "eligible_control_pool_includes_withheld_analytes": True,
+            "eligible_control_pool_provenance": (
+                "all variables covered by configs/panels.yaml catalogue version 2.0; "
+                "identical to the M5-v2 development control pool"
+            ),
+            "fitted_objects": (
+                "use exactly the three artifact-hashed fitted objects in this freeze; "
+                "no refitting or substitution"
+            ),
         },
         "set_c_access": {
             "loaded_during_freeze": False,

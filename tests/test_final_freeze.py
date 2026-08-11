@@ -15,6 +15,7 @@ level, so they fail even if the dataset is absent from the machine.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import pathlib
 
@@ -39,6 +40,34 @@ FREEZE_RESULT = (
     / "m5v2_final_freeze"
     / "final_freeze.json"
 )
+FREEZE_PACKAGE = FREEZE_RESULT.parent
+FREEZE_REPORT = REPO_ROOT / "docs" / "M5_V2_FINAL_FREEZE.md"
+
+EXPECTED_CONTROL_POOL = [
+    "ALP",
+    "ALT",
+    "AST",
+    "Albumin",
+    "BUN",
+    "Bilirubin",
+    "Cholesterol",
+    "Creatinine",
+    "Glucose",
+    "HCO3",
+    "HCT",
+    "K",
+    "Lactate",
+    "Mg",
+    "Na",
+    "PaCO2",
+    "PaO2",
+    "Platelets",
+    "SaO2",
+    "TroponinI",
+    "TroponinT",
+    "WBC",
+    "pH",
+]
 
 FREEZE_SEED = 20260809
 N_FINAL_TRAIN = 6400
@@ -208,3 +237,43 @@ class TestFrozenArtifact:
         for digest in hashes.values():
             assert isinstance(digest, str)
             assert len(digest) == 64
+
+    def test_artifact_hashes_match_package_bytes(self, freeze: dict[str, object]) -> None:
+        hashes = freeze["artifact_hashes"]
+        assert isinstance(hashes, dict)
+        for name, expected in hashes.items():
+            path = FREEZE_PACKAGE / str(name)
+            assert hashlib.sha256(path.read_bytes()).hexdigest() == expected
+
+    def test_control_mechanism_and_pool_are_fully_frozen(
+        self, freeze: dict[str, object]
+    ) -> None:
+        contract = freeze["set_c_evaluation_contract"]
+        assert isinstance(contract, dict)
+        assert contract["control_condition"] == "LossCondition.CELL_RANDOM"
+        assert "exact realised per-patient" in str(contract["amount_matching"])
+        assert contract["eligible_control_pool_n"] == 23
+        assert contract["eligible_control_pool"] == EXPECTED_CONTROL_POOL
+        assert contract["eligible_control_pool_includes_withheld_analytes"] is True
+        assert "no refitting or substitution" in str(contract["fitted_objects"])
+
+    def test_transparent_imputer_and_calibrator_state_is_complete(self) -> None:
+        with np.load(FREEZE_PACKAGE / "final_imputer.npz", allow_pickle=False) as imputer:
+            assert set(imputer.files) == {"medians", "jitter_scales", "seed", "strategy"}
+            assert imputer["medians"].shape == (298,)
+            assert imputer["jitter_scales"].shape == (298,)
+            assert int(imputer["seed"]) == FREEZE_SEED
+            assert str(imputer["strategy"]) == "median"
+        calibrator = json.loads(
+            (FREEZE_PACKAGE / "final_calibrator.json").read_text(encoding="utf-8")
+        )
+        assert calibrator["kind"] == "platt"
+        assert calibrator["fitted"] is True
+        assert calibrator["n_calibration"] == N_FINAL_CALIBRATION
+        assert np.isfinite([calibrator["slope"], calibrator["intercept"]]).all()
+
+
+def test_historical_exposure_wording_does_not_overclaim() -> None:
+    report = FREEZE_REPORT.read_text(encoding="utf-8")
+    assert "No set-c per-patient data" not in report
+    assert "No Set-C patient-level information was retained or used" in report
