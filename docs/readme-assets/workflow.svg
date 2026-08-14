@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 250" width="980" height="250" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="cvArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 1.5 9 5 0 8.5Z" fill="#7C8CA8" />
+    </marker>
+    <linearGradient id="cvSeal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1D45" />
+      <stop offset="1" stop-color="#123246" />
+    </linearGradient>
+  </defs>
+
+  <style>
+    .lbl  { font-size: 12.5px; font-weight: 600; fill: #10234B; }
+    .sub  { font-size: 10px;   font-weight: 500; fill: #6F7D96; }
+    .lblx { font-size: 12.5px; font-weight: 600; fill: #EAFFFC; }
+    .subx { font-size: 10px;   font-weight: 500; fill: #8FB9B8; }
+    .stage{ font-size: 9.5px;  font-weight: 700; fill: #087D7D; letter-spacing: 1.1px; }
+    .flow { stroke: #7C8CA8; stroke-width: 1.4; fill: none; marker-end: url(#cvArrow); }
+  </style>
+
+  <!-- stage bands -->
+  <text class="stage" x="20" y="24">DEVELOPMENT  ·  SETS A + B  ·  8,000 PATIENTS</text>
+  <text class="stage" x="708" y="24" fill="#0B1D45">FROZEN  ·  ONE-SHOT</text>
+  <line x1="20" y1="34" x2="690" y2="34" stroke="#DCE6EA" stroke-width="1" />
+  <line x1="708" y1="34" x2="960" y2="34" stroke="#C6D3DB" stroke-width="1" />
+
+  <!-- 1. model under test -->
+  <rect x="20" y="58" width="150" height="62" rx="12" fill="#FFFFFF" stroke="#DCE6EA" />
+  <text class="lbl" x="36" y="83">Model under test</text>
+  <text class="sub" x="36" y="99">XGBoost · values_mask</text>
+  <text class="sub" x="36" y="112">24-hour cutoff</text>
+
+  <!-- 2. stress + control engines -->
+  <rect x="206" y="34" width="150" height="52" rx="12" fill="#E7F8F5" stroke="#BFE7E0" />
+  <text class="lbl" x="222" y="56">Stress engine</text>
+  <text class="sub" x="222" y="71">withhold analyte groups</text>
+
+  <rect x="206" y="98" width="150" height="52" rx="12" fill="#F4FAF9" stroke="#DCE6EA" />
+  <text class="lbl" x="222" y="120">Control engine</text>
+  <text class="sub" x="222" y="135">amount-matched removal</text>
+
+  <!-- 3. candidate search -->
+  <rect x="392" y="58" width="150" height="62" rx="12" fill="#FFFFFF" stroke="#DCE6EA" />
+  <text class="lbl" x="408" y="83">Candidate search</text>
+  <text class="sub" x="408" y="99">141 candidates</text>
+  <text class="sub" x="408" y="112">excess NLL vs control</text>
+
+  <!-- 4. stability selection -->
+  <rect x="578" y="58" width="150" height="62" rx="12" fill="#FFFFFF" stroke="#DCE6EA" />
+  <text class="lbl" x="594" y="83">Stability selection</text>
+  <text class="sub" x="594" y="99">20 resplits · 1-SE parsimony</text>
+  <text class="sub" x="594" y="112">gates G1–G4</text>
+
+  <!-- 5. freeze -->
+  <rect x="764" y="58" width="196" height="62" rx="12" fill="url(#cvSeal)" stroke="#0B1D45" />
+  <text class="lblx" x="782" y="83">Freeze</text>
+  <text class="subx" x="782" y="99">model + preprocessing + pattern</text>
+  <text class="subx" x="782" y="112">+ statistical contract, hash-sealed</text>
+
+  <!-- 6. holdout -->
+  <rect x="578" y="166" width="196" height="62" rx="12" fill="#FFF3E8" stroke="#FFD9BD" />
+  <text class="lbl" x="596" y="191">Quarantined holdout</text>
+  <text class="sub" x="596" y="207">set C · 4,000 patients</text>
+  <text class="sub" x="596" y="220">executed once — now spent</text>
+
+  <!-- 7. evidence -->
+  <rect x="330" y="166" width="196" height="62" rx="12" fill="#FFFFFF" stroke="#DCE6EA" />
+  <text class="lbl" x="348" y="191">Reliability report</text>
+  <text class="sub" x="348" y="207">clean vs withheld diagnostics</text>
+  <text class="sub" x="348" y="220">+ evidence graph</text>
+
+  <!-- 8. app -->
+  <rect x="82" y="166" width="196" height="62" rx="12" fill="#E7F8F5" stroke="#BFE7E0" />
+  <text class="lbl" x="100" y="191">Cliniverse web app</text>
+  <text class="sub" x="100" y="207">six read-only surfaces</text>
+  <text class="sub" x="100" y="220">every figure traceable</text>
+
+  <!-- flows -->
+  <path class="flow" d="M170 78 H198" />
+  <path class="flow" d="M170 100 H198 V116" />
+  <path class="flow" d="M356 60 H374 V83 H386" />
+  <path class="flow" d="M356 124 H374 V95 H386" />
+  <path class="flow" d="M542 89 H572" />
+  <path class="flow" d="M728 89 H758" />
+  <path class="flow" d="M862 120 V150 H770" />
+  <path class="flow" d="M578 197 H532" />
+  <path class="flow" d="M330 197 H284" />
+</svg>
