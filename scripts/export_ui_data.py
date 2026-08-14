@@ -505,7 +505,9 @@ def copy_public_evidence() -> None:
                 "whose digest no longer matches the one displayed."
             )
         (PUBLIC_EVIDENCE / name).write_bytes(payload)
-        print(f"wrote web/public/evidence/{name} ({len(payload)} bytes, sha256 {digest[:12]}…)")
+        print(
+            f"wrote web/public/evidence/{name} ({len(payload)} bytes, sha256 {digest[:12]}…)"
+        )
 
 
 def main() -> None:
