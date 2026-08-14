@@ -30,7 +30,7 @@ discrimination-focused evaluation can miss entirely.
 <br />
 
 > **Research software.** Not medical advice, not a diagnostic tool, not a treatment recommender.
-> All outputs are research and model simulations. See [Limitations](#limitations).
+> All outputs are research and model simulations. 
 
 ---
 
