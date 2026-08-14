@@ -29,6 +29,7 @@ import {
   type Milestone,
   type MilestoneState,
 } from '../data/cliniverseResults'
+import { repoFileUrl } from '../data/evidenceLinks'
 import './experiments.css'
 
 const STATE_TONE: Record<MilestoneState, 'green' | 'teal' | 'amber' | 'grey'> = {
@@ -167,7 +168,9 @@ export default function Experiments() {
           <Button
             variant="secondary"
             icon={<GitCommitHorizontal size={14} />}
-            disabledReason={`Open ${selected.report} in the repository — reports are committed markdown, not served by this application.`}
+            href={repoFileUrl(selected.report)}
+            external
+            title={`Open ${selected.report} in the repository`}
           >
             Open report
           </Button>

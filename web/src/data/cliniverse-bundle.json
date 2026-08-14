@@ -69,7 +69,7 @@
     "c"
    ],
    "git_dirty": true,
-   "git_sha": "e2120eb3785647b361db9e29038259c0fa5de968",
+   "git_sha": "a97f6905d3f8c34ac4030ede5114a02990c61578",
    "n_patients": 4000,
    "package_versions": {
     "numpy": "2.5.2",
@@ -81,7 +81,8 @@
    "sets": [
     "c"
    ],
-   "split_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+   "split_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "git_sha_at_run": "e2120eb3785647b361db9e29038259c0fa5de968"
   },
   "recordIdsHash": "dc6b25c8ed062234e4952c6aca7c413eeaed444ae251f8f0aa798e19ac1b4218",
   "predictionsFile": {
@@ -101,7 +102,7 @@
   },
   "startedAt": "2026-08-11T09:45:20.895837+00:00",
   "finishedAt": "2026-08-11T09:48:09.116782+00:00",
-  "freezeSourceGitSha": "01bc036145e22c1821de8aae8233c2bc4a75b7a0"
+  "freezeSourceGitSha": "e5edc13b3f242a5f8f94b4af6522018682e47df9"
  },
  "freeze": {
   "stage": "FINAL MODEL FREEZE — no evaluation performed",
@@ -175,7 +176,7 @@
     "c"
    ],
    "git_dirty": false,
-   "git_sha": "01bc036145e22c1821de8aae8233c2bc4a75b7a0",
+   "git_sha": "e5edc13b3f242a5f8f94b4af6522018682e47df9",
    "n_patients": 8000,
    "package_versions": {
     "numpy": "2.5.2",
@@ -188,7 +189,8 @@
     "a",
     "b"
    ],
-   "split_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+   "split_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+   "git_sha_at_run": "01bc036145e22c1821de8aae8233c2bc4a75b7a0"
   },
   "artifactHashes": {
    "final_calibrator.json": "3d38a73417c2416ecd957a08ee1e79ad312a31d7753edf623dee6bec4ecc01f7",
@@ -365,7 +367,7 @@
     "c"
    ],
    "git_dirty": false,
-   "git_sha": "91262fd5c53c56665a042d11225abdc7b5c85777",
+   "git_sha": "3f4b4e01dc58c62636a1b59e5d411a60eb51122d",
    "n_patients": 8000,
    "package_versions": {
     "numpy": "2.5.2",
@@ -378,7 +380,8 @@
     "a",
     "b"
    ],
-   "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775"
+   "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775",
+   "git_sha_at_run": "91262fd5c53c56665a042d11225abdc7b5c85777"
   },
   "cleanAurocByResplit": [
    0.827046,
@@ -435,7 +438,7 @@
     "c"
    ],
    "git_dirty": false,
-   "git_sha": "f6b6e6be671e868f988d05e2c64fa7e9275d7fcd",
+   "git_sha": "abb9ffc012e4d763788bfc96eb0f94019489be58",
    "n_patients": 8000,
    "package_versions": {
     "numpy": "2.5.2",
@@ -448,7 +451,8 @@
     "a",
     "b"
    ],
-   "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775"
+   "split_hash": "21cbeab1b5bc308fac2ebc84ccd400d8892fd6fc7b69840696eb48bd75cb1775",
+   "git_sha_at_run": "f6b6e6be671e868f988d05e2c64fa7e9275d7fcd"
   }
  },
  "visual": {

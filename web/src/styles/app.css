@@ -727,6 +727,10 @@
     background var(--cv-t-fast) var(--cv-ease),
     border-color var(--cv-t-fast) var(--cv-ease);
 }
+/* Actions that navigate or download are anchors, styled identically. */
+a.cv-btn {
+  text-decoration: none;
+}
 .cv-btn:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: var(--cv-shadow-sm);

@@ -17,6 +17,7 @@ import Button from '../components/ui/Button'
 import Tooltip from '../components/ui/Tooltip'
 import Timeline from '../components/ui/Timeline'
 import CopyButton from '../components/ui/CopyButton'
+import { repoFileUrl, setCEvidenceFile, setCReportPath } from '../data/evidenceLinks'
 import {
   MeanRiskShiftChart,
   ReliabilityChart,
@@ -99,10 +100,22 @@ export default function ReliabilityReport() {
         </div>
 
         <div className="rr-head-actions">
-          <Button variant="secondary" icon={<FileText size={14} />} disabledReason="The written report is a committed repository file: docs/M5_V2_SETC_CONFIRMATION.md">
+          <Button
+            variant="secondary"
+            icon={<FileText size={14} />}
+            href={repoFileUrl(setCReportPath)}
+            external
+            title={`Open ${setCReportPath} in the repository`}
+          >
             Written report
           </Button>
-          <Button variant="dark" icon={<Download size={14} />} disabledReason="Result artifacts are committed to the repository under experiments/robustness/results/m5v2_setc/">
+          <Button
+            variant="dark"
+            icon={<Download size={14} />}
+            href={setCEvidenceFile.url}
+            download={setCEvidenceFile.filename}
+            title={`Download ${setCEvidenceFile.sourcePath} — ${setCEvidenceFile.bytes} bytes, sha256 ${setCEvidenceFile.sha256}`}
+          >
             Export data
           </Button>
         </div>

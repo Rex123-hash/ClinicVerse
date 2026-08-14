@@ -35,6 +35,7 @@ import {
   type ArtifactKind,
   type VisualArtifact,
 } from '../data/cliniverseResults'
+import { repoFileUrl } from '../data/evidenceLinks'
 import '../components/visuals/visuals.css'
 import './artifacts.css'
 
@@ -418,7 +419,9 @@ function FileInspector({ id, onBack }: { id: string; onBack: () => void }) {
         <Button
           variant="secondary"
           icon={<Download size={14} />}
-          disabledReason={`${selected.path} lives in the repository. Scientific artifacts are not served to the browser — open it from the repo.`}
+          href={repoFileUrl(selected.path)}
+          external
+          title={`Open ${selected.path} in the repository`}
         >
           Open in repository
         </Button>

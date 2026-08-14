@@ -37,6 +37,7 @@ import {
   product,
   setc,
 } from '../data/cliniverseResults'
+import { repoFileUrl } from '../data/evidenceLinks'
 import './modellab.css'
 
 const TABS = ['Representation grid', 'Training data', 'Feature space', 'Guardrails', 'Lineage'] as const
@@ -99,7 +100,9 @@ export default function ModelLab() {
         <Button
           variant="secondary"
           icon={<FileCode2 size={14} />}
-          disabledReason="The freeze record is a committed repository artifact; open final_freeze.json in the repository."
+          href={repoFileUrl('experiments/robustness/results/m5v2_final_freeze/final_freeze.json')}
+          external
+          title="Open final_freeze.json in the repository"
         >
           View freeze record
         </Button>

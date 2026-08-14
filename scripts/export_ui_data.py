@@ -14,6 +14,7 @@ Output: ``web/src/data/cliniverse-bundle.json``
 
 from __future__ import annotations
 
+import hashlib
 import json
 from collections import defaultdict
 from pathlib import Path
@@ -24,6 +25,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 EXP = ROOT / "experiments"
 OUT = ROOT / "web" / "src" / "data" / "cliniverse-bundle.json"
+PUBLIC_EVIDENCE = ROOT / "web" / "public" / "evidence"
 
 SETC = EXP / "robustness/results/m5v2_setc"
 FREEZE = EXP / "robustness/results/m5v2_final_freeze"
@@ -434,6 +436,78 @@ def visual_artifacts() -> dict[str, Any]:
     }
 
 
+# Evidence files served to the browser verbatim, so the "Export data" action in
+# the UI hands over the committed artifact itself rather than a re-serialisation
+# of it. The expected digest is the same one the Artifacts page displays; keeping
+# it here means a changed artifact fails the export loudly instead of silently
+# desynchronising the hash the UI claims.
+PUBLIC_EVIDENCE_FILES: tuple[tuple[Path, str, str], ...] = (
+    (
+        SETC / "results.json",
+        "setc-confirmation.json",
+        "7179a5744e5d9034a735fb6bcd1652a96e850e285fc60b8de61983a7d192a907",
+    ),
+)
+
+
+# The public repository history was rewritten with `git filter-repo` after these
+# experiments ran, so the commit SHAs recorded in the result artifacts at run
+# time no longer resolve on the public remote. The mapping below is taken
+# verbatim from `.git/filter-repo/commit-map`; every target below was verified
+# reachable from the rewritten `main`.
+#
+# This translates *where to find the commit*, never what was measured. The
+# artifacts themselves are frozen and are not edited: the value recorded at run
+# time travels through as `git_sha_at_run` so nothing is lost.
+GIT_SHA_REWRITE: dict[str, str] = {
+    # set-c one-shot confirmation run
+    "e2120eb3785647b361db9e29038259c0fa5de968": "a97f6905d3f8c34ac4030ede5114a02990c61578",
+    # final freeze the confirmation was executed against
+    "01bc036145e22c1821de8aae8233c2bc4a75b7a0": "e5edc13b3f242a5f8f94b4af6522018682e47df9",
+    # M5-v2 development search
+    "91262fd5c53c56665a042d11225abdc7b5c85777": "3f4b4e01dc58c62636a1b59e5d411a60eb51122d",
+    # M5-v1, the search layer that failed its own bar
+    "f6b6e6be671e868f988d05e2c64fa7e9275d7fcd": "abb9ffc012e4d763788bfc96eb0f94019489be58",
+}
+
+
+def rewritten(sha: str) -> str:
+    """Current public SHA for a commit recorded before the history rewrite."""
+    return GIT_SHA_REWRITE.get(sha, sha)
+
+
+def remap_provenance(provenance: Any) -> Any:
+    """Copy a provenance block with its git SHA pointed at the public history."""
+    if not isinstance(provenance, dict) or "git_sha" not in provenance:
+        return provenance
+    recorded = provenance["git_sha"]
+    updated = dict(provenance)
+    updated["git_sha"] = rewritten(recorded)
+    updated["git_sha_at_run"] = recorded
+    return updated
+
+
+def copy_public_evidence() -> None:
+    """Copy committed evidence artifacts into the web app's static assets.
+
+    Byte-for-byte, never re-serialised: a judge who downloads the file from the
+    deployed application must be able to hash it and get the digest recorded in
+    the result artifact and shown in the UI.
+    """
+    PUBLIC_EVIDENCE.mkdir(parents=True, exist_ok=True)
+    for source, name, expected_sha256 in PUBLIC_EVIDENCE_FILES:
+        payload = source.read_bytes()
+        digest = hashlib.sha256(payload).hexdigest()
+        if digest != expected_sha256:
+            raise SystemExit(
+                f"{source.relative_to(ROOT)} hashes to {digest}, but the UI "
+                f"publishes {expected_sha256}. Refusing to serve an artifact "
+                "whose digest no longer matches the one displayed."
+            )
+        (PUBLIC_EVIDENCE / name).write_bytes(payload)
+        print(f"wrote web/public/evidence/{name} ({len(payload)} bytes, sha256 {digest[:12]}…)")
+
+
 def main() -> None:
     setc = load_json(SETC / "results.json")
     freeze = load_json(FREEZE / "final_freeze.json")
@@ -470,7 +544,7 @@ def main() -> None:
             },
             "confirmation": setc["confirmation"],
             "secondary": setc["secondary_descriptive"],
-            "provenance": setc["provenance"],
+            "provenance": remap_provenance(setc["provenance"]),
             "recordIdsHash": setc["record_ids_hash"],
             "predictionsFile": setc["predictions_file"],
             "frozenArtifactHashes": setc["frozen_artifact_hashes"],
@@ -479,7 +553,7 @@ def main() -> None:
             "alternativeAnalysesRun": setc["alternative_analyses_run"],
             "startedAt": setc["started_at_utc"],
             "finishedAt": setc["finished_at_utc"],
-            "freezeSourceGitSha": setc["freeze_source_git_sha"],
+            "freezeSourceGitSha": rewritten(setc["freeze_source_git_sha"]),
         },
         "freeze": {
             "stage": freeze["stage"],
@@ -490,7 +564,7 @@ def main() -> None:
             "preprocessing": freeze["preprocessing"],
             "calibrator": freeze["calibrator"],
             "split": freeze["split"],
-            "provenance": freeze["provenance"],
+            "provenance": remap_provenance(freeze["provenance"]),
             "artifactHashes": freeze["artifact_hashes"],
             "setCAccess": freeze["set_c_access"],
             "fittingDiagnostics": freeze["fitting_diagnostics_not_evaluation"],
@@ -504,13 +578,13 @@ def main() -> None:
             "gates": m5v2["gates"],
             "estimates": m5v2["development_estimates"],
             "detectability": m5v2["detectability"],
-            "provenance": m5v2["provenance"],
+            "provenance": remap_provenance(m5v2["provenance"]),
             "cleanAurocByResplit": [r(v) for v in m5v2["clean_auroc_by_resplit"]],
             "eligibilityCountByResplit": m5v2["eligibility_count_by_resplit"],
         },
         "m5v1": {
             "nConfigurations": m5.get("n_configurations"),
-            "provenance": m5.get("provenance"),
+            "provenance": remap_provenance(m5.get("provenance")),
         },
         "visual": visual_artifacts(),
         "charts": {
@@ -531,11 +605,29 @@ def main() -> None:
             f"(intercept={calibrator.get('intercept')!r}, slope={calibrator.get('slope')!r})."
         )
 
+    # Every pre-rewrite SHA must have been translated. The only occurrences left
+    # in the bundle should be the ones deliberately preserved as `git_sha_at_run`,
+    # so a provenance field added later that bypasses `remap_provenance` fails
+    # here instead of shipping a commit reference that no longer resolves.
+    serialised = json.dumps(bundle)
+    for old in GIT_SHA_REWRITE:
+        total = serialised.count(old)
+        preserved = serialised.count(f'"git_sha_at_run": "{old}"')
+        if total != preserved:
+            raise SystemExit(
+                f"{old} still appears {total - preserved} time(s) in the bundle "
+                "outside git_sha_at_run. The public history was rewritten, so "
+                "that commit no longer resolves; route the field through "
+                "remap_provenance() or rewritten()."
+            )
+
     OUT.parent.mkdir(parents=True, exist_ok=True)
     with OUT.open("w", encoding="utf-8") as handle:
         json.dump(bundle, handle, indent=1, ensure_ascii=False, sort_keys=False)
         handle.write("\n")
     print(f"wrote {OUT.relative_to(ROOT)} ({OUT.stat().st_size / 1024:.0f} KB)")
+
+    copy_public_evidence()
 
 
 if __name__ == "__main__":
