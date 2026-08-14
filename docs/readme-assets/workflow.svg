@@ -19,10 +19,10 @@
   </style>
 
   <!-- stage bands -->
-  <text class="stage" x="20" y="24">DEVELOPMENT  ·  SETS A + B  ·  8,000 PATIENTS</text>
-  <text class="stage" x="708" y="24" fill="#0B1D45">FROZEN  ·  ONE-SHOT</text>
-  <line x1="20" y1="34" x2="690" y2="34" stroke="#DCE6EA" stroke-width="1" />
-  <line x1="708" y1="34" x2="960" y2="34" stroke="#C6D3DB" stroke-width="1" />
+  <text class="stage" x="20" y="15">DEVELOPMENT  ·  SETS A + B  ·  8,000 PATIENTS</text>
+  <text class="stage" x="708" y="15" fill="#0B1D45">FROZEN  ·  ONE-SHOT</text>
+  <line x1="20" y1="23" x2="690" y2="23" stroke="#DCE6EA" stroke-width="1" />
+  <line x1="708" y1="23" x2="960" y2="23" stroke="#C6D3DB" stroke-width="1" />
 
   <!-- 1. model under test -->
   <rect x="20" y="58" width="150" height="62" rx="12" fill="#FFFFFF" stroke="#DCE6EA" />
@@ -76,13 +76,17 @@
   <text class="sub" x="100" y="220">every figure traceable</text>
 
   <!-- flows -->
-  <path class="flow" d="M170 78 H198" />
-  <path class="flow" d="M170 100 H198 V116" />
-  <path class="flow" d="M356 60 H374 V83 H386" />
-  <path class="flow" d="M356 124 H374 V95 H386" />
-  <path class="flow" d="M542 89 H572" />
-  <path class="flow" d="M728 89 H758" />
-  <path class="flow" d="M862 120 V150 H770" />
-  <path class="flow" d="M578 197 H532" />
-  <path class="flow" d="M330 197 H284" />
+  <!-- model fans out to both engines: right, then vertically, then into the box -->
+  <path class="flow" d="M170 82 H188 V60 H202" />
+  <path class="flow" d="M170 96 H188 V124 H202" />
+  <!-- both engines converge on the candidate search -->
+  <path class="flow" d="M356 60 H374 V86 H388" />
+  <path class="flow" d="M356 124 H374 V92 H388" />
+  <path class="flow" d="M542 89 H574" />
+  <path class="flow" d="M728 89 H760" />
+  <!-- freeze drops to the holdout, entering its top edge -->
+  <path class="flow" d="M862 120 V147 H676 V162" />
+  <!-- holdout to report to app, right to left along the lower row -->
+  <path class="flow" d="M578 197 H530" />
+  <path class="flow" d="M330 197 H282" />
 </svg>
