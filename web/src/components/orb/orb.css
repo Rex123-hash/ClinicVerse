@@ -657,6 +657,166 @@
 /* reduced motion — keep every layer, stand the motion down                 */
 /* ----------------------------------------------------------------------- */
 
+/* Stress Lab material pass: preserve the instrument geometry while separating
+ * smoked glass, internal emission, rim catch-light and front/rear orbit light. */
+.cv-orb--stress .orb-svg:not(.orb-svg--front) {
+  filter: saturate(0.76) brightness(0.8) contrast(1.08);
+}
+
+.cv-orb--stress .orb-svg--front {
+  filter: saturate(0.86) brightness(0.9) drop-shadow(0 0 1px rgb(94 239 226 / 0.28));
+}
+
+.cv-orb--stress .orb-bloom {
+  width: calc(var(--core) * 1.18);
+  height: calc(var(--core) * 1.18);
+  background: conic-gradient(
+    from 205deg,
+    transparent 0 39%,
+    rgb(224 255 251 / calc(0.42 * var(--glow-boost))) 45%,
+    rgb(65 232 220 / calc(0.2 * var(--glow-boost))) 49%,
+    transparent 57% 86%,
+    rgb(31 171 166 / calc(0.11 * var(--glow-boost))) 91%,
+    transparent 97%
+  );
+  -webkit-mask-image: radial-gradient(circle, transparent 0 44%, #000 49%, transparent 60%);
+  mask-image: radial-gradient(circle, transparent 0 44%, #000 49%, transparent 60%);
+  filter: blur(2.2px);
+  animation: orb-stress-breathe var(--breath) ease-in-out infinite;
+}
+
+.cv-orb--stress .orb-halo {
+  width: calc(var(--core) * 1.68);
+  height: calc(var(--core) * 1.68);
+  background:
+    radial-gradient(ellipse at 34% 28%, rgb(121 255 241 / calc(0.075 * var(--glow-boost))), transparent 28%),
+    radial-gradient(circle at 51% 53%, rgb(6 143 141 / calc(0.045 * var(--glow-boost))), transparent 53%);
+  animation: orb-stress-breathe calc(var(--breath) * 1.7) ease-in-out infinite reverse;
+}
+
+.cv-orb--stress .orb-core {
+  background: #001620;
+  animation: orb-stress-breathe var(--breath) ease-in-out infinite;
+  box-shadow:
+    inset 18px 20px 42px rgb(0 5 11 / 0.72),
+    inset -13px -16px 30px rgb(0 94 94 / 0.1),
+    inset 0 8px 18px rgb(176 255 247 / 0.07),
+    0 0 0 1px rgb(222 255 251 / 0.62),
+    0 0 0 2px rgb(56 211 203 / 0.28),
+    0 0 9px rgb(38 215 202 / calc(0.22 * var(--glow-boost))),
+    0 16px 34px rgb(0 7 14 / 0.68);
+}
+
+.cv-orb--stress .orb-core-svg {
+  filter: brightness(0.8) saturate(0.82) contrast(1.14);
+}
+
+.cv-orb--stress .orb-core-body::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 49% 52%, rgb(14 190 177 / 0.2), transparent 29%),
+    radial-gradient(circle at 46% 44%, transparent 28%, rgb(0 5 12 / 0.34) 76%, rgb(0 3 8 / 0.7) 100%);
+  pointer-events: none;
+}
+
+.cv-orb--stress .orb-core::before {
+  z-index: 3;
+  background:
+    radial-gradient(circle at 29% 18%, rgb(244 255 253 / 0.82) 0 0.8%, rgb(172 255 247 / 0.3) 1.8%, transparent 5.5%),
+    radial-gradient(ellipse at 32% 22%, rgb(210 255 251 / 0.2), transparent 25%),
+    radial-gradient(ellipse 76% 58% at 35% 27%, transparent 56%, rgb(139 255 244 / 0.12) 59%, transparent 63%),
+    linear-gradient(118deg, transparent 35%, rgb(124 255 242 / 0.1) 39%, transparent 43%),
+    radial-gradient(ellipse at 78% 82%, transparent 48%, rgb(58 211 200 / 0.09) 54%, transparent 61%);
+  mix-blend-mode: screen;
+}
+
+.cv-orb--stress .orb-core::after {
+  background: radial-gradient(circle at 39% 31%, transparent 25%, rgb(0 11 18 / 0.1) 55%, rgb(0 4 10 / 0.56) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgb(191 255 248 / 0.28),
+    inset 9px 12px 28px rgb(0 4 10 / 0.36),
+    inset -8px -10px 24px rgb(0 68 72 / 0.1);
+}
+
+.cv-orb--stress .orb-core-falloff {
+  background: radial-gradient(
+    circle at 42% 36%,
+    transparent 23%,
+    rgb(0 11 18 / 0.09) 48%,
+    rgb(0 5 12 / 0.42) 77%,
+    rgb(0 2 7 / 0.82) 100%
+  );
+}
+
+.cv-orb--stress .orb-core-sheen {
+  z-index: 3;
+  background:
+    radial-gradient(circle at var(--glow-x) calc(var(--glow-y) - 18%), rgb(242 255 253 / 0.3) 0 1%, rgb(143 255 244 / 0.11) 3%, transparent 12%),
+    radial-gradient(ellipse at 31% 20%, rgb(222 255 251 / 0.12), transparent 25%),
+    linear-gradient(126deg, transparent 43%, rgb(111 249 235 / 0.065) 46%, transparent 50%),
+    radial-gradient(ellipse at 76% 82%, transparent 45%, rgb(41 192 185 / 0.08) 52%, transparent 59%);
+}
+
+.cv-orb--stress .orb-core-rim {
+  z-index: 4;
+  background: conic-gradient(
+    from 205deg,
+    rgb(32 166 162 / 0.12) 0 8%,
+    transparent 17% 39%,
+    rgb(151 255 245 / 0.38) 44%,
+    rgb(249 255 254 / 0.94) 48%,
+    rgb(81 235 222 / 0.34) 53%,
+    transparent 61% 84%,
+    rgb(31 166 164 / 0.2) 91%,
+    transparent 98%
+  );
+  -webkit-mask-image: radial-gradient(circle, transparent 0 92.5%, #000 95%, #000 98.5%, transparent 100%);
+  mask-image: radial-gradient(circle, transparent 0 92.5%, #000 95%, #000 98.5%, transparent 100%);
+  box-shadow: none;
+  filter: drop-shadow(0 0 2px rgb(92 242 229 / 0.38));
+}
+
+.cv-orb--stress .orb-particle,
+.cv-orb--stress .orb-sparkle {
+  filter: drop-shadow(0 0 1px rgb(125 246 234 / 0.52));
+}
+
+.cv-orb--stress .orb-arc {
+  stroke-opacity: 0.05;
+}
+
+.cv-orb--stress .orb-ecg-travel {
+  transform-box: view-box;
+  animation-name: orb-ecg-continuous;
+  animation-duration: var(--ecg-dur);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes orb-ecg-continuous {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes orb-stress-breathe {
+  0%,
+  100% {
+    transform: scale(0.994);
+    opacity: 0.92;
+  }
+  50% {
+    transform: scale(1.006);
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .orb-bloom,
   .orb-halo,

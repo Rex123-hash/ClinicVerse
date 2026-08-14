@@ -39,6 +39,13 @@ import './stresslab.css'
  */
 const SEVERITIES = [0, 0.25, 0.5, 0.75] as const
 
+const ECG_DURATION_BY_SEVERITY: Record<number, number> = {
+  0: 3.74,
+  0.25: 2.62,
+  0.5: 2.23,
+  0.75: 1.95,
+}
+
 const FROZEN = 'BUN+Glucose+Na'
 
 export default function StressLab() {
@@ -226,6 +233,7 @@ export default function StressLab() {
               variant="stress"
               size={orbSize}
               intensity={intensity}
+              ecgDuration={ECG_DURATION_BY_SEVERITY[severity]}
               label={`Stress engine at replayed intensity ${intensity.toFixed(2)}`}
               caption={
                 <>

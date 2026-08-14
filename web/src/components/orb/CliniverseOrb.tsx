@@ -59,6 +59,8 @@ interface Props {
   caption?: ReactNode
   /** 0–1. Drives ring speed, arc frequency and glow strength. */
   intensity?: number
+  /** Optional visual-only wave duration. */
+  ecgDuration?: number
   className?: string
   label: string
 }
@@ -77,7 +79,7 @@ const VARIANTS: Record<
 > = {
   overview: { speed: 1, breath: 3.8, ecg: 7, arcs: false, coreRatio: 0.49, response: 1 },
   model: { speed: 0.72, breath: 4.6, ecg: 4.4, arcs: false, coreRatio: 0.5, response: 0.55 },
-  stress: { speed: 1.9, breath: 2.9, ecg: 2.6, arcs: true, coreRatio: 0.48, response: 1.45 },
+  stress: { speed: 1.045, breath: 3.8, ecg: 7, arcs: true, coreRatio: 0.48, response: 1.45 },
   report: { speed: 0.6, breath: 5.2, ecg: 8.5, arcs: false, coreRatio: 0.52, response: 0.45 },
   experiment: { speed: 1.25, breath: 3.6, ecg: 5.5, arcs: false, coreRatio: 0.49, response: 0.85 },
   artifact: { speed: 0.75, breath: 4.4, ecg: 7.5, arcs: false, coreRatio: 0.5, response: 0.55 },
@@ -116,12 +118,15 @@ export default function CliniverseOrb({
   nodes = [],
   caption,
   intensity = 0.5,
+  ecgDuration,
   className = '',
   label,
 }: Props) {
   const config = VARIANTS[variant]
   const reduced = useReducedMotion() ?? false
   const coreRef = useRef<HTMLDivElement>(null)
+  const ecgTravelRef = useRef<SVGGElement>(null)
+  const ecgRateRef = useRef(1)
   const [ripples, setRipples] = useState<Ripple[]>([])
   const rippleId = useRef(0)
 
@@ -136,7 +141,7 @@ export default function CliniverseOrb({
 
   const uid = variant
   const core = Math.round(size * config.coreRatio)
-  const speed = config.speed * (0.62 + intensity * 0.85)
+  const speed = variant === 'stress' ? config.speed : config.speed * (0.62 + intensity * 0.85)
   const play = visible ? 'running' : 'paused'
   const response = config.response
 
@@ -291,6 +296,31 @@ export default function CliniverseOrb({
     }
   }, [])
 
+  /* Preserve the continuous wave timeline while severity changes its speed. */
+  useEffect(() => {
+    if (variant !== 'stress' || ecgDuration == null || reduced) return
+    const animation = ecgTravelRef.current?.getAnimations()[0]
+    if (!animation) return
+
+    const from = ecgRateRef.current
+    const target = config.ecg / ecgDuration
+    const startedAt = performance.now()
+    const transitionMs = 240
+    let frame = 0
+
+    const updateRate = (now: number) => {
+      const progress = Math.min(1, (now - startedAt) / transitionMs)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      const rate = from + (target - from) * eased
+      animation.updatePlaybackRate(rate)
+      ecgRateRef.current = rate
+      if (progress < 1) frame = requestAnimationFrame(updateRate)
+    }
+
+    frame = requestAnimationFrame(updateRate)
+    return () => cancelAnimationFrame(frame)
+  }, [config.ecg, ecgDuration, reduced, variant])
+
   const rearOrbits = useMemo(() => ORBITS.filter((o) => o.plane === 'rear'), [])
   const frontOrbits = useMemo(() => ORBITS.filter((o) => o.plane === 'front'), [])
 
@@ -299,7 +329,9 @@ export default function CliniverseOrb({
     height: size,
     ['--core' as string]: `${core}px`,
     ['--breath' as string]: `${config.breath}s`,
-    ['--ecg-dur' as string]: `${(config.ecg / (0.6 + intensity * 0.8)).toFixed(2)}s`,
+    ['--ecg-dur' as string]: `${(
+      variant === 'stress' ? config.ecg : config.ecg / (0.6 + intensity * 0.8)
+    ).toFixed(2)}s`,
     ['--glow-boost' as string]: (0.7 + intensity * 0.6).toFixed(2),
   } as CSSProperties
 
@@ -539,43 +571,63 @@ export default function CliniverseOrb({
           style={{ scaleY: ecgPulse }}
         >
           <defs>
-            <linearGradient id={`ecgFade-${uid}`} x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#8FF3EA" stopOpacity="0" />
-              <stop offset="14%" stopColor="#8FF3EA" stopOpacity="0" />
-              <stop offset="26%" stopColor="#8FF3EA" stopOpacity="0.14" />
-              <stop offset="38%" stopColor="#A9F8EF" stopOpacity="0.6" />
+            <linearGradient
+              id={`ecgFade-${uid}`}
+              x1="0"
+              y1="0"
+              x2={variant === 'stress' ? '100' : '1'}
+              y2="0"
+              gradientUnits={variant === 'stress' ? 'userSpaceOnUse' : undefined}
+              spreadMethod={variant === 'stress' ? 'repeat' : undefined}
+            >
+              <stop offset="0%" stopColor="#8FF3EA" stopOpacity={variant === 'stress' ? 0.16 : 0} />
+              <stop offset="14%" stopColor="#8FF3EA" stopOpacity={variant === 'stress' ? 0.22 : 0} />
+              <stop offset="26%" stopColor="#8FF3EA" stopOpacity={variant === 'stress' ? 0.38 : 0.14} />
+              <stop offset="38%" stopColor="#A9F8EF" stopOpacity={variant === 'stress' ? 0.68 : 0.6} />
               <stop offset="48%" stopColor="#E6FFFC" stopOpacity="1" />
               <stop offset="52%" stopColor="#E6FFFC" stopOpacity="1" />
-              <stop offset="62%" stopColor="#A9F8EF" stopOpacity="0.6" />
-              <stop offset="74%" stopColor="#8FF3EA" stopOpacity="0.14" />
-              <stop offset="86%" stopColor="#8FF3EA" stopOpacity="0" />
-              <stop offset="100%" stopColor="#8FF3EA" stopOpacity="0" />
+              <stop offset="62%" stopColor="#A9F8EF" stopOpacity={variant === 'stress' ? 0.68 : 0.6} />
+              <stop offset="74%" stopColor="#8FF3EA" stopOpacity={variant === 'stress' ? 0.38 : 0.14} />
+              <stop offset="86%" stopColor="#8FF3EA" stopOpacity={variant === 'stress' ? 0.22 : 0} />
+              <stop offset="100%" stopColor="#8FF3EA" stopOpacity={variant === 'stress' ? 0.16 : 0} />
             </linearGradient>
             <filter id={`orbEcgGlow-${uid}`} x="-20%" y="-300%" width="140%" height="700%">
               <feGaussianBlur stdDeviation="1.6" />
             </filter>
           </defs>
-          <g className="orb-ecg-travel cv-orb-motion" style={{ animationPlayState: play }}>
-            <path
-              d={ECG_PATH}
-              fill="none"
-              stroke={`url(#ecgFade-${uid})`}
-              strokeWidth="3.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              opacity="0.45"
-              filter={`url(#orbEcgGlow-${uid})`}
-              vectorEffect="non-scaling-stroke"
-            />
-            <path
-              d={ECG_PATH}
-              fill="none"
-              stroke={`url(#ecgFade-${uid})`}
-              strokeWidth="1.3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              vectorEffect="non-scaling-stroke"
-            />
+          <g
+            ref={ecgTravelRef}
+            className="orb-ecg-travel cv-orb-motion"
+            style={{ animationPlayState: play }}
+          >
+            {(variant === 'stress' ? [0, 200] : [0]).map((offset) => (
+              <path
+                key={`glow-${offset}`}
+                d={ECG_PATH}
+                transform={offset ? `translate(${offset} 0)` : undefined}
+                fill="none"
+                stroke={`url(#ecgFade-${uid})`}
+                strokeWidth="3.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity="0.45"
+                filter={`url(#orbEcgGlow-${uid})`}
+                vectorEffect="non-scaling-stroke"
+              />
+            ))}
+            {(variant === 'stress' ? [0, 200] : [0]).map((offset) => (
+              <path
+                key={`line-${offset}`}
+                d={ECG_PATH}
+                transform={offset ? `translate(${offset} 0)` : undefined}
+                fill="none"
+                stroke={`url(#ecgFade-${uid})`}
+                strokeWidth="1.3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            ))}
           </g>
         </motion.svg>
 
