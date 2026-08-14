@@ -210,7 +210,7 @@ export const narrativeInsight: Claim = {
 
 export const limitations: readonly Claim[] = [
   {
-    text: 'The R = 5 control draws are FIXED across all 10,000 bootstrap replicates. The interval propagates patient-sampling uncertainty but NOT control-draw Monte-Carlo uncertainty, and is mildly optimistic on that account.',
+    text: 'The R=5 control draws are FIXED across all 10,000 bootstrap replicates. The interval propagates patient-sampling uncertainty but NOT control-draw Monte-Carlo uncertainty, and is mildly optimistic on that account.',
     evidence: 'limitation',
     source: 'docs/M5_V2_SETC_CONFIRMATION.md §4 — required verbatim wording',
   },
