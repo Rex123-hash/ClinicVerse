@@ -57,8 +57,8 @@ export default function ReliabilityReport() {
           <span className="cv-eyebrow">Reliability report</span>
           <h1 className="cv-page-title rr-title">{confirmation.patternLabel}</h1>
           <p className="cv-body rr-lede">
-            Clean versus failure-inducing comparison on the quarantined set-c holdout, executed once
-            against a contract frozen before the cohort was opened.
+            Clean versus failure-inducing comparison on the quarantined Set-C holdout, executed once
+            under an evaluation contract pre-specified and frozen before patient-level evaluation.
           </p>
           <dl className="rr-meta">
             <Meta k="Model" v={`${freeze.model.estimator} · ${freeze.preprocessing.representation}`} />

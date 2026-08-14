@@ -186,7 +186,7 @@ export const keyFindings: readonly Claim[] = [
     source: 'docs/M5_V2_SETC_CONFIRMATION.md §2',
   },
   {
-    text: 'Discrimination moves only 0.0115 AUROC — below the 0.02 ceiling fixed before the holdout was opened.',
+    text: 'Discrimination moves only 0.0115 AUROC — below the 0.02 ceiling fixed before patient-level evaluation.',
     evidence: 'confirmed',
     source: 'docs/M5_V2_SETC_CONFIRMATION.md §1',
   },
@@ -803,7 +803,8 @@ export const glossary: Readonly<Record<string, string>> = {
     'A random removal of exactly the same number of cells, from the same patients, as the withheld pattern removed. It separates "which analytes" from "how much data".',
   'one-sided 95% lower bound':
     'The 5th percentile of the bootstrap replicate means. The primary rule passes if and only if this exceeds zero.',
-  'set-c': 'The quarantined 4,000-patient holdout. It was opened exactly once, and is now spent.',
+  'set-c':
+    'The quarantined 4,000-patient holdout. It was evaluated at patient level exactly once, and is now spent.',
   resplit:
     'One of 20 independent re-partitions of the development data, used to test whether the selected pattern is stable rather than an artefact of one split.',
   '1-SE parsimony':
