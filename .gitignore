@@ -38,6 +38,10 @@ node_modules/
 .next/
 .vite/
 
+# Firebase local binding and deployment cache
+/.firebaserc
+/.firebase/
+
 # OS / editor
 .DS_Store
 Thumbs.db

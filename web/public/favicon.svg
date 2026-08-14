@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!--
+    Cliniverse tab mark: the same opening ring and clinical cross as the in-app
+    logo, set on a deep navy tile so it stays legible at 16px against both light
+    and dark browser chrome. Stroke weights are increased slightly over the
+    in-app mark, which is drawn much larger and can afford finer lines.
+  -->
+  <defs>
+    <linearGradient id="cvFav" x1="5" y1="4" x2="27" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5FE0D6" />
+      <stop offset="0.55" stop-color="#32C7C0" />
+      <stop offset="1" stop-color="#10AAA5" />
+    </linearGradient>
+  </defs>
+
+  <rect width="32" height="32" rx="7" fill="#0B1D45" />
+
+  <path
+    d="M24.8 9.4A10.2 10.2 0 1 0 24.8 22.6"
+    fill="none"
+    stroke="url(#cvFav)"
+    stroke-width="4.6"
+    stroke-linecap="round"
+  />
+  <path
+    d="M24.1 12.6v6.8M20.7 16h6.8"
+    fill="none"
+    stroke="url(#cvFav)"
+    stroke-width="3.4"
+    stroke-linecap="round"
+  />
+</svg>
