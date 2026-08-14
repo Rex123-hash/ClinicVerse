@@ -92,11 +92,11 @@ export default function StressLab() {
       <div className="cv-note cv-note--amber sl-banner">
         <Lock size={15} strokeWidth={2} aria-hidden />
         <span>
-          <strong>Set C is spent.</strong> The single pre-registered holdout test has been consumed
-          and no further set-c experiment is authorised. Everything below replays results already
-          committed to the repository — changing a control re-reads saved artifacts, it does not
-          re-evaluate the model, and no combination shown here becomes a confirmed finding by being
-          selected.
+          The single patient-level holdout confirmation, pre-specified and frozen before
+          patient-level evaluation, has been consumed. <strong>Set C is now spent.</strong>{' '}
+          Everything below replays results already committed to the repository — changing a control
+          re-reads saved artifacts, it does not re-evaluate the model, and no combination shown here
+          becomes a confirmed finding by being selected.
         </span>
       </div>
 

@@ -248,7 +248,7 @@ export const historicalDisclosure: Claim = {
 }
 
 export const setCSpent: Claim = {
-  text: 'The single pre-registered use is consumed. There is no second test, and no further set-c experiment is authorised by this result.',
+  text: 'The single patient-level holdout confirmation, pre-specified and frozen before patient-level evaluation, has been consumed. Set C is now spent.',
   evidence: 'historical',
   source: 'docs/M5_V2_SETC_CONFIRMATION.md §9',
 }
