@@ -61,7 +61,7 @@ leaving its discrimination broadly intact?**
 
 Cliniverse is a **pre-deployment reliability red-team laboratory** for a healthcare model. It
 systematically withholds groups of information from a frozen model, searches for the patterns that
-do disproportionate damage, and verifies a single pre-registered candidate on a quarantined holdout.
+do disproportionate damage, and verifies a single candidate, pre-specified and frozen before the holdout, on quarantined data.
 
 It performs six things end to end:
 
@@ -72,7 +72,7 @@ It performs six things end to end:
 | **Search** | Score every candidate by excess probability loss over its control |
 | **Stabilise** | Repeat over 20 development resplits and select with 1-SE parsimony, not by taking the maximum |
 | **Freeze** | Hash-seal model, preprocessing, calibrator, pattern and the full statistical contract |
-| **Confirm** | Execute exactly one pre-registered test on a quarantined holdout, then stop |
+| **Confirm** | Execute exactly one test, fixed before unlock, on a quarantined holdout, then stop |
 
 **The mortality predictor is the model under test, not the product.** Cliniverse is the instrument
 around it.
@@ -117,7 +117,7 @@ flowchart TD
 
 ### `BUN + Glucose + Na`
 
-**Confirmed on 4,000 quarantined holdout patients — both pre-registered conditions passed**
+**Confirmed on 4,000 quarantined holdout patients — both frozen conditions passed**
 
 </div>
 
@@ -161,9 +161,9 @@ decision rule:
 | Calibration slope | 0.969704 | 1.071905 |
 | Mean predicted risk | 0.139890 | 0.103699 |
 
-Set-C prevalence is **0.14625**. Under withholding, mean predicted risk falls to 10.4% — the model
-becomes systematically **under-confident about risk** while continuing to rank patients much as
-before.
+Set-C prevalence is **0.14625**. Under withholding, mean predicted risk falls to 10.4%: **risk
+predictions shift systematically downward**, so the model underestimates risk under the withholding
+stress while continuing to rank patients much as before.
 
 > **The ranking still looked reasonable. The probabilities did not.**
 
@@ -438,7 +438,7 @@ npm --prefix web run build
 > [!WARNING]
 > **Do not attempt to re-run the Set-C confirmation.**
 >
-> The one-shot holdout test was executed once under a frozen, pre-registered contract and Set C is
+> The one-shot holdout test was executed once under a contract fixed and frozen before unlock, and Set C is
 > now spent. Re-running it would not be a replication — it would be a second look at a holdout that
 > is only valid when looked at once. `load_cohort()` defaults to sets A + B and requires an explicit
 > unlock token for set C, and this is intentional.
@@ -456,6 +456,7 @@ Observed on this repository at the time of writing:
 | Gate | Command | Result |
 |---|---|---|
 | Full test suite | `python -m pytest` | **436 passed** |
+| Static types | `mypy cliniverse` (strict) | **no issues in 23 source files** |
 | CI gate | `python -m pytest -m "not slow"` | **409 passed, 27 deselected** |
 | Frontend types | `tsc -b --noEmit` | pass |
 | Frontend lint | `eslint . --max-warnings 0` | pass |
@@ -463,8 +464,7 @@ Observed on this repository at the time of writing:
 | Exporter lint | `ruff check` · `ruff format --check` | pass |
 | Bundle determinism | `export_ui_data.py` × 3 | byte-identical |
 
-The repository's CI also runs `mypy` and `uv sync`; those two have **not** been independently
-verified in the environment these figures were produced in, and are listed here without a claimed
+`uv sync` is the one CI step not independently exercised here, and is listed without a claimed
 result.
 
 Reproducibility is enforced structurally rather than by convention: every result artifact carries the
@@ -526,7 +526,7 @@ project makes no such claim.
 The contribution is methodological:
 
 > A healthcare model can preserve its ranking behaviour while its probability behaviour silently
-> deteriorates — and a structured, controlled, pre-registered stress test can expose that before
+> deteriorates — and a structured, controlled stress test with its conditions fixed in advance can expose that before
 > deployment rather than after.
 
 An evaluation that reports AUROC and stops would have recorded a drop of 0.0115 here and called the
@@ -560,6 +560,15 @@ the data; please cite the original challenge alongside this work.
 **Prior art.** Group-level acquisition with shared cost is **not** novel here — see
 [Yu et al., ICLR 2023](https://arxiv.org/abs/2302.10261), the closest prior art. This project adopts
 that setting rather than claiming it. The contribution is a measurement one.
+
+**Dataset licence.**
+
+| What | Licence |
+|---|---|
+| **Data** — PhysioNet/CinC Challenge 2012 | Governed by its own dataset licence and attribution terms (**ODC-BY v1.0**), not by this repository's licence |
+
+No dataset files are redistributed here. Obtaining and using the data remains subject to
+PhysioNet's terms, including its attribution requirement.
 
 ---
 

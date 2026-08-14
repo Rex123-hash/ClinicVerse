@@ -17,7 +17,7 @@
 
 1. **Repository code** — the definitive statement of what actually happens.
 2. **Machine-readable artifacts** (`results.json`, `predictions.npz`) — the definitive numbers.
-3. **Milestone / the reviewer reports** in `docs/`.
+3. **Milestone / the independent review reports** in `docs/`.
 4. **`docs/STATUS.md`.**
 5. **This handoff.**
 6. Old conversation transcripts — **least authoritative**, may contain superseded claims.
@@ -520,7 +520,7 @@ Do not present this framing as an implemented product.
 - Windows + PowerShell. Multi-line strings to native exes break easily — write commit messages to a
   file and use `git commit -F`. Avoid `Get-Content -Raw`/`Out-File` round-trips on UTF-8 docs (they
   mojibake em-dashes).
-- Commits are authored by **Amaan Khan**. **Do not add a AI-assistant co-author trailer.**
+- Commits are authored by **Amaan Khan**. **Do not add AI-assistant co-author trailers.**
 - **A degenerate-booster guard exists** (`FoldModel.n_features_used`). If a fold trains on too few
   rows, `min_child_weight=10` forbids all splits, the model becomes a constant, and every policy
   scores identically — which looks exactly like a propagation bug. The guard raises instead.

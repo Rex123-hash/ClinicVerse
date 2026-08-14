@@ -1,4 +1,4 @@
-# Cliniverse Independent Review + Repair #1
+# Cliniverse the independent review Review + Repair #1
 
 **Date:** 2026-08-09  
 **Scope:** M1 audit, repair, and M2 safety gate. No substantive M2 model training was run.

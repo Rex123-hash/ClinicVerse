@@ -1,4 +1,4 @@
-# Adversarial Repair #3 - M3 Structured-Loss Audit
+# the independent review Repair #3 - M3 Structured-Loss Audit
 
 ## Executive Verdict
 

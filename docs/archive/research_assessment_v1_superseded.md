@@ -23,10 +23,10 @@
 > | §15 | Comparisons via non-overlapping standalone CIs | **Replaced** by paired patient-level inference on ΔAUBC. |
 >
 > **Current authoritative documents:**
-> [`REVIEW_RESPONSE_0.md`](REVIEW_RESPONSE_0.md) (findings and verification) ·
-> [`NOVELTY_REASSESSMENT.md`](NOVELTY_REASSESSMENT.md) (what we may claim) ·
-> [`BENCHMARK_SPEC.md`](BENCHMARK_SPEC.md) (estimand and information boundary) ·
-> [`DECISIONS.md`](DECISIONS.md) D-007/D-008/D-009.
+> [`REVIEW_RESPONSE_0.md`](../REVIEW_RESPONSE_0.md) (findings and verification) ·
+> [`NOVELTY_REASSESSMENT.md`](../NOVELTY_REASSESSMENT.md) (what we may claim) ·
+> [`BENCHMARK_SPEC.md`](../BENCHMARK_SPEC.md) (estimand and information boundary) ·
+> [`DECISIONS.md`](../DECISIONS.md) D-007/D-008/D-009.
 >
 > §1–2 (literature survey), §4.1 (the AFAPE risk), §5 (dataset access), §11–12 (GCP and
 > components not to build) remain valid.
@@ -196,7 +196,7 @@ natural but under-explored coupling of the selective-prediction and AFA literatu
 
 ### 4.1 RISK-1 (critical, methodological): retrospective AFA evaluation is biased
 
-This is the risk most likely to invalidate the whole project, and the one the reviewer should be
+This is the risk most likely to invalidate the whole project, and the one the independent review should be
 expected to find.
 
 The AFAPE work (von Kleist et al., JMLR 26) formalizes it. Two assumptions are required to

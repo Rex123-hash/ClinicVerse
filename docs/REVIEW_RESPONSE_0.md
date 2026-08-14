@@ -1,11 +1,11 @@
-# Response to Independent Scientific Review #0
+# Response to the independent review Scientific Review #0
 
 **Date:** 2026-08-09
-**Reviewer:** the reviewer (independent)
+**Reviewer:** the independent review (independent)
 **Status:** All P0 findings resolved or formally specified. Recommendation at the end: **MODIFY**.
 
 Every finding below was independently verified against the repository, the actual data, the
-PhysioNet documentation, or primary literature before being classified. Where the reviewer is right I
+PhysioNet documentation, or primary literature before being classified. Where the independent review is right I
 say so plainly; where it is partly right I separate the correct part from the overreach.
 
 ---
@@ -49,7 +49,7 @@ Medical Diagnosis*, Yu, Li, Kim, Huang, Luo, Wang, ICLR 2023. Confirmed from pri
   up to 85% cost reduction.
 
 This is sequential, panel-level, shared-cost acquisition on clinical outcomes with cost-performance
-curves. **the reviewer is factually correct. Our claimed primary contribution does not exist.**
+curves. **the independent review is factually correct. Our claimed primary contribution does not exist.**
 
 **Action taken.**
 - D-001 is **superseded by D-008**.
@@ -83,7 +83,7 @@ The parser routed **all** of these into the static vector, because it tested
 `if param in config.statics` *before* considering the timestamp. A model with a 24h cutoff
 therefore received weights measured as late as hour 47. **Confirmed and severe.**
 
-**Broader audit (the reviewer asked for one).** I audited every static descriptor. `Age`, `Gender`,
+**Broader audit (the independent review asked for one).** I audited every static descriptor. `Age`, `Gender`,
 `Height`, `ICUType` and `RecordID` each appear **exactly 4,000 times in set-a, all at hour 0**.
 **Weight was the only offender.**
 
@@ -112,7 +112,7 @@ caught it because it encoded the same wrong assumption. Both corrected.
 
 ## 4. Raw-row occupancy is not the binned missingness statistic — **ACCEPT**
 
-the reviewer is right, and the cleanest demonstration is the degenerate-record discrepancy.
+the independent review is right, and the cleanest demonstration is the degenerate-record discrepancy.
 
 Records `140501`, `140936`, `141264` contain **only** `Weight,-1` at hour 0. The raw row-count
 script now sees a row and calls them non-empty; the production parser drops `-1` as an
@@ -136,7 +136,7 @@ sentinel rows and within-hour collisions*; the reported missingness statistic is
 
 ## 5. Temporal semantics of the acquisition action — **ACCEPT** (P0)
 
-the reviewer is right that the action was undefined. "At t=24h, buy a BMP" cannot mean *reveal a past
+the independent review is right that the action was undefined. "At t=24h, buy a BMP" cannot mean *reveal a past
 observation as if newly ordered* (incoherent), nor *reveal a future observation* (leakage).
 
 **Resolution: Option A, stated honestly.** The benchmark is **sequential retrospective selective
@@ -225,7 +225,7 @@ claim attached to it. We now say: *these analytes are co-measured in this datase
 ## 10. Cost model — **PARTIALLY ACCEPT**
 
 **Accept:** no fake monetary values. The `$` framing is removed; costs are dimensionless relative
-units. Adopted the three regimes the reviewer asked for: **uniform per-event**, **shared event cost +
+units. Adopted the three regimes the independent review asked for: **uniform per-event**, **shared event cost +
 marginal analyte cost**, and **ordinal routine/targeted/specialised tiers** — replacing our
 previous ad-hoc numbers.
 
@@ -240,7 +240,7 @@ appendix**.
 
 ## 11. Mask-only baseline — **ACCEPT** (executed, and it changed the project)
 
-the reviewer called this "extremely important." It was. **Already run — see `EXPERIMENTS.md` E-002.**
+the independent review called this "extremely important." It was. **Already run — see `EXPERIMENTS.md` E-002.**
 
 In-hospital mortality at a 24h cutoff, 5-fold CV, n=8,000 (sets a+b), prevalence 14.03%:
 
@@ -277,7 +277,7 @@ is **pre-registered in `docs/BENCHMARK_SPEC.md` before final results are compute
 
 Correct; our wording conflated them. They decompose into calibration *and* refinement, so a better
 Brier does not by itself demonstrate better calibration. Corrected wording, and added the metrics
-the reviewer asked for: **reliability curves, calibration slope, and calibration intercept** (the latter
+the independent review asked for: **reliability curves, calibration slope, and calibration intercept** (the latter
 two being the direct calibration readouts).
 
 ---

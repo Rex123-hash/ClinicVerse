@@ -1,4 +1,4 @@
-# Independent Review + Repair #4 — Narrow Scientific Audit
+# the independent review Review + Repair #4 — Narrow Scientific Audit
 
 **Date:** 2026-08-11
 **Scope:** the five user-prioritized M4 validity questions, plus Set C and split isolation

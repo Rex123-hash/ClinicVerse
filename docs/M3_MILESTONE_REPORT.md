@@ -1,4 +1,4 @@
-# M3 Milestone Report - Repaired After Independent Review #3
+# M3 Milestone Report - Repaired After the independent review Review #3
 
 **Original run:** 2026-08-09
 **Repair:** 2026-08-10

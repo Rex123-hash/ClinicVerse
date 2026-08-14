@@ -194,7 +194,7 @@ could resolve it.
 
 ## 11. Quality gate
 
-Recorded here after the the reviewer M5-v2 audit; the earlier revision of this report omitted the counts.
+Recorded here after the the independent review M5-v2 audit; the earlier revision of this report omitted the counts.
 
 | check | result |
 |---|---|
@@ -208,6 +208,6 @@ Recorded here after the the reviewer M5-v2 audit; the earlier revision of this r
 ### Audit repair recorded
 
 The nested four-fold selection previously allowed the held-out fold to influence AUROC eligibility.
-the reviewer repaired it at `91262fd`. The repair changed **16 of 100** nested choices. It did **not** change
+adversarial repaired it at `91262fd`. The repair changed **16 of 100** nested choices. It did **not** change
 the frozen pattern (`BUN+Glucose+Na`), the selection frequency (11/20), or any gate verdict. The
 post-repair nested positivity is **99/100**, not the 100/100 stated in the pre-repair revision.

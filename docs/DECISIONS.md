@@ -217,7 +217,7 @@ calibration as the thesis (MOSAIC 2026 overlaps) — retained as secondary analy
 **Status:** ACCEPTED
 **Date:** 2026-08-09
 
-**Context.** the reviewer correctly observed that "at t=24h, buy a panel" was undefined: it can neither
+**Context.** the independent review correctly observed that "at t=24h, buy a panel" was undefined: it can neither
 re-order a past observation nor reveal future data without leakage.
 
 **Decision.** The benchmark is **sequential retrospective selective disclosure of historically

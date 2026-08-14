@@ -8,7 +8,7 @@ numbers may appear here. Every entry records the command, environment, and obser
 ## E-000 — Dataset access verification and structural statistics
 
 - **Date:** 2026-08-09
-- **Status:** COMPLETE, REPAIRED BY INDEPENDENT REVIEW #3 (M3-B)
+- **Status:** COMPLETE, REPAIRED BY REVIEW REVIEW #3 (M3-B)
 - **Command:** `python scripts/verify_physionet2012.py --cache data/raw/physionet2012 --set a`
 - **Environment:** Windows 11, Python 3.14.4, pandas 3.0.2, numpy 2.4.4
 - **Purpose:** Confirm the primary dataset is obtainable without credentialing, and establish
@@ -243,7 +243,7 @@ protocol (D-009, `BENCHMARK_SPEC.md` §5) is necessary rather than merely tidy.
 ## E-003 — Disclosure protocol mechanics on real patients (M1 integration check)
 
 - **Date:** 2026-08-09
-- **Status:** RERUN AFTER ADVERSARIAL REVIEW #1; original ambiguous `random` rows superseded
+- **Status:** RERUN AFTER REVIEW REPAIR #1; original ambiguous `random` rows superseded
 - **Command:** `python experiments/baselines/disclosure_smoke.py --n 300 --budget 5 --rate 0.5 --seed 20260809 --cutoff 24`
 - **Purpose:** Verify the M1 disclosure engine behaves as specified in
   `BENCHMARK_SPEC.md` on real data. **Mechanics only — no model is fitted and no predictive

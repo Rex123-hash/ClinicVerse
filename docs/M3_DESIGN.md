@@ -1,6 +1,6 @@
 # M3 Design — Calibration Robustness Under Structured Information Loss
 
-**Status:** HISTORICAL PREDECLARATION, amended after results by Independent Review #3.
+**Status:** HISTORICAL PREDECLARATION, amended after results by the independent review Review #3.
 **Date:** 2026-08-09
 
 The original choices remain visible below. Review #3 corrections are explicitly
