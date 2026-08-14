@@ -1,0 +1,7 @@
+# TypeScript incremental build cache — machine-local, never committed
+*.tsbuildinfo
+
+# build output and deps are covered by the repository .gitignore, repeated
+# here so the web workspace is self-describing
+dist/
+node_modules/

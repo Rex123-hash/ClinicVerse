@@ -1,0 +1,434 @@
+/* Overview — narrative summary of the discovered vulnerability. */
+
+.ov-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.52fr) minmax(0, 1fr);
+  gap: var(--cv-gap);
+}
+
+.ov-hero-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 452px;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 14px 20px 26px;
+  background:
+    radial-gradient(78% 100% at 76% 50%, rgb(16 170 165 / 0.09) 0%, transparent 62%),
+    var(--cv-surface);
+  overflow: hidden;
+}
+
+.ov-hero-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 13px;
+  min-width: 0;
+}
+
+.ov-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--cv-success);
+}
+
+.ov-title {
+  font-size: 38px;
+  letter-spacing: -0.032em;
+  line-height: 1.08;
+}
+
+.ov-lede {
+  max-width: 40ch;
+  font-size: 13.5px;
+}
+
+.ov-hero-orb {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  height: 372px;
+}
+
+/* ---------------- confirmation panel ---------------------------------- */
+
+.ov-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.ov-confirm-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+.ov-confirm-head h2 {
+  flex: 1;
+  min-width: 0;
+}
+.ov-confirm-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--cv-success-soft);
+  color: var(--cv-success);
+  flex: none;
+}
+
+.ov-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ov-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 13px 14px;
+  border: 1px solid var(--cv-line);
+  border-radius: var(--cv-r-inner);
+  background: var(--cv-surface-sunk);
+  min-width: 0;
+}
+.ov-metric-label {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--cv-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ov-metric-value {
+  font-size: 22px;
+  white-space: nowrap;
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  color: var(--cv-navy-900);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+.ov-metric-foot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--cv-muted);
+}
+.ov-metric-foot.ov-up {
+  color: var(--cv-orange);
+}
+.ov-metric-foot.ov-good {
+  color: var(--cv-success);
+}
+
+.ov-explain {
+  align-items: flex-start;
+  margin-top: 2px;
+}
+.ov-explain strong {
+  font-weight: 600;
+}
+
+.ov-secondary {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.ov-secondary-head {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10.5px;
+}
+.ov-secondary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 14px;
+}
+.ov-shift {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--cv-line-soft);
+  min-width: 0;
+}
+.ov-shift > span {
+  font-size: 10.5px;
+  color: var(--cv-muted);
+  white-space: nowrap;
+}
+.ov-shift b {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--cv-teal-700);
+  font-variant-numeric: tabular-nums;
+}
+.ov-shift i {
+  font-style: normal;
+  color: var(--cv-muted-soft);
+  font-size: 10px;
+}
+.ov-shift em {
+  font-style: normal;
+  color: var(--cv-orange);
+}
+
+.ov-confirm-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--cv-muted);
+  padding-top: 2px;
+  margin-top: auto;
+}
+.ov-confirm-foot b {
+  font-weight: 600;
+  color: var(--cv-navy-800);
+}
+.ov-confirm-foot i {
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--cv-line-strong);
+}
+
+/* ---------------- snapshots ------------------------------------------- */
+
+.ov-snapshots {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--cv-gap);
+}
+
+.ov-snap-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.ov-snap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 10px;
+  border: 1px solid var(--cv-line);
+  border-radius: 10px;
+  background: var(--cv-surface-sunk);
+  min-width: 0;
+}
+.ov-snap span {
+  font-size: 10px;
+  color: var(--cv-muted);
+  white-space: nowrap;
+}
+.ov-snap strong {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  color: var(--cv-navy-900);
+  font-variant-numeric: tabular-nums;
+}
+
+.ov-snap-chart {
+  margin: 0 -4px 4px;
+}
+
+/* stress snapshot */
+.ov-stress {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+.ov-stress-count {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 12px 10px;
+  border-radius: var(--cv-r-inner);
+  background: var(--cv-teal-50);
+  border: 1px solid #dcefeb;
+}
+.ov-stress-count strong {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--cv-teal-700);
+  line-height: 1;
+}
+.ov-stress-count span {
+  font-size: 10px;
+  color: var(--cv-muted);
+  line-height: 1.35;
+}
+.ov-stress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+.ov-stress-caption {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10.5px;
+}
+
+.ov-rank {
+  display: grid;
+  grid-template-columns: 15px minmax(0, 1fr) 52px 34px;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.ov-rank-n {
+  display: grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  background: var(--cv-teal-100);
+  color: var(--cv-teal-700);
+  font-size: 9px;
+  font-weight: 700;
+}
+.ov-rank-name {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--cv-navy-800);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ov-rank-val {
+  font-size: 10px;
+  color: var(--cv-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* reliability snapshot */
+.ov-compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 11px;
+}
+.ov-compare-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.ov-compare-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.ov-compare-row b {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.024em;
+  color: var(--cv-teal-700);
+  font-variant-numeric: tabular-nums;
+}
+.ov-compare-row b.ov-warn {
+  color: var(--cv-orange);
+}
+.ov-arrow {
+  color: var(--cv-muted-soft);
+  flex: none;
+}
+.ov-sub {
+  font-size: 10.5px;
+}
+.ov-sub.ov-warn {
+  color: var(--cv-orange);
+  font-weight: 600;
+}
+.ov-alert {
+  align-items: flex-start;
+  margin-top: auto;
+}
+
+/* ---------------- responsive ------------------------------------------ */
+
+@media (max-width: 1560px) {
+  .ov-hero-main {
+    grid-template-columns: minmax(0, 1fr) 400px;
+  }
+  .ov-hero-orb {
+    height: 344px;
+  }
+}
+
+@media (max-width: 1400px) {
+  /* give the pattern names room instead of ellipsing them */
+  .ov-rank {
+    grid-template-columns: 14px minmax(0, 1fr) 26px 30px;
+    gap: 5px;
+  }
+  /* the four snapshot tiles get tight at a third of a narrow viewport */
+  .ov-snap {
+    padding: 8px;
+  }
+  .ov-snap strong {
+    font-size: 14px;
+  }
+  .ov-hero-main {
+    grid-template-columns: minmax(0, 1fr) 348px;
+  }
+  .ov-hero-orb {
+    height: 312px;
+  }
+  .ov-title {
+    font-size: 31px;
+  }
+  /* two columns collide once the panel narrows: the value of one row runs
+     into the label of the next */
+  .ov-secondary-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}
+
+@media (max-width: 1180px) {
+  .ov-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ov-snapshots {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ov-snapshots > *:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 820px) {
+  .ov-hero-main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ov-hero-orb {
+    height: 250px;
+  }
+  .ov-snapshots {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ov-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
